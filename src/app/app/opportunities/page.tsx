@@ -108,7 +108,7 @@ function OppsInner() {
                 const closed = o.deadline && +new Date(o.deadline) < Date.now();
                 return (
                   <motion.li key={o.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03 }}>
-                    <button onClick={() => setOpenId(o.id)} className="t-card group flex h-full w-full flex-col items-stretch rounded-[22px] p-4 text-start transition hover:-translate-y-0.5 hover:bg-white/35">
+                    <button onClick={() => setOpenId(o.id)} className="t-card group flex h-full w-full flex-col items-stretch p-4 text-start lg-lift">
                       <div className="flex items-start gap-3">
                         <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl" style={{ background: o.tint }}>{o.image ? <img src={o.image} alt="" className="h-10 w-10 object-contain" /> : <Trophy size={20} aria-hidden />}</span>
                         <span className="min-w-0 flex-1">

@@ -69,8 +69,9 @@ function Schools({ onOpen }: { onOpen: (id: string) => void }) {
   const list = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const base = needle ? SCHOOLS.filter((s) => `${s.name} ${s.nameAr} ${s.area} ${s.curriculum} ${(s.specialities ?? []).join(" ")}`.toLowerCase().includes(needle)) : SCHOOLS;
-    return applyFilters(base, filters, (s, f) => (f === "curriculum" ? s.curriculum : f === "area" ? s.area : f === "rating" ? ratingOf(s) : f === "sector" ? s.sector : f === "hiring" ? (JOBS.some((j) => j.schoolId === s.id) ? "yes" : "no") : undefined));
-  }, [filters, q]);
+    const rank = (x: School) => (x.id === me?.schoolId ? 0 : x.id.startsWith("khda-") ? 1 : 2);
+    return applyFilters([...base].sort((x, y) => rank(x) - rank(y)), filters, (s, f) => (f === "curriculum" ? s.curriculum : f === "area" ? s.area : f === "rating" ? ratingOf(s) : f === "sector" ? s.sector : f === "hiring" ? (JOBS.some((j) => j.schoolId === s.id) ? "yes" : "no") : undefined));
+  }, [filters, q, me?.schoolId]);
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-aegold-50 px-3 py-2 text-[13px] text-aegold-900">
@@ -95,7 +96,7 @@ function Schools({ onOpen }: { onOpen: (id: string) => void }) {
             const saved = state.tSavedSchools.includes(s.id);
             return (
               <li key={s.id}>
-                <button onClick={() => onOpen(s.id)} className="t-card flex h-full w-full flex-col items-stretch rounded-[22px] p-4 text-start transition hover:-translate-y-0.5 hover:bg-white/35">
+                <button onClick={() => onOpen(s.id)} className="t-card flex h-full w-full flex-col items-stretch p-4 text-start lg-lift">
                   <div className="flex items-start justify-between gap-2">
                     <span className="min-w-0"><span className="block font-semibold">{ar ? s.nameAr : s.name}</span><span className="block text-[12px] text-grey">{s.area} · {s.curriculum} · {s.grades ?? "-"}</span></span>
                     {saved && <BookmarkCheck size={17} className="shrink-0 text-sawa" aria-label={ar ? "محفوظ" : "Saved"} />}
@@ -184,7 +185,7 @@ function Jobs({ onSchool }: { onSchool: (id: string) => void }) {
           const s = SCHOOLS.find((x) => x.id === j.schoolId)!;
           const saved = state.tSavedJobs.includes(j.id);
           return (
-            <li key={j.id} className="t-card rounded-[22px] p-4">
+            <li key={j.id} className="t-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-semibold">{j.title}</p>
@@ -223,7 +224,7 @@ function Learning() {
         {PD.map((p) => {
           const on = state.tPd.includes(p.id);
           return (
-            <li key={p.id} className="t-card flex flex-col rounded-[22px] p-4">
+            <li key={p.id} className="t-card flex flex-col p-4">
               <div className="flex items-start justify-between gap-2"><p className="font-semibold">{p.title}</p>{p.certificate && <ShieldCheck size={16} className="shrink-0 text-aegreen-700" aria-label={ar ? "شهادة" : "Certificate"} />}</div>
               <p className="mt-1 text-[13px] text-[var(--ink-2)]">{p.about}</p>
               <p className="mt-2 text-[12px] text-grey"><CalendarDays size={11} className="me-1 inline" aria-hidden />{fmtDate(p.startsAt, L)} · {p.hours}h · {p.format.replace("_", " ")} · {p.cost}</p>

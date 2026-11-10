@@ -11,7 +11,7 @@ export const useAr = () => useStore().state.lang === "ar";
 
 /** Shared panel surface for the teacher workspace (t-card on the silk background). */
 export function Panel({ children, className = "", as: As = "section", ...rest }: { children: React.ReactNode; className?: string; as?: "section" | "div" | "article" | "li" } & React.HTMLAttributes<HTMLElement>) {
-  return <As className={cn("t-card rounded-[24px] p-4 sm:p-5", className)} {...rest}>{children}</As>;
+  return <As className={cn("t-card p-4 sm:p-5", className)} {...rest}>{children}</As>;
 }
 
 export function PanelHead({ title, sub, action, id }: { title: string; sub?: string; action?: React.ReactNode; id?: string }) {
@@ -73,13 +73,13 @@ export function Tabs<T extends string>({ tabs, value, onChange, className = "", 
   const id = useId();
   const reduce = useReducedMotion();
   return (
-    <div role="tablist" aria-label={label} className={cn("no-scrollbar flex gap-1 overflow-x-auto rounded-full bg-white/45 p-1", className)}>
+    <div role="tablist" aria-label={label} className={cn("lg no-scrollbar flex gap-1 overflow-x-auto !rounded-full p-1.5", className)}>
       {tabs.map((t) => {
         const active = t.id === value;
         return (
           <button key={t.id} role="tab" aria-selected={active} type="button" onClick={() => onChange(t.id)}
-            className={cn("relative flex-none whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors", active ? "text-white" : "text-ink/70 hover:text-ink")}>
-            {active && <motion.span layoutId={`tab-${id}`} className="absolute inset-0 rounded-full bg-ink" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }} />}
+            className={cn("relative flex-none whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors", active ? "text-white" : "text-ink/65 hover:text-ink")}>
+            {active && <motion.span layoutId={`tab-${id}`} className="lg lg-dark absolute inset-0 !rounded-full" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 30, mass: 0.9 }} />}
             <span className="relative flex items-center gap-1.5">
               {t.label}
               {t.count !== undefined && <span className={cn("rounded-full px-1.5 text-[11px]", active ? "bg-white/20" : "bg-black/5")}>{t.count}</span>}
@@ -93,7 +93,7 @@ export function Tabs<T extends string>({ tabs, value, onChange, className = "", 
 
 export function EmptyState({ icon: Icon, title, text, action }: { icon: React.ComponentType<{ size?: number; className?: string }>; title: string; text?: string; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-[24px] border border-dashed border-black/15 bg-white/35 px-5 py-9 text-center">
+    <div className="t-card flex flex-col items-center px-5 py-10 text-center">
       <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/80 text-ink/70"><Icon size={22} /></span>
       <p className="mt-3 font-semibold">{title}</p>
       {text && <p className="mt-1 max-w-sm text-sm text-grey">{text}</p>}

@@ -142,7 +142,7 @@ function AssignmentList({ assignments, clsId, onOpen, onNew }: { assignments: TA
         const toGrade = subs.filter((x) => x?.status === "submitted" || x?.status === "late").length;
         return (
           <li key={a.id}>
-            <button onClick={() => onOpen(a.id)} className="t-card flex w-full flex-wrap items-center gap-3 rounded-[20px] p-3.5 text-start transition hover:bg-white/35">
+            <button onClick={() => onOpen(a.id)} className="t-card flex w-full flex-wrap items-center gap-3 p-3.5 text-start transition hover:bg-white/35">
               <span className="min-w-0 flex-1">
                 <span className="flex flex-wrap items-center gap-1.5"><span className="font-semibold">{a.title}</span>{a.returned && <span className="rounded-full bg-aegreen-100 px-2 py-0.5 text-[11px] font-semibold text-aegreen-800">{ar ? "أُعيدت" : "Returned"}</span>}</span>
                 <span className="block text-[12px] text-grey">{KIND_LABEL[a.kind][ar ? 1 : 0]} · {a.points} {ar ? "درجة" : "pts"} · {ar ? "التسليم" : "due"} {fmtDate(a.dueAt, L)} ({relDays(a.dueAt, L)})</span>
@@ -366,7 +366,7 @@ function Students({ clsId, students, onStudent }: { clsId: string; students: Ros
           const st = studentAverage(s.id, cls, state.tAssignments, state.tSubs);
           return (
             <li key={s.id}>
-              <button onClick={() => onStudent(s.id)} className="t-card flex w-full items-center gap-3 rounded-[20px] p-3 text-start transition hover:bg-white/35">
+              <button onClick={() => onStudent(s.id)} className="t-card flex w-full items-center gap-3 p-3 text-start transition hover:bg-white/35">
                 <Initials name={s.name} size={40} />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5 font-semibold">{ar ? s.nameAr : s.name}{s.support && <span className="rounded-full bg-white/60 px-1.5 text-[10.5px] font-semibold text-ink">{s.support === "extension" ? (ar ? "إثراء" : "Extension") : (ar ? "دعم" : "Support")}</span>}</span>

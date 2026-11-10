@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion } from "motion/react";
-import { BookOpenCheck, FolderOpen, Home, Telescope, TrendingUp } from "lucide-react";
+import { BookOpenCheck, FolderOpen, Home, Sparkles, Telescope, TrendingUp } from "lucide-react";
 import { Icon3D } from "@/components/s/kit";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import { AppToolbar } from "@/components/AppToolbar";
 import { SampleFooter } from "@/components/ui";
 import { LimelightNav, type NavItem } from "@/components/ui/limelight-nav";
@@ -40,20 +40,24 @@ export function TeacherShell({ children }: { children: React.ReactNode }) {
   }));
 
   return (
-    <div className="mx-auto min-h-dvh max-w-5xl pb-36">
-      <header className="sticky top-0 z-30 px-4 pb-2 pt-3 backdrop-blur-xl [background:linear-gradient(180deg,rgba(207,204,199,.82)_0%,rgba(207,204,199,.55)_72%,rgba(207,204,199,0)_100%)]">
+    <div className="lg-scope mx-auto min-h-dvh max-w-5xl pb-36" onPointerMove={glint}>
+      <div className="lg-ambient" aria-hidden><span className="o1" /><span className="o2" /><span className="o3" /><span className="o4" /></div>
+      <svg width="0" height="0" className="absolute" aria-hidden>
+        <filter id="lg-refract" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="7" result="noise" />
+          <feGaussianBlur in="noise" stdDeviation="2" result="soft" />
+          <feDisplacementMap in="SourceGraphic" in2="soft" scale="38" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
+
+      <header className="sticky top-0 z-30 px-4 pb-3 pt-3 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-full before:backdrop-blur-xl before:[mask-image:linear-gradient(to_bottom,black_55%,transparent)]">
         <div className="flex items-center justify-between gap-2">
-          <Link href="/app/today" aria-label={ar ? "سوا، الصفحة الرئيسية" : "Sawa home"} className="flex items-center gap-2">
+          <Link href="/app/today" aria-label={ar ? "سوا، الصفحة الرئيسية" : "Sawa home"} className="lg lg-refract lg-lift flex h-12 items-center gap-2 !rounded-full pe-4 ps-2">
             <Icon3D name="logo3d" size={34} />
-            <span className="hidden text-[19px] font-extrabold tracking-tight sm:inline">SAWA <span className="font-semibold text-black/45">سوا</span></span>
+            <span className="hidden text-[18px] font-extrabold tracking-tight sm:inline">SAWA <span className="font-semibold text-black/45">سوا</span></span>
           </Link>
           <div className="flex min-w-0 items-center gap-2">
-            <motion.div whileTap={{ scale: 0.94 }}>
-              <Link href="/app/ask" aria-label="SAWA AI" aria-current={path.startsWith("/app/ask") ? "page" : undefined}
-                className={`grid h-11 w-12 place-items-center rounded-[25px] border border-white/60 backdrop-blur transition ${path.startsWith("/app/ask") ? "bg-white/70" : "bg-white/25 hover:bg-white/45"}`}>
-                <Icon3D name="wand" size={30} />
-              </Link>
-            </motion.div>
+            <LiquidMetalButton label="SAWA AI" viewMode="icon" height={48} icon={<Sparkles size={20} className="text-white" aria-hidden />} onClick={() => router.push("/app/ask")} className="shrink-0" />
             <AppToolbar />
           </div>
         </div>
@@ -62,16 +66,26 @@ export function TeacherShell({ children }: { children: React.ReactNode }) {
       <main className="px-4 pt-3">{children}</main>
       <SampleFooter />
 
-      <div className="fixed inset-x-0 bottom-3 z-40 flex justify-center px-3" style={{ ["--color-primary" as string]: "#5185de" }}>
+      <div className="fixed inset-x-0 bottom-3 z-40 flex justify-center px-3">
         <LimelightNav
+          variant="lens"
           aria-label={ar ? "أقسام مساحة المعلم" : "Teacher workspace"}
           items={items}
           activeIndex={active}
           showLabels
-          className="!h-[68px] !rounded-[32px] !border-white/55 !bg-[rgba(217,217,217,0.28)] text-ink shadow-[0_12px_30px_-16px_rgba(40,30,20,.45)] backdrop-blur-2xl"
+          className="lg lg-refract !h-[70px] !rounded-[34px] !border-0 !bg-transparent text-ink"
           iconContainerClassName="!px-3 sm:!px-5 min-w-[62px]"
         />
       </div>
     </div>
   );
+}
+
+/** Moves the specular light on whichever glass card is under the pointer. */
+function glint(e: React.PointerEvent) {
+  const el = (e.target as HTMLElement).closest?.(".t-card, .lg") as HTMLElement | null;
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+  el.style.setProperty("--my", `${e.clientY - r.top}px`);
 }

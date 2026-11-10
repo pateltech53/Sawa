@@ -80,7 +80,7 @@ const errs = [];
     await p.click('role=tab[name=/Network/]'); await p.waitForTimeout(300); await p.click('button:has-text("Connect") >> nth=0'); await p.waitForTimeout(2600); await shot('27-network');
   });
   await step('ai', async () => {
-    await p.click('header a[aria-label="SAWA AI"]'); await p.waitForURL('**/app/ask'); await p.waitForTimeout(500); await shot('28-ai-empty');
+    await p.click('header button[aria-label="SAWA AI"]'); await p.waitForURL('**/app/ask'); await p.waitForTimeout(500); await shot('28-ai-empty');
     await p.click('button:has-text("Al Diyafah")'); await p.waitForSelector('text=Questions to ask', { timeout: 20000 }); await p.waitForTimeout(400); await shot('30-ai-school');
     await p.fill('input[aria-label="Your question"]', "I've received a job offer from Horizon Valley School. What should I know?"); await p.keyboard.press('Enter');
     await p.waitForSelector('text=is not in the school data', { timeout: 20000 }); await p.waitForTimeout(400); await shot('29-ai-unknown-school');

@@ -104,7 +104,7 @@ function ResourcesInner() {
               const saved = state.tSavedRes.includes(r.id);
               return (
                 <motion.li key={r.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }}>
-                  <div className="t-card group flex h-full flex-col rounded-[22px] p-4 transition hover:-translate-y-0.5 hover:bg-white/35">
+                  <div className="t-card group flex h-full flex-col p-4 lg-lift">
                     <button className="flex flex-1 flex-col items-stretch text-start" onClick={() => setOpenId(r.id)}>
                       <div className="flex items-start gap-3">
                         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl" style={{ background: K.tint }}><K.icon size={20} aria-hidden /></span>

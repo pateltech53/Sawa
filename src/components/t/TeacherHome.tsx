@@ -52,15 +52,25 @@ export function TeacherHome() {
 
   return (
     <div className="space-y-4">
-      <motion.div {...rise(0)} className="flex flex-wrap items-end justify-between gap-3 pt-1">
-        <div>
-          <p className="label-xs">{new Date().toLocaleDateString(ar ? "ar-AE" : "en-GB", { weekday: "long", day: "numeric", month: "long" })} · {ar ? school?.nameAr : school?.name}</p>
-          <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight sm:text-[32px]">{greet}, {firstName}</h1>
-          <p className="mt-1 text-sm text-grey">
-            {needs.length === 0 ? (ar ? "لا شيء عاجل. يوم هادئ!" : "Nothing urgent. Enjoy the calm.") : ar ? `${needs.length} أمور تحتاجك اليوم.` : `${needs.length} things need you today.`}
-          </p>
+      <motion.section {...rise(0)} className="lg lg-refract overflow-hidden p-5 sm:p-6" aria-label={ar ? "ملخص اليوم" : "Today at a glance"}>
+        <p className="text-[12px] font-semibold uppercase tracking-[.08em] text-grey">{new Date().toLocaleDateString(ar ? "ar-AE" : "en-GB", { weekday: "long", day: "numeric", month: "long" })} · {ar ? school?.nameAr : school?.name}</p>
+        <h1 className="mt-1.5 text-[30px] font-bold leading-[1.1] tracking-tight sm:text-[36px]">{greet}, {firstName}</h1>
+        <p className="mt-1.5 text-[15px] text-grey">
+          {needs.length === 0 ? (ar ? "لا شيء عاجل. يوم هادئ!" : "Nothing urgent. Enjoy the calm.") : ar ? `${needs.length} أمور تحتاجك اليوم.` : `${needs.length} things need you today.`}
+        </p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {[
+            { v: toGrade, en: "to grade", ar: "للتصحيح", href: "/app/classes" },
+            { v: attendanceDue.length, en: "registers due", ar: "حضور مطلوب", href: attendanceDue[0] ? `/app/classes/${attendanceDue[0]}?tab=attendance` : "/app/classes" },
+            { v: pendingReq, en: "parent requests", ar: "طلبات أولياء الأمور", href: "/app/office" },
+          ].map((x) => (
+            <Link key={x.en} href={x.href} className="t-row lg-lift px-3 py-3">
+              <span className={`block text-[26px] font-bold leading-none tabular-nums ${x.v ? "text-ink" : "text-grey-2"}`}>{x.v}</span>
+              <span className="mt-1 block text-[12px] font-medium text-grey">{ar ? x.ar : x.en}</span>
+            </Link>
+          ))}
         </div>
-      </motion.div>
+      </motion.section>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_1fr]">
         <motion.div {...rise(1)}>
@@ -135,7 +145,7 @@ export function TeacherHome() {
         <ul className="grid gap-3 sm:grid-cols-3">
           {stats.map(({ c, s }) => (
             <li key={c.id}>
-              <Link href={`/app/classes/${c.id}`} className="t-card group block rounded-[22px] p-4 transition hover:-translate-y-0.5 hover:bg-white/35">
+              <Link href={`/app/classes/${c.id}`} className="t-card group block p-4 lg-lift">
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 font-bold"><span className="h-3 w-3 rounded-full" style={{ background: c.color }} aria-hidden />{ar ? c.nameAr : c.name}</span>
                   <ArrowRight size={16} className="opacity-40 transition group-hover:translate-x-0.5 group-hover:opacity-80 rtl:rotate-180" aria-hidden />

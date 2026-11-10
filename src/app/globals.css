@@ -191,14 +191,73 @@ body::before {
 }
 
 @layer components {
-  /* Teacher workspace surfaces, from the Figma community/messages frames */
-  .t-card {
-    background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.55); border-radius: 24px;
-    backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 12px 30px -20px rgba(40, 30, 20, 0.35);
+  /* ── Liquid glass (teacher workspace) ─────────────────────────────
+     Figma surfaces (white 20%, 24px radius, black pills, #5185DE) rendered as liquid glass:
+     strong backdrop blur + saturation, a specular rim, an inner glow and a light that follows the pointer. */
+  .t-card, .lg {
+    position: relative; isolation: isolate; border-radius: 26px;
+    background: linear-gradient(135deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.16) 55%, rgba(255,255,255,.26) 100%);
+    backdrop-filter: blur(22px) saturate(185%) brightness(1.04); -webkit-backdrop-filter: blur(22px) saturate(185%) brightness(1.04);
+    box-shadow:
+      inset 0 1px 0.5px rgba(255,255,255,.95), inset 0 -1px 1px rgba(255,255,255,.28),
+      inset 0 0 28px rgba(255,255,255,.16),
+      0 22px 44px -26px rgba(28, 32, 70, .5), 0 3px 10px -4px rgba(28, 32, 70, .14);
   }
-  .t-row { background: rgba(255, 255, 255, 0.42); border-radius: 18px; transition: background .18s var(--ease); }
-  .t-row:hover { background: rgba(255, 255, 255, 0.62); }
+  .t-card::before, .lg::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.25px; pointer-events: none; z-index: 2;
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(255,255,255,.18) 32%, rgba(255,255,255,0) 52%, rgba(255,255,255,.22) 76%, rgba(255,255,255,.85));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  .t-card::after, .lg::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+    background: radial-gradient(320px circle at var(--mx, 20%) var(--my, -10%), rgba(255,255,255,.42), rgba(255,255,255,0) 62%);
+    opacity: .9; transition: opacity .3s var(--ease);
+  }
+  .lg-refract { backdrop-filter: blur(16px) saturate(190%) brightness(1.05); -webkit-backdrop-filter: blur(16px) saturate(190%) brightness(1.05); }
+  .lg-refract { backdrop-filter: url(#lg-refract) blur(14px) saturate(190%) brightness(1.06); }
+  .lg-dark {
+    background: linear-gradient(135deg, rgba(30,30,38,.86), rgba(18,18,23,.74)); color: #fff;
+    box-shadow: inset 0 1px 0.5px rgba(255,255,255,.35), inset 0 0 18px rgba(255,255,255,.06), 0 18px 34px -18px rgba(18,18,23,.65);
+  }
+  .lg-dark::before { background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,.04) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,.25)); }
+  .lg-lift { transition: transform .45s cubic-bezier(.2,.9,.25,1.2), box-shadow .45s var(--ease); }
+  .lg-lift:hover { transform: translateY(-3px) scale(1.006); }
+  .lg-lift:active { transform: translateY(0) scale(.985); transition-duration: .12s; }
+
+  /* Rows inside glass: a thinner lens */
+  .t-row {
+    position: relative; border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(255,255,255,.26));
+    box-shadow: inset 0 1px 0.5px rgba(255,255,255,.9), inset 0 -1px 0.5px rgba(255,255,255,.2), 0 6px 14px -12px rgba(28,32,70,.35);
+    transition: background .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .t-row:hover { background: linear-gradient(135deg, rgba(255,255,255,.72), rgba(255,255,255,.42)); box-shadow: inset 0 1px 0.5px #fff, 0 10px 20px -14px rgba(28,32,70,.4); }
+
+  /* Shared components restyled inside the teacher workspace */
+  .lg-scope .glass, .lg-scope .glass-strong {
+    background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(255,255,255,.2)) !important;
+    backdrop-filter: blur(22px) saturate(185%); -webkit-backdrop-filter: blur(22px) saturate(185%);
+    border: 1px solid rgba(255,255,255,.7) !important;
+    box-shadow: inset 0 1px 0.5px #fff, inset 0 0 20px rgba(255,255,255,.18), 0 18px 36px -22px rgba(28,32,70,.5) !important;
+  }
+  .lg-scope .btn-ink {
+    background: linear-gradient(135deg, rgba(34,34,42,.92), rgba(18,18,23,.82));
+    box-shadow: inset 0 1px 0.5px rgba(255,255,255,.4), inset 0 -2px 6px rgba(0,0,0,.35), 0 14px 26px -14px rgba(18,18,23,.7);
+    backdrop-filter: blur(12px);
+  }
+  .lg-scope .btn-ghost, .lg-scope .chip, .lg-scope .input {
+    background: linear-gradient(135deg, rgba(255,255,255,.62), rgba(255,255,255,.32));
+    border: 1px solid rgba(255,255,255,.85);
+    box-shadow: inset 0 1px 0.5px #fff, 0 6px 14px -10px rgba(28,32,70,.35);
+    backdrop-filter: blur(14px) saturate(170%); -webkit-backdrop-filter: blur(14px) saturate(170%);
+  }
+  .lg-scope .chip[aria-pressed="true"] { background: linear-gradient(135deg, #26262e, #121217); color: #fff; border-color: rgba(255,255,255,.25); box-shadow: inset 0 1px 0.5px rgba(255,255,255,.35), 0 8px 16px -10px rgba(18,18,23,.6); }
+  .lg-scope .input:focus { box-shadow: inset 0 1px 0.5px #fff, 0 0 0 3px rgba(81,133,222,.35); }
+  .lg-scope [aria-modal="true"] {
+    background: linear-gradient(180deg, rgba(250,248,245,.86), rgba(240,238,236,.78)) !important;
+    backdrop-filter: blur(34px) saturate(180%); -webkit-backdrop-filter: blur(34px) saturate(180%);
+    box-shadow: inset 0 1px 0.5px #fff, 0 -24px 60px -20px rgba(28,32,70,.35) !important;
+  }
 
   .glass {
     background: var(--surface);
@@ -323,3 +382,15 @@ body::before {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 .leaflet-container { font: inherit; border-radius: 24px; }
+
+/* Ambient colour that drifts behind the teacher workspace, so the glass has something to refract */
+.lg-ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.lg-ambient span { position: absolute; border-radius: 9999px; filter: blur(70px); opacity: .55; will-change: transform; }
+.lg-ambient .o1 { width: 46vmax; height: 46vmax; left: -12vmax; top: -10vmax; background: #8fb0ee; animation: lg-drift-a 28s ease-in-out infinite alternate; }
+.lg-ambient .o2 { width: 38vmax; height: 38vmax; right: -10vmax; top: 22vh; background: #c9b6f2; animation: lg-drift-b 34s ease-in-out infinite alternate; }
+.lg-ambient .o3 { width: 42vmax; height: 42vmax; left: 18vw; bottom: -18vmax; background: #f0d2b0; animation: lg-drift-c 30s ease-in-out infinite alternate; }
+.lg-ambient .o4 { width: 22vmax; height: 22vmax; right: 18vw; top: -6vmax; background: #a6d8e8; opacity: .45; animation: lg-drift-b 26s ease-in-out infinite alternate-reverse; }
+@keyframes lg-drift-a { to { transform: translate3d(14vw, 10vh, 0) scale(1.12); } }
+@keyframes lg-drift-b { to { transform: translate3d(-12vw, 14vh, 0) scale(.9); } }
+@keyframes lg-drift-c { to { transform: translate3d(-10vw, -12vh, 0) scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .lg-ambient span { animation: none; } }

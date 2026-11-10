@@ -41,7 +41,7 @@ function ClassesInner() {
           const s = classStats(c, state.tAssignments, state.tSubs);
           return (
             <li key={c.id}>
-              <Link href={`/app/classes/${c.id}`} className="t-card group block h-full rounded-[24px] p-4 transition hover:-translate-y-0.5 hover:bg-white/35">
+              <Link href={`/app/classes/${c.id}`} className="t-card group block h-full rounded-[24px] p-4 lg-lift">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="flex items-center gap-2 text-lg font-bold"><span className="h-3 w-3 rounded-full" style={{ background: c.color }} aria-hidden />{ar ? c.nameAr : c.name}</p>
