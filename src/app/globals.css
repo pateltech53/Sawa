@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 /* TDRA UAE Design System (aegov-dls 3.x) — colour scales (aegold, aeblack, aegreen, aered) and components */
 @plugin "@aegov/design-system";
 
@@ -100,6 +101,28 @@
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* shadcn/ui semantic tokens (used by components/ui/*), mapped onto Sawa's palette */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted-bg);
+  --color-muted-foreground: var(--muted);
+  --color-border: var(--border);
+  --color-ring: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+}
+
 :root {
   --ink: #121217;
   --ink-2: #34343a;
@@ -116,6 +139,23 @@
   --grad-brand-soft: linear-gradient(100deg, #fff1fb 0%, #f3eefe 50%, #eef3ff 100%);
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 14px 34px -18px rgba(52, 40, 28, 0.42);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --background: #f4efe5;
+  --foreground: #121217;
+  --primary: #121217;
+  --primary-foreground: #ffffff;
+  --secondary: #ebe5da;
+  --secondary-foreground: #121217;
+  --muted-bg: rgba(255, 255, 255, 0.5);
+  --border: rgba(18, 18, 23, 0.12);
+  --destructive: #d0453b;
+  --destructive-foreground: #a3271f;
+  --info: #5185de;
+  --info-foreground: #2d5aa8;
+  --success: #2e9e6b;
+  --success-foreground: #1f7a50;
+  --warning: #d9822b;
+  --warning-foreground: #9a5410;
 }
 
 html { -webkit-tap-highlight-color: transparent; }

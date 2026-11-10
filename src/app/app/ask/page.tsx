@@ -3,10 +3,11 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowUp, ExternalLink, Loader2, Mic, ShieldCheck } from "lucide-react";
+import { ArrowUp, ExternalLink, Mic, ShieldCheck } from "lucide-react";
 import { Mascot, Pill } from "@/components/ui";
 import { useStore } from "@/lib/store";
 import { TeacherAsk } from "@/components/t/TeacherAsk";
+import { MessageLoading } from "@/components/ui/message-loading";
 
 interface Msg {
   role: "user" | "sawa";
@@ -126,7 +127,7 @@ function AskInner() {
             )}
           </li>
         ))}
-        {busy && <li className="flex"><span className="glass flex items-center gap-2 rounded-3xl px-4 py-3 text-sm"><Loader2 size={16} className="animate-spin" /> {ar ? "يبحث في المصادر…" : "Checking sources…"}</span></li>}
+        {busy && <li className="flex"><span className="glass flex items-center gap-2 rounded-3xl px-4 py-3 text-sm"><MessageLoading className="text-[#8C59F2]" label={ar ? "سوا يكتب" : "Sawa is typing"} /> {ar ? "يبحث في المصادر…" : "Checking sources…"}</span></li>}
       </ul>
       <div ref={end} />
 

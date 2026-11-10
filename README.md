@@ -50,6 +50,22 @@ Design source: the team's Figma export. Assets in `public/figma/` were extracted
 | School apps | `/app/connections` | Google Classroom connect (consent → sync → classes and classwork on Home and Calendar), disconnect. **Simulated with sample data** |
 | Profile | `/app/profile` | Figma header, achievements, interests editing, projects with progress, saved, communities |
 
+### Components (`src/components/ui`, shadcn layout)
+
+| Component | Source | Used in |
+|---|---|---|
+| `OnyxGlyphPreloader` | 21st.dev | `/welcome` intro: school, student, family, teacher and UAE tiles merge into the Sawa mark (`src/components/s/SawaPreloader.tsx`). Tap or *Skip intro* to skip; reduced motion skips it automatically |
+| `LiquidMetalButton` | 21st.dev (`@paper-design/shaders`) | *Get Started* on `/welcome` |
+| `FlowButton` | 21st.dev | *Explore all opportunities* on Home |
+| `AiLoader` | 21st.dev | Matching step in onboarding |
+| `MessageLoading` | 21st.dev | Ask Sawa typing indicator |
+| `LogoCarousel` | 21st.dev (on `motion/react`) | Landing and School apps. Generic wordmarks only, no vendor logos |
+| `Avatar` | shadcn/ui (`@radix-ui/react-avatar`) | All initials avatars (via `Avatar` in `src/components/s/kit.tsx`) |
+
+`cn()` lives in `src/lib/utils.ts`; shadcn colour tokens (`background`, `foreground`, `secondary`, `info`, `success`, `warning`…) are mapped onto Sawa's palette in `globals.css`.
+
+**Not seeing the new screens?** Pull the branch, run `npm install` (new dependencies), and restart `npm run dev`. The saved demo state key was bumped to `sawa-demo-v2`, so old browser data no longer hides new screens.
+
 Not carried over from the Figma file on purpose: the Instagram-style feed with likes, direct messages, reels and real/stock photos of students. These conflict with the under-15 rules and student privacy.
 
 Tests: with the app running, `npm run e2e` (parent/teacher flow) and `npm run e2e:student` (full student journey). Screenshots go to `e2e-screens/`.

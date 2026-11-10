@@ -7,6 +7,8 @@ import { ArrowRight, BookOpen, Fingerprint, Globe, GraduationCap, ShieldCheck, U
 import { EASE, MascotLive } from "@/components/s/kit";
 import { LangToggle } from "@/components/ui";
 import FooterSection from "@/components/ui/footer";
+import { LogoCarousel } from "@/components/ui/logo-carousel";
+import { SYSTEM_MARKS } from "@/components/s/system-marks";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 
@@ -40,6 +42,11 @@ export default function Landing() {
       <motion.div className="my-6 flex justify-center" animate={{ opacity: leaving && leaving !== "student" ? 0 : 1, y: leaving === "student" ? -30 : 0, scale: leaving === "student" ? 1.08 : 1 }} transition={{ duration: 0.45, ease: EASE }}>
         <MascotLive size={170} delay={0.2} />
       </motion.div>
+
+      <motion.section className="mb-6 flex flex-col items-center" initial={{ opacity: 0 }} animate={{ opacity: leaving ? 0 : 1 }} transition={{ delay: 0.3 }}>
+        <p className="label-xs mb-1">{ar ? "كل أنظمة المدرسة في مكان واحد" : "Every school system, one front door"}</p>
+        <LogoCarousel columnCount={3} logos={SYSTEM_MARKS} />
+      </motion.section>
 
       <section className="mt-auto" aria-labelledby="iam">
         <h2 id="iam" className="label-xs mb-2.5 px-1">{t(L, "iAm")}</h2>

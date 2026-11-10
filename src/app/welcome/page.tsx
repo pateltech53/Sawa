@@ -10,6 +10,9 @@ import { rankOpportunities, TYPE_LABEL } from "@/lib/match";
 import { useStore } from "@/lib/store";
 import type { Profile } from "@/lib/types";
 import { BRAND } from "@/lib/brand";
+import { SawaPreloader } from "@/components/s/SawaPreloader";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
+import { AiLoader } from "@/components/ui/ai-loader";
 
 type Step = "splash" | "start" | "school" | "consent" | "loading" | "verify" | "scan" | "face" | "verified" | "interests" | "matching" | "done";
 const ORDER: Step[] = ["splash", "start", "school", "consent", "loading", "verify", "scan", "face", "verified", "interests", "matching", "done"];
@@ -36,10 +39,10 @@ export default function Welcome() {
   const go = (s: Step) => setStep(s);
   const back = () => setStep(ORDER[Math.max(0, ORDER.indexOf(step) - 1)]);
 
-  // splash → start
+  // splash → start (reduced motion skips the cinematic gate)
   useEffect(() => {
-    if (step !== "splash") return;
-    const t = setTimeout(() => go("start"), reduce ? 400 : 1700);
+    if (step !== "splash" || !reduce) return;
+    const t = setTimeout(() => go("start"), 400);
     return () => clearTimeout(t);
   }, [step, reduce]);
 
@@ -64,10 +67,13 @@ export default function Welcome() {
       )}
       <AnimatePresence mode="wait">
         {step === "splash" && (
-          <motion.section key="splash" className="flex min-h-dvh items-center justify-center" exit={{ opacity: 0, transition: { duration: 0.4 } }}>
-            <motion.div initial={{ scale: 0.6, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 140, damping: 16 }}>
-              <Icon3D name="logo3d" size={150} alt="Sawa" />
-            </motion.div>
+          <motion.section key="splash" className="relative min-h-dvh" exit={{ opacity: 0, transition: { duration: 0.4 } }}>
+            {reduce ? (
+              <div className="flex min-h-dvh items-center justify-center"><Icon3D name="logo3d" size={150} alt="Sawa" /></div>
+            ) : (
+              <SawaPreloader onComplete={() => go("start")} />
+            )}
+            <button onClick={() => go("start")} className="absolute end-4 top-5 z-50 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/25">Skip intro</button>
           </motion.section>
         )}
 
@@ -81,8 +87,9 @@ export default function Welcome() {
               { }
               <img src="/figma/bg/mascot-dubai.png" alt="Sawa's mascot waving in front of the Dubai skyline" className="mx-auto w-full select-none" draggable={false} />
             </motion.div>
-            <motion.button initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.5, ease: EASE }}
-              className="btn-glass relative z-10 -mt-8 w-full max-w-[313px]" onClick={() => go("school")}>Get Started</motion.button>
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.5, ease: EASE }} className="relative z-10 -mt-8 flex w-full justify-center">
+              <LiquidMetalButton label="Get Started" width={300} height={58} onClick={() => go("school")} />
+            </motion.div>
             <p className="mt-4 text-center text-xs text-[var(--muted)]">Prototype · sample data only</p>
           </motion.section>
         )}
@@ -487,7 +494,7 @@ function MatchingStep({ profile, onDone }: { profile: Profile; onDone: () => voi
   return (
     <motion.section {...page} className="flex min-h-dvh flex-col px-6 pb-8 pt-14">
       <div className="flex justify-center">
-        <motion.div animate={reduce ? {} : { rotate: [0, 8, -8, 0] }} transition={{ duration: 2.4, repeat: Infinity }}><Icon3D name="wand" size={64} alt="" /></motion.div>
+        <AiLoader text={stage >= 4 ? "Matched" : "Matching"} size={124} />
       </div>
       <h1 className="mt-5 text-center text-[28px] font-bold tracking-tight">Personalising Sawa</h1>
       <ul className="mt-6 space-y-3" aria-live="polite">

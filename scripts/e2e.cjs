@@ -25,7 +25,7 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens'); require('fs').
   await p.goto(B + '/app/post'); await p.click('button:has-text("Post")>>nth=-1'); await p.waitForTimeout(400); await shot('08-teacher-post');
   await p.goto(B + '/app/office'); await p.click('button:has-text("Approve & complete")'); await p.waitForTimeout(300); await shot('09-office');
   // student
-  await p.evaluate(() => { const k = 'sawa-demo-v1'; const s = JSON.parse(localStorage.getItem(k)); s.onboarded['stu-sara'] = true; localStorage.setItem(k, JSON.stringify(s)); });
+  await p.evaluate(() => { const k = 'sawa-demo-v2'; const s = JSON.parse(localStorage.getItem(k)); s.onboarded['stu-sara'] = true; localStorage.setItem(k, JSON.stringify(s)); });
   await p.goto(B + '/app/profile'); await p.click('button:has-text("Student")'); await p.waitForURL('**/app/today'); await p.waitForTimeout(500); await shot('10-student-today');
   await p.goto(B + '/app/opportunities/op-1'); await p.waitForTimeout(600);
   await p.click('button:has-text("Ask my guardian")'); await p.waitForTimeout(500); await shot('11-explore');

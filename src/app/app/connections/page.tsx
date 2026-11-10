@@ -8,6 +8,8 @@ import { EASE, Sheet, spring, useToast } from "@/components/s/kit";
 import { CLASSROOM_COURSES, CLASSROOM_WORK } from "@/lib/seed";
 import { useStore } from "@/lib/store";
 import { BRAND } from "@/lib/brand";
+import { LogoCarousel } from "@/components/ui/logo-carousel";
+import { SYSTEM_MARKS } from "@/components/s/system-marks";
 
 const APPS = [
   { key: "gclassroom", name: "Google Classroom", short: "GC", color: "#2E9E6B", desc: "Classes, assignments and due dates", demo: true },
@@ -31,12 +33,17 @@ export default function Connections() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Link href="/app/profile" aria-label="Back" className="grid h-10 w-10 place-items-center rounded-full bg-white/45"><ArrowLeft size={18} className="rtl:rotate-180" /></Link>
-        <div>
-          <h1 className="text-[26px] font-bold tracking-tight">School apps</h1>
-          <p className="text-sm text-[var(--muted)]">One place for the systems your school already uses.</p>
+      <div>
+        <div className="flex items-center gap-2">
+          <Link href="/app/profile" aria-label="Back" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/45"><ArrowLeft size={18} className="rtl:rotate-180" /></Link>
+          <h1 className="text-[26px] font-bold leading-tight tracking-tight">School apps</h1>
         </div>
+        <p className="mt-1 px-1 text-sm text-[var(--muted)]">One place for the systems your school already uses.</p>
+      </div>
+
+      <div className="glass flex flex-col items-center rounded-[24px] px-3 pb-2 pt-3">
+        <p className="label-xs">Joined up in Sawa</p>
+        <LogoCarousel columnCount={3} logos={SYSTEM_MARKS} />
       </div>
 
       <ul className="space-y-2.5">
