@@ -7,6 +7,8 @@ import { CalendarDays, Lock, Search, ShieldCheck } from "lucide-react";
 import { CommunityBadge, CommunityTile } from "@/components/s/cards";
 import { EASE, useToast } from "@/components/s/kit";
 import { COMMUNITIES, COMMUNITY_ACTIVITIES } from "@/lib/seed";
+import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/components/hooks/use-debounce";
 import { ageOf, useStore } from "@/lib/store";
 
 const CATS = [["all", "All"], ["near", "Near me"], ["clubs", "School clubs"], ["stem", "STEM"], ["creative", "Creative"], ["sports", "Sports"], ["leadership", "Leadership"]] as const;
@@ -16,13 +18,15 @@ export default function Communities() {
   const toast = useToast();
   const [cat, setCat] = useState<string>("all");
   const [q, setQ] = useState("");
+  // filter after typing pauses, so the animated list doesn't reshuffle on every keystroke
+  const dq = useDebounce(q.trim().toLowerCase(), 250);
   if (!me) return null;
   const age = ageOf(me);
   const joined = state.joined[me.id] ?? [];
   const matchesInterest = (c: (typeof COMMUNITIES)[number]) => c.interests.some((i) => me.interests.includes(i));
   const list = COMMUNITIES
     .filter((c) => cat === "all" || (cat === "near" ? c.emirate === "Dubai" : c.category === cat))
-    .filter((c) => !q || `${c.name} ${c.interests.join(" ")}`.toLowerCase().includes(q.toLowerCase()))
+    .filter((c) => !dq || `${c.name} ${c.interests.join(" ")}`.toLowerCase().includes(dq))
     .sort((a, b) => Number(matchesInterest(b)) - Number(matchesInterest(a)) || Number(age >= b.minAge) - Number(age >= a.minAge));
   const featured = COMMUNITIES.filter((c) => age >= c.minAge && matchesInterest(c) && !joined.includes(c.id))[0] ?? COMMUNITIES.find((c) => age >= c.minAge)!;
   const next = COMMUNITY_ACTIVITIES.filter((a) => a.communityId === featured.id).sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
@@ -32,8 +36,8 @@ export default function Communities() {
     <div className="space-y-4">
       <h1 className="text-[28px] font-bold tracking-tight">Communities</h1>
       <label className="relative block">
-        <Search size={18} className="absolute start-4 top-1/2 -translate-y-1/2 opacity-50" />
-        <input className="input !ps-11" placeholder="Search communities" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search communities" />
+        <Search size={18} className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 opacity-50" aria-hidden />
+        <Input type="search" className="ps-11" placeholder="Search communities" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search communities" />
       </label>
       <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Category">
         {CATS.map(([k, l]) => <button key={k} aria-pressed={cat === k} onClick={() => setCat(k)} className="chip chip-cat !min-h-10 !px-4 !text-[15px] !font-medium">{l}</button>)}
@@ -49,7 +53,7 @@ export default function Communities() {
               <img src={featured.image} alt="" className="absolute -right-4 -top-2 h-[190px] w-[190px] object-contain opacity-90 drop-shadow-[0_12px_14px_rgba(0,0,0,.2)]" />
             )}
             <span className="absolute left-3 top-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-bold">Featured for you</span>
-            {next && <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#5185DE] px-2.5 py-1 text-[11px] font-bold text-white"><CalendarDays size={11} /> {new Date(next.startsAt).toLocaleDateString("en-GB", { weekday: "short" })} · {next.titleEn}</span>}
+            {next && <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-1 text-[11px] font-bold text-white"><CalendarDays size={11} /> {new Date(next.startsAt).toLocaleDateString("en-GB", { weekday: "short" })} · {next.titleEn}</span>}
             <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2.5">
               <CommunityBadge c={featured} size={46} />
               <div className="min-w-0 flex-1 text-white [text-shadow:0_1px_6px_rgba(0,0,0,.35)]">
@@ -76,7 +80,7 @@ export default function Communities() {
                     <span className="block truncate font-bold">{c.name}</span>
                     <span className="block text-xs text-[var(--muted)]">{c.members.toLocaleString()} members</span>
                   </span>
-                  {state.posts.some((p) => p.communityId === c.id && Date.now() - +new Date(p.createdAt) < 86_400_000) && <span className="me-3 h-2 w-2 rounded-full bg-[#5185DE]" aria-label="New today" />}
+                  {state.posts.some((p) => p.communityId === c.id && Date.now() - +new Date(p.createdAt) < 86_400_000) && <span className="me-3 h-2 w-2 rounded-full bg-blue-500" aria-label="New today" />}
                 </Link>
               </li>
             ))}

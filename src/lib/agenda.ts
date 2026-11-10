@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { CLASSROOM_COURSES, CLASSROOM_WORK, COMMUNITY_ACTIVITIES, COMMUNITIES, OPPORTUNITIES } from "./seed";
 import { useStore } from "./store";
+import { BRAND } from "@/lib/brand";
 
 export type AgendaKind = "assignment" | "exam" | "event" | "notice" | "opportunity" | "saved" | "reminder" | "community" | "proactive";
 
@@ -20,7 +21,7 @@ export interface AgendaItem {
 }
 
 export const KIND_COLOR: Record<AgendaKind, string> = {
-  assignment: "#5185DE", exam: "#D0453B", event: "#2E9E6B", notice: "#7B6A59", opportunity: "#8C59F2",
+  assignment: BRAND.blue, exam: "#D0453B", event: "#2E9E6B", notice: "#7B6A59", opportunity: BRAND.pinkDeep,
   saved: "#B68A35", reminder: "#121217", community: "#D9822B", proactive: "#B68A35",
 };
 

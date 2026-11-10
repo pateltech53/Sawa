@@ -35,7 +35,7 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens'); require('fs').
   // ask in arabic
   await p.goto(B + '/app/ask'); await p.click(`button:has-text("ابنتي")`); await p.waitForSelector("text=Sources", { timeout: 15000 }); await p.waitForTimeout(400); await shot('15-ask');
   // arabic RTL
-  await p.goto(B + '/app/today'); await p.click('button:has-text("العربية")'); await p.waitForTimeout(600); await shot('16-rtl-today');
+  await p.goto(B + '/app/today'); await p.click('button[aria-label="Language"]'); await p.click('button[role="radio"]:has-text("العربية")'); await p.waitForTimeout(600); await shot('16-rtl-today');
   await p.goto(B + '/app/impact'); await p.waitForTimeout(300); await shot('17-impact-ar');
   await p.goto(B + '/app/data'); await p.waitForTimeout(300); await shot('18-data-ar');
   // desktop landing

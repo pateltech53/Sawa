@@ -9,6 +9,7 @@ import { COMMUNITIES, INTERESTS, OPPORTUNITIES, SCHOOLS } from "@/lib/seed";
 import { rankOpportunities, TYPE_LABEL } from "@/lib/match";
 import { useStore } from "@/lib/store";
 import type { Profile } from "@/lib/types";
+import { BRAND } from "@/lib/brand";
 
 type Step = "splash" | "start" | "school" | "consent" | "loading" | "verify" | "scan" | "face" | "verified" | "interests" | "matching" | "done";
 const ORDER: Step[] = ["splash", "start", "school", "consent", "loading", "verify", "scan", "face", "verified", "interests", "matching", "done"];
@@ -115,7 +116,7 @@ export default function Welcome() {
             <ol className="mt-5 space-y-3">
               {["Scan your ID card", "Quick face match", "You're in"].map((t, i) => (
                 <li key={t} className="flex items-center gap-3 font-medium text-black/75">
-                  <span className="grid h-7 w-7 place-items-center rounded-full bg-[#8C59F2]/15 text-[13px] font-semibold text-[#8C59F2]">{i + 1}</span>{t}
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-iris-500/15 text-[13px] font-semibold text-iris-500">{i + 1}</span>{t}
                 </li>
               ))}
             </ol>
@@ -270,7 +271,7 @@ function ScanStep({ onDone }: { onDone: () => void }) {
         <div className="absolute left-[10px] top-[15px]"><IdCard scanning /></div>
         {/* corner brackets */}
         {[["top-0 left-0", "border-t-4 border-l-4 rounded-tl-md"], ["top-0 right-0", "border-t-4 border-r-4 rounded-tr-md"], ["bottom-0 left-0", "border-b-4 border-l-4 rounded-bl-md"], ["bottom-0 right-0", "border-b-4 border-r-4 rounded-br-md"]].map(([pos, b]) => (
-          <span key={pos} className={`absolute h-7 w-7 border-[#8C59F2] ${pos} ${b}`} />
+          <span key={pos} className={`absolute h-7 w-7 border-iris-500 ${pos} ${b}`} />
         ))}
         {!reduce && phase < 2 && (
           <motion.div className="absolute inset-x-0 h-[60px]" initial={{ top: -46 }} animate={{ top: [-46, 170, -46] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}>
@@ -280,8 +281,8 @@ function ScanStep({ onDone }: { onDone: () => void }) {
         )}
       </div>
       <div className="mt-10 flex justify-center">
-        <motion.span layout className="inline-flex items-center gap-2 rounded-full bg-[#8C59F2]/12 px-4 py-2 text-sm font-medium text-[#8C59F2]">
-          {phase < 2 ? <motion.span className="h-2 w-2 rounded-full bg-[#8C59F2]" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} /> : <Check size={14} />}
+        <motion.span layout className="inline-flex items-center gap-2 rounded-full bg-iris-500/12 px-4 py-2 text-sm font-medium text-iris-500">
+          {phase < 2 ? <motion.span className="h-2 w-2 rounded-full bg-iris-500" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} /> : <Check size={14} />}
           {labels[phase]}
         </motion.span>
       </div>
@@ -312,7 +313,7 @@ function FaceStep({ onDone }: { onDone: () => void }) {
           <circle cx="50" cy="50" r="47" fill="none" stroke="rgba(0,0,0,.08)" strokeWidth="3" />
           <motion.circle cx="50" cy="50" r="47" fill="none" stroke="url(#ring)" strokeWidth="3" strokeLinecap="round" pathLength={1} initial={{ pathLength: 0 }} animate={{ pathLength: p / 100 }} transition={{ ease: "linear" }} />
         </svg>
-        <div className="relative h-[200px] w-[200px] overflow-hidden rounded-full border-[3px] border-white bg-[#8C59F2]/12">
+        <div className="relative h-[200px] w-[200px] overflow-hidden rounded-full border-[3px] border-white bg-iris-500/12">
           <div className="absolute left-1/2 top-[22%] h-[44%] w-[37%] -translate-x-1/2 rounded-full bg-[#7B6A59]/35" />
           <div className="absolute bottom-[-12%] left-1/2 h-[48%] w-[80%] -translate-x-1/2 rounded-full bg-[#7B6A59]/35" />
           {!reduce && p < 100 && (
@@ -323,8 +324,8 @@ function FaceStep({ onDone }: { onDone: () => void }) {
           )}
         </div>
       </div>
-      <p className="mt-6 flex items-center gap-2 text-sm font-medium text-[#8C59F2]">
-        <motion.span className="h-2 w-2 rounded-full bg-[#8C59F2]" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} />
+      <p className="mt-6 flex items-center gap-2 text-sm font-medium text-iris-500">
+        <motion.span className="h-2 w-2 rounded-full bg-iris-500" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} />
         {p < 100 ? "Matching face to ID (demo)…" : "Match confirmed (demo)"}
       </p>
       <div className="mt-auto w-full pt-8"><StepBars done={2} /></div>
@@ -380,14 +381,14 @@ function InterestsStep({ selected, setSelected, onNext }: { selected: string[]; 
                 style={{ width: 262, height: 358, perspective: 900 }}
                 tabIndex={d === 0 ? 0 : -1}>
                 <motion.div className="relative h-full w-full overflow-hidden rounded-[22px] border"
-                  animate={{ borderColor: on ? "#8C59F2" : "rgba(255,255,255,.7)", backgroundColor: on ? "rgba(178,156,250,.72)" : "rgba(255,255,255,.22)", boxShadow: d === 0 ? (on ? "0 18px 40px rgba(140,89,242,.45)" : "0 18px 40px rgba(64,115,255,.25)") : "none" }}
+                  animate={{ borderColor: on ? BRAND.iris : "rgba(255,255,255,.7)", backgroundColor: on ? "rgba(178,156,250,.72)" : "rgba(255,255,255,.22)", boxShadow: d === 0 ? (on ? "0 18px 40px rgba(140,89,242,.45)" : "0 18px 40px rgba(64,115,255,.25)") : "none" }}
                   transition={{ duration: 0.3 }} style={{ borderWidth: 2, backdropFilter: "blur(8px)" }}>
                   { }
                   <img src={c.img} alt="" draggable={false} className="absolute left-1/2 top-5 h-[240px] w-[240px] -translate-x-1/2 object-contain drop-shadow-[0_12px_14px_rgba(0,0,0,.18)]" />
                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2"><CurvedLabel text={c.en} width={230} size={40} curve={18} /></div>
                   <AnimatePresence>
                     {on && (
-                      <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-[#8C59F2] text-white shadow"><Check size={17} strokeWidth={3} /></motion.span>
+                      <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-iris-500 text-white shadow"><Check size={17} strokeWidth={3} /></motion.span>
                     )}
                   </AnimatePresence>
                 </motion.div>
@@ -443,7 +444,7 @@ function MoreInterests({ open, onClose, selected, toggle, add }: { open: boolean
           const on = selected.includes(i.id);
           return (
             <motion.button key={i.id} layout whileTap={{ scale: 0.95 }} onClick={() => toggle(i.id)} aria-pressed={on}
-              className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-[15px] font-medium transition ${on ? "border-white bg-white text-[#5C29BF] shadow-[0_6px_16px_rgba(102,38,204,.3)]" : "border-white/45 bg-white/18 text-white"}`}>
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-[15px] font-medium transition ${on ? "border-white bg-white text-iris-700 shadow-[0_6px_16px_rgba(102,38,204,.3)]" : "border-white/45 bg-white/18 text-white"}`}>
               {on ? <Check size={14} /> : <span aria-hidden>+</span>} {i.en}
             </motion.button>
           );
@@ -452,11 +453,11 @@ function MoreInterests({ open, onClose, selected, toggle, add }: { open: boolean
       <p className="mt-8 flex items-center gap-1.5 text-sm font-medium"><Sparkles size={14} /> Suggestions</p>
       <form onSubmit={(e) => { e.preventDefault(); if (q.trim()) suggest(); }} className="mt-2 flex items-center gap-2 rounded-full border border-white/60 bg-white/20 p-1.5 ps-4">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type an interest… e.g. astrophotography" aria-label="Describe an interest" className="min-w-0 flex-1 bg-transparent text-white placeholder:text-white/70 outline-none" />
-        <button aria-label="Suggest" className="grid h-10 w-10 place-items-center rounded-full bg-white text-[#5C29BF]"><ArrowRight size={18} className="-rotate-90" /></button>
+        <button aria-label="Suggest" className="grid h-10 w-10 place-items-center rounded-full bg-white text-iris-700"><ArrowRight size={18} className="-rotate-90" /></button>
       </form>
       <p className="mt-2 min-h-5 text-sm text-white/90" aria-live="polite">{hint}</p>
       <p className="text-xs text-white/70">Matched on this device from keywords — nothing is sent to an AI service.</p>
-      <button className="mt-5 w-full rounded-full bg-white py-3.5 font-semibold text-[#5C29BF]" onClick={onClose}>Done · {selected.length} selected</button>
+      <button className="mt-5 w-full rounded-full bg-white py-3.5 font-semibold text-iris-700" onClick={onClose}>Done · {selected.length} selected</button>
     </Sheet>
   );
 }
@@ -492,8 +493,8 @@ function MatchingStep({ profile, onDone }: { profile: Profile; onDone: () => voi
       <ul className="mt-6 space-y-3" aria-live="polite">
         {stages.map((t, i) => (
           <motion.li key={t} initial={{ opacity: 0, x: -8 }} animate={{ opacity: stage >= i ? 1 : 0.35, x: 0 }} transition={{ delay: i * 0.05 }} className="flex items-center gap-3">
-            <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full ${stage > i ? "bg-[#8C59F2] text-white" : "bg-black/8"}`}>
-              {stage > i ? <Check size={14} strokeWidth={3} /> : stage === i ? <motion.span className="h-2 w-2 rounded-full bg-[#8C59F2]" animate={{ scale: [1, 1.5, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} /> : null}
+            <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full ${stage > i ? "bg-iris-500 text-white" : "bg-black/8"}`}>
+              {stage > i ? <Check size={14} strokeWidth={3} /> : stage === i ? <motion.span className="h-2 w-2 rounded-full bg-iris-500" animate={{ scale: [1, 1.5, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} /> : null}
             </span>
             <span className="font-medium">{t}</span>
           </motion.li>
@@ -518,7 +519,7 @@ function MatchingStep({ profile, onDone }: { profile: Profile; onDone: () => voi
               <p className="truncate font-semibold">{m.o.titleEn}</p>
               <p className="truncate text-xs text-[var(--muted)]">{m.reasons[0]}</p>
             </div>
-            <span className="text-lg font-bold text-[#8C59F2]">{m.score}%</span>
+            <span className="text-lg font-bold text-iris-500">{m.score}%</span>
           </motion.div>
         ))}
       </div>
@@ -545,7 +546,7 @@ function DoneStep({ profile, onEnter }: { profile: Profile; onEnter: () => void 
       <ul className="space-y-2">
         {ranked.map((m) => (
           <li key={m.o.id} className="flex items-center justify-between rounded-2xl bg-white/45 px-4 py-3 text-sm">
-            <span className="truncate font-semibold">{m.o.titleEn}</span><span className="font-bold text-[#8C59F2]">{m.score}%</span>
+            <span className="truncate font-semibold">{m.o.titleEn}</span><span className="font-bold text-iris-500">{m.score}%</span>
           </li>
         ))}
       </ul>

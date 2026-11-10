@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { ArrowRight, GraduationCap, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Fingerprint, Globe, GraduationCap, ShieldCheck, Users } from "lucide-react";
 import { EASE, MascotLive } from "@/components/s/kit";
 import { LangToggle } from "@/components/ui";
+import FooterSection from "@/components/ui/footer";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 
@@ -46,11 +47,11 @@ export default function Landing() {
           {roles.map((r, i) => (
             <motion.li key={r.role} initial={{ opacity: 0, y: 14 }} animate={{ opacity: leaving && leaving !== r.role ? 0 : 1, y: 0, scale: leaving === r.role ? 1.02 : 1 }} transition={{ delay: leaving ? 0 : 0.15 + i * 0.07, duration: 0.4, ease: EASE }}>
               <motion.button whileTap={{ scale: 0.98 }} onClick={() => go(r.role, r.href)}
-                className={`flex w-full items-center gap-3.5 rounded-[24px] border p-3.5 text-start transition-colors ${r.role === "student" ? "border-[#121217] bg-[#121217] text-white" : "glass"}`}>
-                <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${r.role === "student" ? "bg-white/12" : "bg-white/70"}`}><r.icon size={22} /></span>
+                className={`flex w-full items-center gap-3.5 rounded-[24px] border p-3.5 text-start transition-[box-shadow,background-color] ${r.role === "student" ? "border-white/40 bg-[image:var(--grad-brand)] text-white shadow-[var(--shadow-brand)] hover:shadow-[0_22px_46px_-18px_rgba(64,115,255,.65)]" : "glass hover:bg-white/60"}`}>
+                <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${r.role === "student" ? "bg-white/20" : r.role === "parent" ? "bg-pink-100 text-pink-700" : "bg-blue-100 text-blue-700"}`}><r.icon size={22} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[17px] font-semibold">{r.label}</span>
-                  <span className={`block text-[13px] ${r.role === "student" ? "text-white/70" : "text-[var(--muted)]"}`}>{r.hint}</span>
+                  <span className={`block text-[13px] ${r.role === "student" ? "text-white/85" : "text-[var(--muted)]"}`}>{r.hint}</span>
                 </span>
                 <ArrowRight size={18} className="shrink-0 opacity-60 rtl:rotate-180" />
               </motion.button>
@@ -59,7 +60,21 @@ export default function Landing() {
         </ul>
       </section>
 
-      <p className="mt-6 text-center text-xs text-[var(--muted)]">{t(L, "sampleData")} · {ar ? "الدخول بالهوية الرقمية محاكاة" : "UAE PASS and school sign-in are simulated"}</p>
+      <FooterSection
+        className="-mx-5 mt-4 !pb-0"
+        links={[
+          { title: ar ? "للطلاب" : "Students", href: "/welcome" },
+          { title: ar ? "لأولياء الأمور" : "Parents", href: "/signin?role=parent" },
+          { title: ar ? "للمعلمين" : "Teachers", href: "/signin?role=teacher" },
+        ]}
+        socials={[
+          { label: "u.ae — UAE government portal", href: "https://u.ae", icon: Globe },
+          { label: "UAE PASS", href: "https://uaepass.ae", icon: Fingerprint },
+          { label: ar ? "وزارة التربية والتعليم" : "Ministry of Education", href: "https://www.moe.gov.ae", icon: BookOpen },
+        ]}
+        note={<>{t(L, "sampleData")} · {ar ? "الدخول بالهوية الرقمية محاكاة" : "UAE PASS and school sign-in are simulated"}</>}
+        copyright={ar ? "سوا · هاكاثون الإمارات" : "Sawa · UAE Hackathon 2026"}
+      />
     </main>
   );
 }

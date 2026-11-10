@@ -7,6 +7,8 @@ import { List, Map as MapIcon, Search, ShieldCheck } from "lucide-react";
 import { OppCard } from "@/components/s/cards";
 import { OPPORTUNITIES, SCHOOLS } from "@/lib/seed";
 import { rankOpportunities } from "@/lib/match";
+import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/components/hooks/use-debounce";
 import { ageOf, tierOf, useStore } from "@/lib/store";
 
 const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false, loading: () => <div className="shimmer h-[340px] rounded-3xl" /> });
@@ -20,12 +22,14 @@ export default function Explore() {
   const { state, me } = useStore();
   const [f, setF] = useState<string>("all");
   const [q, setQ] = useState("");
+  // filter after typing pauses, so the animated list doesn't reshuffle on every keystroke
+  const dq = useDebounce(q.trim().toLowerCase(), 250);
   const [mode, setMode] = useState<"list" | "map">("list");
   const ranked = useMemo(() => (me ? rankOpportunities(me, OPPORTUNITIES) : []), [me]);
   if (!me) return null;
   const saved = state.saved[me.id] ?? [];
   const list = ranked.filter((m) => (f === "all" ? true : f === "saved" ? saved.includes(m.o.id) : m.o.type === f))
-    .filter((m) => !q || `${m.o.titleEn} ${m.o.organiser} ${m.o.interests.join(" ")}`.toLowerCase().includes(q.toLowerCase()));
+    .filter((m) => !dq || `${m.o.titleEn} ${m.o.organiser} ${m.o.interests.join(" ")}`.toLowerCase().includes(dq));
 
   return (
     <div className="space-y-4">
@@ -35,8 +39,8 @@ export default function Explore() {
       </div>
       <div className="flex gap-2">
         <label className="relative block flex-1">
-          <Search size={18} className="absolute start-4 top-1/2 -translate-y-1/2 opacity-50" />
-          <input className="input !ps-11" placeholder="Search opportunities" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search opportunities" />
+          <Search size={18} className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 opacity-50" aria-hidden />
+          <Input type="search" className="ps-11" placeholder="Search opportunities" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search opportunities" />
         </label>
         <button className="btn-ghost !min-h-12 !px-3.5" aria-label={mode === "list" ? "Show map" : "Show list"} onClick={() => setMode(mode === "list" ? "map" : "list")}>
           {mode === "list" ? <MapIcon size={18} /> : <List size={18} />}

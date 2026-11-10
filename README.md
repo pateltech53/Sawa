@@ -54,6 +54,23 @@ Not carried over from the Figma file on purpose: the Instagram-style feed with l
 
 Tests: with the app running, `npm run e2e` (parent/teacher flow) and `npm run e2e:student` (full student journey). Screenshots go to `e2e-screens/`.
 
+## Brand, design tokens and UI components
+
+**Colour.** Pink and blue from the logo, taken from the Figma accents: pink `#F280D9`, blue `#4073FF`, joined by iris `#734DF2`/`#8C59F2` (used only for verification and AI moments). The warm silk neutrals and ink buttons from Figma stay as the base. Tokens live in `src/app/globals.css` (`pink-*`, `blue-*`, `iris-*`, shadcn names like `primary`, `muted`, `ring`, plus radii and shadows). `src/lib/brand.ts` mirrors them for inline styles. Use the `-600`/`-700` steps for text on white (AA contrast).
+
+**shadcn structure.** `components.json`, `cn()` in `src/lib/utils.ts`, components in `src/components/ui`, hooks in `src/components/hooks`. `npx shadcn add …` and 21st.dev installs land there.
+
+| Component (21st.dev) | Where it is used |
+|---|---|
+| `ui/bottom-nav-bar.tsx` | Main navigation for parents and teachers. Real links, badges, RTL. Students keep the Figma 3D nav. |
+| `ui/bottom-menu.tsx` | Header toolbar for parents and teachers (`src/components/AppToolbar.tsx`): quick actions, search, notifications, profile and sign-out, language |
+| `ui/footer.tsx` | Landing page, with role links and official UAE portals |
+| `hooks/use-debounce.ts` + `ui/input.tsx` | Toolbar search, opportunity search, community search |
+
+Changes from the originals: icons use `lucide-react` and motion uses `motion/react` (both already in the project), so `@hugeicons/*` and `framer-motion` are not added. The menus take their items as props, and every animation respects the OS reduced-motion setting.
+
+**21st.dev MCP.** `.mcp.json` registers the 21st server and reads the key from the `TWENTY_FIRST_API_KEY` environment variable. The key itself is never committed.
+
 ## What is built (Winning Plan §4)
 
 | | Feature | Where |

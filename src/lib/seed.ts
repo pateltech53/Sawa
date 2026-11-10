@@ -230,8 +230,8 @@ export const COMMUNITY_ACTIVITIES: CommunityActivity[] = [
 
 // Mock Google Classroom data — shown only after the student connects the (simulated) integration.
 export const CLASSROOM_COURSES: ClassroomCourse[] = [
-  { id: "gc-sci", name: "Grade 8 Science", teacher: "Mr Hassan", room: "Lab 2", color: "#5185DE" },
-  { id: "gc-eng", name: "Grade 8 English", teacher: "Ms Rania", room: "B12", color: "#8C59F2" },
+  { id: "gc-sci", name: "Grade 8 Science", teacher: "Mr Hassan", room: "Lab 2", color: "#4073FF" },
+  { id: "gc-eng", name: "Grade 8 English", teacher: "Ms Rania", room: "B12", color: "#F280D9" },
   { id: "gc-math", name: "Grade 8 Maths", teacher: "Mr Omar", room: "B07", color: "#2E9E6B" },
   { id: "gc-cs", name: "Computing", teacher: "Ms Layla", room: "IT Lab", color: "#D9822B" },
 ];

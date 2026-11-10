@@ -165,7 +165,7 @@ export function StudentProfile() {
             const on = me.interests.includes(i.id);
             return (
               <motion.button key={i.id} whileTap={{ scale: 0.95 }} aria-pressed={on} onClick={() => setInterests(on ? me.interests.filter((x) => x !== i.id) : [...me.interests, i.id])}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-sm font-medium transition ${on ? "border-[#8C59F2] bg-[#8C59F2] text-white" : "border-black/10 bg-white"}`}>
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-sm font-medium transition ${on ? "border-iris-500 bg-iris-500 text-white" : "border-black/10 bg-white"}`}>
                 {on && <Check size={14} />} {i.en}
               </motion.button>
             );
@@ -181,7 +181,7 @@ export function StudentProfile() {
             <div className="space-y-4">
               <p className="text-sm text-[var(--muted)]">{cur.role}</p>
               <div className="text-center text-4xl font-bold">{cur.progress}%</div>
-              <input type="range" min={0} max={100} step={5} value={cur.progress} onChange={(e) => setProjectProgress(cur.id, Number(e.target.value))} className="w-full accent-[#5185DE]" aria-label="Progress" />
+              <input type="range" min={0} max={100} step={5} value={cur.progress} onChange={(e) => setProjectProgress(cur.id, Number(e.target.value))} className="w-full accent-blue-500" aria-label="Progress" />
               <button className="btn-ink w-full" onClick={() => { setProject(null); toast("Progress saved"); }}>Save</button>
             </div>
           );
