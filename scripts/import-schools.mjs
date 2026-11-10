@@ -5,7 +5,9 @@
 // Column names vary between dataset versions; adjust COLS below after opening the CSV.
 import fs from "node:fs";
 
-const COLS = { name: ["school_name", "name_en", "School Name"], nameAr: ["name_ar", "school_name_ar"], area: ["area", "location", "Area"], lat: ["latitude", "lat"], lng: ["longitude", "lng", "long"], curriculum: ["curriculum", "Curriculum"] };
+const COLS = { name: ["school_name", "name_en", "School Name"], nameAr: ["name_ar", "school_name_ar"], area: ["area", "location", "Area"], lat: ["latitude", "lat"], lng: ["longitude", "lng", "long"], curriculum: ["curriculum", "Curriculum"],
+  rating: ["rating", "khda_rating", "overall_rating", "Rating"], ratingYear: ["rating_year", "inspection_year", "year"], grades: ["grades", "grade_range", "Grades"],
+  gender: ["gender", "Gender"], feeRange: ["fees", "fee_range", "Fees"], established: ["established", "year_established", "founded"], website: ["website", "url", "Website"] };
 
 const file = process.argv[2];
 if (!file) { console.error("Usage: npm run import:schools -- path/to/file.csv"); process.exit(1); }
@@ -37,6 +39,9 @@ const schools = data.map((r, n) => ({
   lat: I.lat >= 0 ? Number(r[I.lat]) : NaN,
   lng: I.lng >= 0 ? Number(r[I.lng]) : NaN,
   curriculum: I.curriculum >= 0 ? r[I.curriculum]?.trim() : "",
+  // optional fields: only written when the CSV has the column, so SAWA AI never shows a value the dataset doesn't contain
+  ...Object.fromEntries(["rating", "ratingYear", "grades", "gender", "feeRange", "established", "website"].filter((k) => I[k] >= 0 && r[I[k]]?.trim()).map((k) => [k, r[I[k]].trim()])),
+  sector: "Private",
   source: `KHDA via Dubai Pulse (imported ${new Date().toISOString().slice(0, 10)})`,
 })).filter((s) => s.name && Number.isFinite(s.lat) && Number.isFinite(s.lng));
 

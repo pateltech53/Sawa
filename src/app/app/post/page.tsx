@@ -1,26 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { CLASSES } from "@/lib/seed-teacher";
 import { CheckCircle2, Megaphone, Users } from "lucide-react";
 import { Card, PageTitle, Pill } from "@/components/ui";
 import { fmtDate } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 
 /** F8 — the teacher posts once; it lands in every student's and parent's Today. */
-export default function Post() {
+function PostInner() {
   const { state, me, postAnnouncement } = useStore();
+  const params = useSearchParams();
+  const preClass = CLASSES.find((c) => c.id === params.get("class"));
   const L = state.lang;
   const ar = L === "ar";
-  const [title, setTitle] = useState("Grade 8 exam timetable");
-  const [body, setBody] = useState("Science exam on Thursday, period 2. Revise chapters 3–5. Bring a calculator.");
-  const [kind, setKind] = useState<"notice" | "exam" | "event">("exam");
+  const [title, setTitle] = useState(params.get("title") ?? "Grade 8 exam timetable");
+  const [body, setBody] = useState(params.get("body") ?? "Science exam on Thursday, period 2. Revise chapters 3–5. Bring a calculator.");
+  const [kind, setKind] = useState<"notice" | "exam" | "event">(params.get("body") ? "notice" : "exam");
   const [date, setDate] = useState(() => new Date(Date.now() + 3 * 86_400_000).toISOString().slice(0, 10));
   const [includeParents, setIncludeParents] = useState(true);
   const [sent, setSent] = useState<string | null>(null);
+  const [grade, setGrade] = useState(preClass?.grade ?? me?.grade ?? "8");
   if (!me) return null;
   if (me.role !== "teacher") return <Card>{ar ? "للمعلمين فقط." : "Teachers only."}</Card>;
 
-  const grade = me.grade ?? "8";
   const students = state.profiles.filter((p) => p.role === "student" && p.grade === grade && p.schoolId === me.schoolId);
   const mine = state.announcements.filter((a) => a.teacherId === me.id);
 
@@ -48,7 +52,10 @@ export default function Post() {
           <div className="rounded-2xl bg-white/70 p-3">
             <p className="flex items-center gap-2 text-sm font-semibold"><Users size={16} /> {ar ? "الجمهور" : "Audience"}</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              <Pill tone="ink">{ar ? `الصف ${grade}` : `Grade ${grade}`} · {students.length} {ar ? "طلاب" : "students"}</Pill>
+              {[...new Set(CLASSES.map((c) => c.grade))].map((g) => (
+                <button key={g} className="chip" aria-pressed={grade === g} onClick={() => setGrade(g)}>{ar ? `الصف ${g}` : `Grade ${g}`}</button>
+              ))}
+              <Pill tone="ink">{students.length} {ar ? "طلاب على سوا" : "students on Sawa"}</Pill>
               <button className="chip" aria-pressed={includeParents} onClick={() => setIncludeParents(!includeParents)}>{ar ? "+ أولياء الأمور" : "+ Parents"}</button>
             </div>
           </div>
@@ -77,4 +84,8 @@ export default function Post() {
       )}
     </div>
   );
+}
+
+export default function Post() {
+  return <Suspense><PostInner /></Suspense>;
 }

@@ -4,13 +4,14 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  BarChart3, Bell, Building2, ChevronRight, Database, FileCheck2, FileUp, Languages, LogOut, Megaphone,
-  MessageCircleQuestion, Plus, Search, Sparkles, UserRound,
+  BarChart3, Bell, Building2, ChevronRight, ClipboardCheck, ClipboardPlus, Database, FileCheck2, FileUp, Languages, LogOut, Megaphone,
+  MessageCircleQuestion, Plus, Search, Sparkles, UploadCloud, UserRound,
 } from "lucide-react";
 import { BottomMenu, menuRow, type BottomMenuItem } from "@/components/ui/bottom-menu";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/components/hooks/use-debounce";
-import { SERVICES } from "@/lib/seed";
+import { OPPORTUNITIES, SCHOOLS, SERVICES } from "@/lib/seed";
+import { CLASSES, ROSTER } from "@/lib/seed-teacher";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import type { Lang } from "@/lib/types";
@@ -31,7 +32,21 @@ export function AppToolbar() {
     .sort((a, b) => a.priority - b.priority || +new Date(a.dueAt ?? 0) - +new Date(b.dueAt ?? 0));
   const pendingApprovals = state.approvals.filter((a) => a.guardianId === me.id && a.status === "pending").length;
   const pendingRequests = me.role === "teacher" ? state.requests.filter((r) => r.status !== "done").length : 0;
-  const urgent = open.filter((n) => n.priority === 1 || n.kind === "proactive").length + pendingApprovals + pendingRequests;
+  const ungraded = me.role === "teacher" ? Object.values(state.tSubs).reduce((n, subs) => n + Object.values(subs).filter((x) => x.status === "submitted" || x.status === "late").length, 0) : 0;
+  const sponsorUpdates = me.role === "teacher" ? state.tSponsor.filter((x) => x.status !== "submitted") : [];
+  const teacherAlerts = me.role === "teacher"
+    ? [
+        ...(ungraded ? [{ id: "ungraded", text: ar ? `${ungraded} تسليمات بانتظار التصحيح` : `${ungraded} submissions to grade`, href: "/app/classes", hot: true }] : []),
+        ...sponsorUpdates.slice(0, 2).map((x) => {
+          const op = OPPORTUNITIES.find((o) => o.id === x.opportunityId);
+          return { id: x.id, text: ar ? `الرعاية ${x.status === "approved" ? "معتمدة" : "مرفوضة"}: ${op?.titleAr}` : `Sponsorship ${x.status}: ${op?.titleEn}`, href: "/app/opportunities", hot: false };
+        }),
+        ...OPPORTUNITIES.filter((o) => o.deadline && +new Date(o.deadline) - Date.now() < 6 * 86_400_000 && +new Date(o.deadline) > Date.now()).slice(0, 2).map((o) => ({
+          id: o.id, text: ar ? `آخر موعد قريب: ${o.titleAr}` : `Deadline soon: ${o.titleEn}`, href: "/app/opportunities", hot: false,
+        })),
+      ]
+    : [];
+  const urgent = open.filter((n) => n.priority === 1 || n.kind === "proactive").length + pendingApprovals + pendingRequests + (ungraded ? 1 : 0);
 
   const quick =
     me.role === "parent"
@@ -42,8 +57,11 @@ export function AppToolbar() {
         ]
       : [
           { href: "/app/post", icon: Megaphone, label: ar ? "نشر إعلان" : "Post an announcement" },
-          { href: "/app/office", icon: Building2, label: ar ? "مراجعة الطلبات" : "Review requests" },
-          { href: "/app/ask", icon: MessageCircleQuestion, label: t(L, "ask") },
+          { href: "/app/resources?upload=1", icon: UploadCloud, label: ar ? "رفع ملف أو مورد" : "Upload a file" },
+          { href: "/app/classes?new=1", icon: ClipboardPlus, label: ar ? "واجب جديد" : "New assignment" },
+          { href: "/app/classes/cl-8a?tab=attendance", icon: ClipboardCheck, label: ar ? "تسجيل الحضور" : "Take attendance" },
+          { href: "/app/office", icon: Building2, label: ar ? "مراجعة طلبات أولياء الأمور" : "Review parent requests" },
+          { href: "/app/ask", icon: Sparkles, label: "SAWA AI" },
         ];
 
   const items: BottomMenuItem[] = [
@@ -94,6 +112,14 @@ export function AppToolbar() {
                 </Link>
               </li>
             )}
+            {teacherAlerts.map((a) => (
+              <li key={a.id}>
+                <Link href={a.href} onClick={close} className={menuRow}>
+                  <span className={cn("h-2 w-2 shrink-0 rounded-full", a.hot ? "bg-pink-500" : "bg-blue-500")} aria-hidden />
+                  <span className="min-w-0 flex-1 truncate">{a.text}</span>
+                </Link>
+              </li>
+            ))}
             {open.slice(0, 4).map((n) => (
               <li key={n.id}>
                 <Link href={n.action?.href ?? "/app/today"} onClick={close} className={menuRow}>
@@ -102,7 +128,7 @@ export function AppToolbar() {
                 </Link>
               </li>
             ))}
-            {open.length === 0 && pendingApprovals === 0 && pendingRequests === 0 && (
+            {open.length === 0 && pendingApprovals === 0 && pendingRequests === 0 && teacherAlerts.length === 0 && (
               <li className="px-3 py-3 text-sm text-muted-foreground">{ar ? "لا شيء جديد. أحسنت!" : "You're all caught up."}</li>
             )}
           </ul>
@@ -196,14 +222,27 @@ function SearchPanel({ close }: { close: () => void }) {
         : [
             { id: "p-post", title: t(L, "post"), sub: ar ? "صفحة" : "Page", href: "/app/post" },
             { id: "p-office", title: t(L, "office"), sub: ar ? "صفحة" : "Page", href: "/app/office" },
+            { id: "p-classes", title: ar ? "الصفوف" : "Classes", sub: ar ? "صفحة" : "Page", href: "/app/classes" },
+            { id: "p-res", title: ar ? "الموارد" : "Resources", sub: ar ? "صفحة" : "Page", href: "/app/resources" },
+            { id: "p-opp", title: ar ? "فرص الطلاب" : "Student opportunities", sub: ar ? "صفحة" : "Page", href: "/app/opportunities" },
+            { id: "p-growth", title: ar ? "المسار المهني والمدارس" : "Career, schools & network", sub: ar ? "صفحة" : "Page", href: "/app/growth" },
           ]),
     ];
+    const teacherHits: Hit[] = me?.role === "teacher"
+      ? [
+          ...CLASSES.map((c) => ({ id: c.id, title: ar ? c.nameAr : c.name, sub: ar ? "صف" : `Class · ${c.source}`, href: `/app/classes/${c.id}` })),
+          ...ROSTER.map((r) => ({ id: `st-${r.id}`, title: ar ? r.nameAr : r.name, sub: (ar ? "طالب · " : "Student · ") + (CLASSES.filter((c) => c.studentIds.includes(r.id)).map((c) => c.name).join(", ")), href: `/app/classes/${CLASSES.find((c) => c.studentIds.includes(r.id))?.id}?student=${r.id}` })),
+          ...state.tResources.map((r) => ({ id: r.id, title: r.title, sub: ar ? "مورد" : `Resource · ${r.owner}`, href: `/app/resources?open=${r.id}` })),
+          ...OPPORTUNITIES.map((o) => ({ id: o.id, title: ar ? o.titleAr : o.titleEn, sub: ar ? "فرصة للطلاب" : "Student opportunity", href: `/app/opportunities?open=${o.id}` })),
+          ...SCHOOLS.map((x) => ({ id: x.id, title: ar ? x.nameAr : x.name, sub: ar ? "مدرسة" : `School · ${x.area} · ${x.curriculum}`, href: `/app/growth?tab=schools&open=${x.id}` })),
+        ]
+      : [];
     const services: Hit[] = me?.role === "parent"
       ? SERVICES.map((s) => ({ id: s.id, title: ar ? s.nameAr : s.nameEn, sub: s.ownerSystem, href: s.href ?? "/app/services" }))
       : [];
     const notices: Hit[] = visibleNotices.map((n) => ({ id: n.id, title: ar ? n.titleAr : n.titleEn, sub: n.sourceSystem, href: n.action?.href ?? "/app/today" }));
-    return [...pages, ...services, ...notices];
-  }, [L, ar, me?.role, visibleNotices]);
+    return [...pages, ...teacherHits, ...services, ...notices];
+  }, [L, ar, me?.role, visibleNotices, state.tResources]);
 
   const hits = query ? index.filter((h) => `${h.title} ${h.sub}`.toLowerCase().includes(query)).slice(0, 6) : [];
   const askHref = `/app/ask?q=${encodeURIComponent(q.trim())}`;
@@ -217,7 +256,7 @@ function SearchPanel({ close }: { close: () => void }) {
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder={ar ? "ابحث في الخدمات والإشعارات…" : "Search services, notices, pages…"}
+          placeholder={me?.role === "teacher" ? (ar ? "ابحث في الطلاب والموارد والمدارس…" : "Search students, files, schools…") : ar ? "ابحث في الخدمات والإشعارات…" : "Search services, notices, pages…"}
           aria-label={ar ? "بحث" : "Search"}
           className="min-h-11 ps-10"
         />

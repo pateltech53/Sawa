@@ -9,10 +9,12 @@ import { OPPORTUNITIES } from "@/lib/seed";
 import { useStore } from "@/lib/store";
 import type { Notice } from "@/lib/types";
 import { StudentHome } from "@/components/s/StudentHome";
+import { TeacherHome } from "@/components/t/TeacherHome";
 
 export default function Today() {
   const { me } = useStore();
   if (me?.role === "student") return <StudentHome />;
+  if (me?.role === "teacher") return <TeacherHome />;
   return <GuardianToday />;
 }
 

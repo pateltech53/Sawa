@@ -97,6 +97,17 @@ export interface School {
   lng: number;
   curriculum: string;
   source: string;
+  /** Optional KHDA directory fields. Present only when the dataset provides them. */
+  rating?: string;
+  ratingYear?: string;
+  grades?: string;
+  gender?: "Mixed" | "Boys" | "Girls";
+  feeRange?: string;
+  established?: string;
+  students?: number;
+  website?: string;
+  specialities?: string[];
+  sector?: "Public" | "Private";
 }
 
 export type OpportunityType = "competition" | "workshop" | "club" | "hackathon" | "mun" | "volunteering" | "leadership" | "event";
@@ -228,4 +239,166 @@ export interface DataSource {
   usedFor: string;
   lastUpdated: string;
   status: "sample" | "imported";
+}
+
+/* ───────────── Teacher workspace ───────────── */
+
+export type Subject = "Science" | "Maths" | "English" | "Arabic" | "Computing" | "Art" | "Social Studies" | "Islamic Studies";
+
+export interface RosterStudent {
+  id: string; // matches a Profile id when the student also uses Sawa
+  name: string;
+  nameAr: string;
+  birthYear: number;
+  interests: string[];
+  /** Support flags the school shares with class teachers (sample). Never health or family details. */
+  support?: "extension" | "learning_support";
+}
+
+export interface TeacherClass {
+  id: string;
+  name: string; // "8A Science"
+  nameAr: string;
+  subject: Subject;
+  grade: string;
+  room: string;
+  color: string;
+  studentIds: string[];
+  /** Where the class lives today. Sawa reads from it; it does not replace it. */
+  source: "Google Classroom" | "Microsoft Teams" | "ManageBac" | "Sawa";
+}
+
+export interface TimetableSlot {
+  day: number; // 0 = Sunday ... 4 = Thursday (UAE school week, Mon-Fri also supported)
+  period: number;
+  start: string; // "07:30"
+  end: string;
+  classId?: string;
+  label?: string; // duty, PLC meeting
+}
+
+export interface TAssignment {
+  id: string;
+  classId: string;
+  title: string;
+  kind: "homework" | "quiz" | "project" | "lab";
+  dueAt: string;
+  points: number;
+  createdAt: string;
+  status: "draft" | "published";
+  returned?: boolean;
+}
+
+export interface Submission {
+  status: "missing" | "submitted" | "late" | "graded";
+  score?: number;
+  feedback?: string;
+}
+
+export type ResourceKind = "worksheet" | "slides" | "lesson_plan" | "assessment" | "video" | "link";
+export interface Resource {
+  id: string;
+  title: string;
+  titleAr?: string;
+  kind: ResourceKind;
+  subject: Subject;
+  grades: string[];
+  owner: string; // display name
+  ownerId: string;
+  school: string;
+  scope: "mine" | "school" | "network";
+  sizeKb?: number;
+  fileName?: string;
+  url?: string;
+  tags: string[];
+  saves: number;
+  createdAt: string;
+  sharedWith?: string[]; // class ids
+  summary?: string;
+}
+
+export interface Educator {
+  id: string;
+  name: string;
+  nameAr: string;
+  schoolId: string;
+  subjects: Subject[];
+  grades: string;
+  years: number;
+  bio: string;
+  openTo: ("resource_swap" | "mentoring" | "co_teaching" | "competitions")[];
+}
+
+export interface TeacherCommunity {
+  id: string;
+  name: string;
+  nameAr: string;
+  members: number;
+  subject?: Subject;
+  about: string;
+  emirate: string;
+  moderated: boolean;
+}
+
+export interface JobPosting {
+  id: string;
+  schoolId: string;
+  title: string;
+  subject: Subject;
+  grades: string;
+  start: string;
+  contract: string;
+  postedAt: string;
+  closesAt: string;
+  source: string;
+}
+
+export interface PdProgramme {
+  id: string;
+  title: string;
+  provider: string;
+  format: "online" | "in_person" | "blended";
+  hours: number;
+  startsAt: string;
+  subjects: (Subject | "All")[];
+  cost: string;
+  certificate: boolean;
+  about: string;
+  source: string;
+}
+
+export interface Recommendation {
+  id: string;
+  opportunityId: string;
+  classId: string;
+  studentIds: string[];
+  note: string;
+  at: string;
+}
+
+export interface Sponsorship {
+  id: string;
+  opportunityId: string;
+  classId: string;
+  students: number;
+  budget: string;
+  reason: string;
+  status: "submitted" | "approved" | "declined";
+  history: { status: Sponsorship["status"]; at: string; by: string }[];
+}
+
+/** One answer from SAWA AI for teachers. `verified` is built from retrieved records, never by the model. */
+export interface TeacherAiAnswer {
+  answer: string;
+  verified: { label: string; value: string; source: string }[];
+  advice: string[];
+  questions?: string[];
+  missing: string[];
+  records: { type: "school" | "opportunity" | "job" | "pd" | "educator" | "resource"; id: string; title: string; sub: string; href: string }[];
+  sources: { n: number; title: string; url: string; name: string; status: "live" | "sample" | "mock" | "imported" }[];
+  actions: { label: string; href: string; confirm?: string }[];
+  draft?: { title: string; body: string };
+  mode: string;
+  tools: string[];
+  flagged?: boolean;
 }

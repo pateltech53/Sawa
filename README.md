@@ -71,6 +71,24 @@ Changes from the originals: icons use `lucide-react` and motion uses `motion/rea
 
 **21st.dev MCP.** `.mcp.json` registers the 21st server and reads the key from the `TWENTY_FIRST_API_KEY` environment variable. The key itself is never committed.
 
+## Teacher workspace
+
+Sign in as **Teacher** (`/` → Teacher / school staff → *Sign in with UAE PASS*, or the staff email fallback). Two bars:
+
+- **Top right:** SAWA AI, quick create (post, upload a file, new assignment, take attendance, parent requests), search (students, files, schools, opportunities), notifications, profile, language. Shared with the parent toolbar.
+- **Bottom centre:** the five sections in the 21st.dev LimelightNav.
+
+| Section | Route | What works |
+|---|---|---|
+| Today | `/app/today` | Timetable with now/next, "needs you" (grading, attendance, parent requests, overdue work), class snapshots, matched opportunities, AI prompts, posts seen-by, network and PD |
+| Classes | `/app/classes`, `/app/classes/[id]` | Assignments (create → students' Today), grading sheet with feedback and "return grades", editable gradebook, attendance (confirm before sending), student profiles with check-in and stretch lists |
+| Resources | `/app/resources` | My files / My school / Teacher network / Saved, search + filter bar, upload (type and size checks, visibility, share with classes), detail with share, save, delete, "adapt with AI" |
+| Students (opportunities) | `/app/opportunities` | Filter by type, age, cost, interest, deadline, consent; eligibility per class; recommend to chosen students (with guardian-consent note); sponsorship request with status timeline; deadline reminders |
+| Career | `/app/growth` | School explorer (KHDA format, filters, map), school detail showing what is *not* in the dataset, jobs, PD with hours log, teacher network and communities |
+| SAWA AI | `/app/ask`, `/api/teacher-ai` | Retrieval tools over schools, opportunities, jobs, PD, educators and resources. "From SAWA data" facts are built from records, never by the model; advice is labelled; missing data is listed; drafts open in Post once for review |
+
+Integration status is labelled everywhere: Google Classroom and Teams are **mock**, ManageBac is **awaiting credentials**, schools/opportunities/jobs/PD are **sample data**, SAWA AI is **live** only with `ANTHROPIC_API_KEY` (otherwise retrieval-only). Test: `npm run e2e:teacher` with the app running.
+
 ## What is built (Winning Plan §4)
 
 | | Feature | Where |

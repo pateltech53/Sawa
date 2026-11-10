@@ -10,6 +10,7 @@ import { AppToolbar } from "@/components/AppToolbar";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import { StudentShell } from "@/components/s/StudentShell";
+import { TeacherShell } from "@/components/t/TeacherShell";
 import { ToastProvider } from "@/components/s/kit";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [ready, me, router, state.onboarded]);
   if (!ready || !me) return <div className="grid min-h-dvh place-items-center"><div className="shimmer h-10 w-40 rounded-full" /></div>;
   if (me.role === "student") return <ToastProvider><StudentShell>{children}</StudentShell></ToastProvider>;
+  if (me.role === "teacher") return <ToastProvider><TeacherShell>{children}</TeacherShell></ToastProvider>;
 
   const pendingApprovals = state.approvals.filter((a) => a.guardianId === me.id && a.status === "pending").length;
 

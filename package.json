@@ -9,7 +9,8 @@
     "lint": "eslint",
     "import:schools": "node scripts/import-schools.mjs",
     "e2e": "node scripts/e2e.cjs",
-    "e2e:student": "node scripts/e2e-student.cjs"
+    "e2e:student": "node scripts/e2e-student.cjs",
+    "e2e:teacher": "node scripts/e2e-teacher.cjs"
   },
   "dependencies": {
     "@aegov/design-system": "^3.0.7",

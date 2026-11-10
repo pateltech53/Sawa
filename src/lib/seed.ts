@@ -120,11 +120,20 @@ export const PROFILE_FACTS: ProfileFact[] = [
 // Sample schools. Replace with the KHDA "Dubai private schools" dataset (Dubai Pulse)
 // using `npm run import:schools -- path/to/khda.csv`. Names below are fictional.
 const SAMPLE_SCHOOLS: School[] = [
-  { id: "sch-1", name: "Al Noor Public School (sample)", nameAr: "مدرسة النور الحكومية (عينة)", area: "Al Barsha", lat: 25.1046, lng: 55.1983, curriculum: "MOE", source: "Sample — to be replaced by MOE school list" },
-  { id: "sch-2", name: "Creek Science Academy (sample)", nameAr: "أكاديمية الخور للعلوم (عينة)", area: "Al Garhoud", lat: 25.2410, lng: 55.3500, curriculum: "UK", source: "Sample — KHDA via Dubai Pulse format" },
-  { id: "sch-3", name: "Marina Innovation School (sample)", nameAr: "مدرسة المرسى للابتكار (عينة)", area: "Dubai Marina", lat: 25.0800, lng: 55.1400, curriculum: "IB", source: "Sample — KHDA via Dubai Pulse format" },
-  { id: "sch-4", name: "Mirdif Future School (sample)", nameAr: "مدرسة مردف للمستقبل (عينة)", area: "Mirdif", lat: 25.2200, lng: 55.4200, curriculum: "US", source: "Sample — KHDA via Dubai Pulse format" },
-  { id: "sch-5", name: "Al Quoz Arts & Tech School (sample)", nameAr: "مدرسة القوز للفنون والتقنية (عينة)", area: "Al Quoz", lat: 25.1400, lng: 55.2350, curriculum: "Indian", source: "Sample — KHDA via Dubai Pulse format" },
+  { id: "sch-1", name: "Al Noor Public School (sample)", nameAr: "مدرسة النور الحكومية (عينة)", area: "Al Barsha", lat: 25.1046, lng: 55.1983, curriculum: "MOE", source: "Sample, to be replaced by the MOE school list",
+    sector: "Public", grades: "KG-12", gender: "Mixed", students: 1350, specialities: ["Robotics club", "School garden"] },
+  { id: "sch-2", name: "Creek Science Academy (sample)", nameAr: "أكاديمية الخور للعلوم (عينة)", area: "Al Garhoud", lat: 25.2410, lng: 55.3500, curriculum: "UK", source: "Sample row in KHDA directory format",
+    sector: "Private", rating: "Very good (sample)", ratingYear: "2024-25 (sample)", grades: "FS1-Y13", gender: "Mixed", feeRange: "AED 45,000-78,000 (sample)", established: "2009", students: 1900, specialities: ["Physics olympiad", "STEM labs"] },
+  { id: "sch-3", name: "Marina Innovation School (sample)", nameAr: "مدرسة المرسى للابتكار (عينة)", area: "Dubai Marina", lat: 25.0800, lng: 55.1400, curriculum: "IB", source: "Sample row in KHDA directory format",
+    sector: "Private", rating: "Outstanding (sample)", ratingYear: "2024-25 (sample)", grades: "KG-12", gender: "Mixed", feeRange: "AED 62,000-98,000 (sample)", established: "2014", students: 1400, specialities: ["Project-based learning", "Hackathons"] },
+  { id: "sch-4", name: "Mirdif Future School (sample)", nameAr: "مدرسة مردف للمستقبل (عينة)", area: "Mirdif", lat: 25.2200, lng: 55.4200, curriculum: "US", source: "Sample row in KHDA directory format",
+    sector: "Private", rating: "Good (sample)", ratingYear: "2024-25 (sample)", grades: "KG-12", gender: "Mixed", feeRange: "AED 38,000-60,000 (sample)", established: "2006", students: 2100, specialities: ["Model UN", "Maths olympiad"] },
+  { id: "sch-5", name: "Al Quoz Arts & Tech School (sample)", nameAr: "مدرسة القوز للفنون والتقنية (عينة)", area: "Al Quoz", lat: 25.1400, lng: 55.2350, curriculum: "Indian", source: "Sample row in KHDA directory format",
+    sector: "Private", rating: "Good (sample)", ratingYear: "2024-25 (sample)", grades: "KG-12", gender: "Mixed", feeRange: "AED 18,000-32,000 (sample)", established: "2001", students: 2600, specialities: ["Robotics", "Digital arts"] },
+  { id: "sch-6", name: "Jumeirah Heritage School (sample)", nameAr: "مدرسة جميرا للتراث (عينة)", area: "Jumeirah", lat: 25.2048, lng: 55.2458, curriculum: "UK", source: "Sample row in KHDA directory format",
+    sector: "Private", rating: "Very good (sample)", ratingYear: "2024-25 (sample)", grades: "FS1-Y13", gender: "Mixed", feeRange: "AED 52,000-85,000 (sample)", established: "1998", students: 1700, specialities: ["Arabic language programme", "Debate"] },
+  { id: "sch-7", name: "Silicon Oasis STEM School (sample)", nameAr: "مدرسة واحة السيليكون للعلوم (عينة)", area: "Dubai Silicon Oasis", lat: 25.1180, lng: 55.3800, curriculum: "US", source: "Sample row in KHDA directory format",
+    sector: "Private", rating: "Acceptable (sample)", ratingYear: "2024-25 (sample)", grades: "KG-12", gender: "Mixed", feeRange: "AED 30,000-48,000 (sample)", established: "2017", students: 900, specialities: ["Engineering electives"] },
 ];
 
 /** Sample rows + any rows imported from the real KHDA CSV. */

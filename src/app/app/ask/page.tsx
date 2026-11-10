@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { ArrowUp, ExternalLink, Loader2, Mic, ShieldCheck } from "lucide-react";
 import { Mascot, Pill } from "@/components/ui";
 import { useStore } from "@/lib/store";
+import { TeacherAsk } from "@/components/t/TeacherAsk";
 
 interface Msg {
   role: "user" | "sawa";
@@ -140,6 +141,11 @@ function AskInner() {
   );
 }
 
+function AskRouter() {
+  const { me } = useStore();
+  return me?.role === "teacher" ? <TeacherAsk /> : <AskInner />;
+}
+
 export default function Ask() {
-  return <Suspense><AskInner /></Suspense>;
+  return <Suspense><AskRouter /></Suspense>;
 }

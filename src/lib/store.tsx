@@ -2,9 +2,13 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as seed from "./seed";
+import * as tseed from "./seed-teacher";
 import type {
   AgeTier, Announcement, Approval, CommunityPost, Lang, Notice, Profile, ProfileFact, Project, Reminder, RequestStatus, Role, ServiceRequest,
+  Recommendation, Resource, Sponsorship, Submission, TAssignment,
 } from "./types";
+
+export type Attendance = "present" | "absent" | "late";
 
 const KEY = "sawa-demo-v1";
 
@@ -34,6 +38,20 @@ export interface State {
   verification: Record<string, { verifiedAt: string; method: "sample_id_simulated" }>;
   feedUnlockedOn: Record<string, string>;
   bios: Record<string, { handle: string; bio: string }>;
+  // ── teacher workspace ──
+  tAssignments: TAssignment[];
+  tSubs: Record<string, Record<string, Submission>>;
+  tAttendance: Record<string, Record<string, Attendance>>; // key: classId|yyyy-mm-dd
+  tAttendanceSent: Record<string, string>;
+  tResources: Resource[];
+  tSavedRes: string[];
+  tConnections: Record<string, "pending" | "connected">;
+  tCommunities: string[];
+  tRecs: Recommendation[];
+  tSponsor: Sponsorship[];
+  tSavedJobs: string[];
+  tSavedSchools: string[];
+  tPd: string[];
 }
 
 export const initialState = (): State => ({
@@ -64,6 +82,19 @@ export const initialState = (): State => ({
   verification: {},
   feedUnlockedOn: {},
   bios: { "stu-sara": { handle: "sara.builds", bio: "Grade 8 · robots, cameras and code." } },
+  tAssignments: structuredClone(tseed.T_ASSIGNMENTS),
+  tSubs: tseed.seedSubmissions(),
+  tAttendance: {},
+  tAttendanceSent: {},
+  tResources: structuredClone(tseed.RESOURCES),
+  tSavedRes: [],
+  tConnections: { "edu-hassan": "connected" },
+  tCommunities: ["tc-1"],
+  tRecs: [],
+  tSponsor: [],
+  tSavedJobs: [],
+  tSavedSchools: [],
+  tPd: [],
 });
 
 export const ageOf = (p?: Profile) => (p?.birthYear ? new Date().getFullYear() - p.birthYear : 30);
@@ -373,6 +404,97 @@ function useBuildStore() {
     setProjectProgress: (id: string, progress: number) =>
       update((s) => ({ ...s, projects: s.projects.map((p) => (p.id === id ? { ...p, progress: Math.max(0, Math.min(100, progress)) } : p)) })),
     unlockFeed: () => update((s) => ({ ...s, feedUnlockedOn: { ...s.feedUnlockedOn, [s.sessionUserId!]: new Date().toDateString() } })),
+    // ── teacher actions ──
+    createAssignment: (a: Pick<TAssignment, "classId" | "title" | "kind" | "dueAt" | "points">) => {
+      const id = `as-${uid()}`;
+      update((s) => {
+        const cls = tseed.CLASSES.find((c) => c.id === a.classId)!;
+        const teacher = s.profiles.find((p) => p.id === s.sessionUserId);
+        const subs: Record<string, Submission> = Object.fromEntries(cls.studentIds.map((sid) => [sid, { status: "missing" } as Submission]));
+        const fan: Notice[] = cls.studentIds.filter((sid) => s.profiles.some((p) => p.id === sid)).map((sid) => ({
+          id: `${id}-${sid}`, userId: sid, sourceSystem: cls.source === "Sawa" ? "School" : "LMS", kind: "assignment", priority: 2, status: "open",
+          titleEn: `${cls.subject}: ${a.title}`, titleAr: `${cls.nameAr}: ${a.title}`, bodyEn: `${a.points} points · set by ${teacher?.name ?? "your teacher"}`, bodyAr: `${a.points} درجة · من ${teacher?.nameAr ?? "معلمك"}`, dueAt: a.dueAt,
+        }));
+        return { ...s, tAssignments: [{ ...a, id, createdAt: now(), status: "published" }, ...s.tAssignments], tSubs: { ...s.tSubs, [id]: subs }, notices: [...fan, ...s.notices] };
+      });
+      return id;
+    },
+    setSubmission: (asgId: string, sid: string, patch: Partial<Submission>) =>
+      update((s) => {
+        const cur = s.tSubs[asgId]?.[sid] ?? { status: "missing" as const };
+        const next: Submission = { ...cur, ...patch };
+        if (patch.score !== undefined && !Number.isNaN(patch.score)) next.status = "graded";
+        return { ...s, tSubs: { ...s.tSubs, [asgId]: { ...(s.tSubs[asgId] ?? {}), [sid]: next } } };
+      }),
+    returnGrades: (asgId: string) =>
+      update((s) => {
+        const a = s.tAssignments.find((x) => x.id === asgId);
+        if (!a) return s;
+        const subs = s.tSubs[asgId] ?? {};
+        const fan: Notice[] = Object.entries(subs).filter(([sid, v]) => v.status === "graded" && s.profiles.some((p) => p.id === sid)).map(([sid, v]) => ({
+          id: `ret-${asgId}-${sid}`, userId: sid, sourceSystem: "LMS", kind: "notice", priority: 3, status: "open",
+          titleEn: `Grade returned: ${a.title} (${v.score}/${a.points})`, titleAr: `أُعيدت الدرجة: ${a.title} (${v.score}/${a.points})`,
+          bodyEn: v.feedback ? `Feedback: ${v.feedback}` : "Open your class to see feedback.", bodyAr: v.feedback ? `ملاحظة: ${v.feedback}` : "افتح صفك لرؤية الملاحظات.",
+        }));
+        return { ...s, tAssignments: s.tAssignments.map((x) => (x.id === asgId ? { ...x, returned: true } : x)), notices: [...fan, ...s.notices] };
+      }),
+    setAttendance: (key: string, sid: string, v: Attendance) =>
+      update((s) => ({ ...s, tAttendance: { ...s.tAttendance, [key]: { ...(s.tAttendance[key] ?? {}), [sid]: v } } })),
+    markAllPresent: (key: string, ids: string[]) =>
+      update((s) => ({ ...s, tAttendance: { ...s.tAttendance, [key]: Object.fromEntries(ids.map((i) => [i, (s.tAttendance[key]?.[i] ?? "present") as Attendance])) } })),
+    submitAttendance: (key: string) => update((s) => ({ ...s, tAttendanceSent: { ...s.tAttendanceSent, [key]: now() } })),
+    addResource: (r: Omit<Resource, "id" | "createdAt" | "saves" | "owner" | "ownerId" | "school">) => {
+      const id = `rs-${uid()}`;
+      update((s) => {
+        const me = s.profiles.find((p) => p.id === s.sessionUserId)!;
+        const school = seed.SCHOOLS.find((x) => x.id === me.schoolId)?.name ?? "";
+        return { ...s, tResources: [{ ...r, id, createdAt: now(), saves: 0, owner: me.name, ownerId: me.id, school }, ...s.tResources] };
+      });
+      return id;
+    },
+    updateResource: (id: string, patch: Partial<Resource>) => update((s) => ({ ...s, tResources: s.tResources.map((r) => (r.id === id ? { ...r, ...patch } : r)) })),
+    deleteResource: (id: string) => update((s) => ({ ...s, tResources: s.tResources.filter((r) => r.id !== id) })),
+    shareResource: (id: string, classIds: string[]) =>
+      update((s) => {
+        const r = s.tResources.find((x) => x.id === id);
+        if (!r) return s;
+        const students = [...new Set(classIds.flatMap((c) => tseed.CLASSES.find((x) => x.id === c)?.studentIds ?? []))].filter((sid) => s.profiles.some((p) => p.id === sid));
+        const fan: Notice[] = students.map((sid) => ({
+          id: `res-${id}-${sid}-${uid()}`, userId: sid, sourceSystem: "School", kind: "notice", priority: 3, status: "open",
+          titleEn: `New resource: ${r.title}`, titleAr: `مورد جديد: ${r.titleAr ?? r.title}`, bodyEn: r.summary ?? "Shared by your teacher.", bodyAr: "شاركه معلمك.",
+        }));
+        return { ...s, tResources: s.tResources.map((x) => (x.id === id ? { ...x, sharedWith: [...new Set([...(x.sharedWith ?? []), ...classIds])] } : x)), notices: [...fan, ...s.notices] };
+      }),
+    toggleSaveResource: (id: string) => update((s) => ({ ...s, tSavedRes: s.tSavedRes.includes(id) ? s.tSavedRes.filter((x) => x !== id) : [...s.tSavedRes, id], tResources: s.tResources.map((r) => (r.id === id ? { ...r, saves: r.saves + (s.tSavedRes.includes(id) ? -1 : 1) } : r)) })),
+    requestConnection: (eduId: string) => update((s) => ({ ...s, tConnections: { ...s.tConnections, [eduId]: "pending" } })),
+    acceptConnection: (eduId: string) => update((s) => (s.tConnections[eduId] === "pending" ? { ...s, tConnections: { ...s.tConnections, [eduId]: "connected" } } : s)),
+    removeConnection: (eduId: string) => update((s) => { const c = { ...s.tConnections }; delete c[eduId]; return { ...s, tConnections: c }; }),
+    toggleTCommunity: (id: string) => update((s) => ({ ...s, tCommunities: s.tCommunities.includes(id) ? s.tCommunities.filter((x) => x !== id) : [...s.tCommunities, id] })),
+    /** Teacher recommends an opportunity: eligible students with Sawa accounts get it in their Today. */
+    recommend: (opportunityId: string, classId: string, studentIds: string[], note: string) =>
+      update((s) => {
+        const op = seed.OPPORTUNITIES.find((o) => o.id === opportunityId)!;
+        const teacher = s.profiles.find((p) => p.id === s.sessionUserId);
+        const rec: Recommendation = { id: `rec-${uid()}`, opportunityId, classId, studentIds, note, at: now() };
+        const fan: Notice[] = studentIds.filter((sid) => s.profiles.some((p) => p.id === sid)).map((sid) => ({
+          id: `${rec.id}-${sid}`, userId: sid, sourceSystem: "School", kind: "notice", priority: 2, status: "open",
+          titleEn: `${teacher?.name ?? "Your teacher"} recommends: ${op.titleEn}`, titleAr: `${teacher?.nameAr ?? "معلمك"} يرشّح لك: ${op.titleAr}`,
+          bodyEn: note || op.descEn, bodyAr: note || op.descAr, dueAt: op.deadline,
+          reasonEn: "Your teacher picked this because it matches your interests and you meet the age rules.", reasonAr: "اختاره معلمك لأنه يناسب اهتماماتك وتنطبق عليك شروط العمر.",
+          action: { labelEn: "View opportunity", labelAr: "عرض الفرصة", href: `/app/opportunities/${op.id}` },
+        }));
+        return { ...s, tRecs: [rec, ...s.tRecs], notices: [...fan, ...s.notices] };
+      }),
+    requestSponsorship: (sp: Pick<Sponsorship, "opportunityId" | "classId" | "students" | "budget" | "reason">) => {
+      const id = `sp-${uid()}`;
+      update((s) => ({ ...s, tSponsor: [{ ...sp, id, status: "submitted", history: [{ status: "submitted", at: now(), by: s.sessionUserId! }] }, ...s.tSponsor] }));
+      return id;
+    },
+    decideSponsorship: (id: string, approve: boolean) =>
+      update((s) => ({ ...s, tSponsor: s.tSponsor.map((x) => (x.id === id ? { ...x, status: approve ? "approved" : "declined", history: [...x.history, { status: approve ? "approved" : "declined", at: now(), by: "principal (simulated)" }] } : x)) })),
+    toggleSavedJob: (id: string) => update((s) => ({ ...s, tSavedJobs: s.tSavedJobs.includes(id) ? s.tSavedJobs.filter((x) => x !== id) : [...s.tSavedJobs, id] })),
+    toggleSavedSchool: (id: string) => update((s) => ({ ...s, tSavedSchools: s.tSavedSchools.includes(id) ? s.tSavedSchools.filter((x) => x !== id) : [...s.tSavedSchools, id] })),
+    togglePd: (id: string) => update((s) => ({ ...s, tPd: s.tPd.includes(id) ? s.tPd.filter((x) => x !== id) : [...s.tPd, id] })),
     logAi: (q: string, mode: string, flagged?: boolean) =>
       update((s) => ({ ...s, aiLog: [{ q: q.slice(0, 80), mode, flagged, at: now() }, ...s.aiLog].slice(0, 50) })),
   };
