@@ -6,7 +6,7 @@ import type {
   AgeTier, Announcement, Approval, CommunityPost, Lang, Notice, Profile, ProfileFact, Project, Reminder, RequestStatus, Role, ServiceRequest,
 } from "./types";
 
-const KEY = "sawa-demo-v1";
+const KEY = "sawa-demo-v2"; // bumped with each redesign so an old saved demo cannot hide the new screens
 
 export interface State {
   v: 1;

@@ -10,8 +10,8 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens', 'student'); req
   const shot = async (name) => { await p.screenshot({ path: `${OUT}/${String(++n).padStart(2,'0')}-${name}.png` }); };
   await p.goto(B); await p.waitForTimeout(1200); await shot('landing');
   await p.click('button:has-text("Student")'); await p.waitForURL('**/welcome'); await p.waitForTimeout(500); await shot('splash');
-  await p.waitForSelector('text=Get Started', { timeout: 6000 }); await p.waitForTimeout(1300); await shot('get-started');
-  await p.click('text=Get Started'); await p.waitForTimeout(800); await shot('school');
+  await p.waitForTimeout(2500); await shot('preloader'); await p.click('text=Skip intro'); await p.waitForSelector('button[aria-label="Get Started"]', { timeout: 6000 }); await p.waitForTimeout(1500); await shot('get-started');
+  await p.click('button[aria-label="Get Started"]'); await p.waitForTimeout(800); await shot('school');
   await p.click('text=Continue with school login'); await p.waitForTimeout(700); await shot('consent');
   await p.click('text=Allow and continue'); await p.waitForTimeout(900); await shot('loading');
   await p.waitForSelector('text=Verify your identity', { timeout: 8000 }); await p.waitForTimeout(800); await shot('verify');

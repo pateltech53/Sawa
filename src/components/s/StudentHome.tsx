@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform, animate } from "motion/react";
 import { ArrowRight, Check, ChevronRight, KeyRound, Lock, LockOpen, Maximize2, Play, ShieldCheck, Sparkles, ThumbsUp } from "lucide-react";
+import { FlowButton } from "@/components/ui/flow-button";
 import { CurvedLabel, EASE, MascotLive, SectionHead, useToast } from "./kit";
 import { CommunityBadge, OppCard } from "./cards";
 import { addDays, sameDay, startOfDay, useAgenda, type AgendaItem } from "@/lib/agenda";
@@ -111,6 +112,7 @@ export function StudentHome() {
             </motion.div>
           ))}
         </div>
+        <div className="mt-3 flex justify-center"><FlowButton text="Explore all opportunities" href="/app/explore" size="sm" /></div>
       </section>
 
       <FeedGate />
