@@ -66,7 +66,7 @@ export default function CalendarPage() {
             <button onClick={() => move(-1)} aria-label="Previous" className="grid h-9 w-9 place-items-center rounded-full bg-white/60"><ChevronLeft size={18} className="rtl:rotate-180" /></button>
             <div className="text-center">
               <p className="font-semibold" aria-live="polite">{title_}</p>
-              {!sameDay(cursor, today) && <button className="text-xs font-semibold text-[#3b6fca]" onClick={() => { setCursor(today); setSelected(today); }}>Today</button>}
+              {!sameDay(cursor, today) && <button className="text-xs font-semibold text-blue-600" onClick={() => { setCursor(today); setSelected(today); }}>Today</button>}
             </div>
             <button onClick={() => move(1)} aria-label="Next" className="grid h-9 w-9 place-items-center rounded-full bg-white/60"><ChevronRight size={18} className="rtl:rotate-180" /></button>
           </div>
@@ -85,7 +85,7 @@ export default function CalendarPage() {
                   <button key={d.toISOString()} role="gridcell" aria-selected={sel} aria-label={`${d.toDateString()}, ${list.length} items`} onClick={() => setSelected(d)}
                     className={`relative flex flex-col items-center rounded-2xl ${view === "week" ? "py-3" : "py-1.5"} ${out ? "opacity-35" : ""}`}>
                     {sel && <motion.span layoutId="cal-sel" className="absolute inset-0 rounded-2xl bg-[#121217]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-                    <span className={`relative text-[15px] font-semibold ${sel ? "text-white" : sameDay(d, today) ? "text-[#3b6fca]" : ""}`}>{d.getDate()}</span>
+                    <span className={`relative text-[15px] font-semibold ${sel ? "text-white" : sameDay(d, today) ? "text-blue-600" : ""}`}>{d.getDate()}</span>
                     <span className="relative mt-1 flex h-1.5 gap-0.5">{list.slice(0, 3).map((i) => <span key={i.id} className="h-1.5 w-1.5 rounded-full" style={{ background: sel ? "#fff" : i.color, opacity: i.done ? 0.35 : 1 }} />)}</span>
                     {view === "week" && <span className={`relative mt-1 text-[10px] ${sel ? "text-white/70" : "text-[var(--muted)]"}`}>{list.length || ""}</span>}
                   </button>

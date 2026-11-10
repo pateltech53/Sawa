@@ -9,6 +9,7 @@ import { EASE, spring, useToast } from "@/components/s/kit";
 import { OPPORTUNITIES } from "@/lib/seed";
 import { eligibility, matchOpportunity, TYPE_LABEL } from "@/lib/match";
 import { ageOf, useStore } from "@/lib/store";
+import { BRAND } from "@/lib/brand";
 
 export default function OpportunityDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -56,12 +57,12 @@ export default function OpportunityDetail({ params }: { params: Promise<{ id: st
         <div className="relative h-16 w-16 shrink-0">
           <svg viewBox="0 0 36 36" className="h-16 w-16 -rotate-90" aria-hidden>
             <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(0,0,0,.08)" strokeWidth="3.5" />
-            <motion.circle cx="18" cy="18" r="15.5" fill="none" stroke="#8C59F2" strokeWidth="3.5" strokeLinecap="round" pathLength={1} initial={{ pathLength: 0 }} animate={{ pathLength: m.score / 100 }} transition={{ duration: 0.9, ease: EASE }} />
+            <motion.circle cx="18" cy="18" r="15.5" fill="none" stroke={BRAND.iris} strokeWidth="3.5" strokeLinecap="round" pathLength={1} initial={{ pathLength: 0 }} animate={{ pathLength: m.score / 100 }} transition={{ duration: 0.9, ease: EASE }} />
           </svg>
           <span className="absolute inset-0 grid place-items-center text-sm font-bold">{m.score}%</span>
         </div>
         <div>
-          <p className="flex items-center gap-1 font-semibold"><Sparkles size={14} className="text-[#8C59F2]" /> Why it matches you</p>
+          <p className="flex items-center gap-1 font-semibold"><Sparkles size={14} className="text-iris-500" /> Why it matches you</p>
           <ul className="mt-1 space-y-0.5 text-sm text-[var(--ink-2)]">{m.reasons.map((r) => <li key={r}>{r}</li>)}</ul>
         </div>
       </section>

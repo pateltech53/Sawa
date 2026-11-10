@@ -49,7 +49,7 @@ export function OppCard({ m, compact = false }: { m: Match; compact?: boolean })
             <span className="inline-flex items-center gap-1"><Clock size={12} /> {fmtShort(o.startsAt)}</span>
             <span className="inline-flex items-center gap-1"><MapPin size={12} /> {m.distance === 0 ? "Your school" : `${m.distance} km`}</span>
           </p>
-          {!compact && m.reasons[0] && <p className="mt-2 text-xs font-medium text-[#5C29BF]">Why: {m.reasons.slice(0, 2).join(" · ")}</p>}
+          {!compact && m.reasons[0] && <p className="mt-2 text-xs font-medium text-iris-700">Why: {m.reasons.slice(0, 2).join(" · ")}</p>}
         </div>
       </motion.article>
     </Link>

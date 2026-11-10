@@ -4,10 +4,15 @@
 @plugin "@aegov/design-system";
 
 /* ─────────────────────────────────────────────────────────────
-   Sawa design tokens — derived from the Figma file
-   Surfaces: warm silk neutrals (#F2EDE3 → #BDB9B1 → #7B6A59 → #423A31)
-   Ink: #121217 · Info accent: #5185DE · Verification/AI accent: #8C59F2 (+ #F280D9 → #734DF2)
+   Sawa design tokens
+   Surfaces: warm silk neutrals from the Figma file (#F2EDE3 → #BDB9B1 → #7B6A59 → #423A31)
+   Ink: #121217 (primary buttons, as in Figma)
+   Brand: pink (#F280D9 family) + blue (#4073FF family), bridged by iris (#734DF2 / #8C59F2)
+     — pink: highlights, celebration, "for you" moments
+     — blue: links, focus, info, primary interactive accents
+     — iris: verification and AI moments only (Figma)
    Official/government marks: aegold (UAE Design System)
+   Text on white: use the -600/-700 steps (AA contrast); -400/-500 are for fills and glows.
    ───────────────────────────────────────────────────────────── */
 @theme {
   --font-sans: "Inter Variable", "Inter", "Noto Kufi Arabic Variable", ui-sans-serif, system-ui, sans-serif;
@@ -26,24 +31,69 @@
   --color-sand-200: #bdb9b1;
   --color-sand-500: #7b6a59;
   --color-sand-800: #423a31;
+
+  /* Brand — pink */
+  --color-pink-50: #fff1fb;
+  --color-pink-100: #ffe1f6;
+  --color-pink-200: #fcc4ec;
+  --color-pink-300: #f8a3e3;
+  --color-pink-400: #f280d9;
+  --color-pink-500: #e35cc4;
+  --color-pink-600: #c23ea5;
+  --color-pink-700: #9c2e85;
+  --color-pink-800: #74235f;
+  /* Brand — blue */
+  --color-blue-50: #eef3ff;
+  --color-blue-100: #dde7ff;
+  --color-blue-200: #bccfff;
+  --color-blue-300: #93b0ff;
+  --color-blue-400: #6a92ff;
+  --color-blue-500: #4073ff;
+  --color-blue-600: #2c58e6;
+  --color-blue-700: #2243b8;
+  --color-blue-800: #1d3889;
+  /* Bridge — iris (verification / AI) */
+  --color-iris-100: #ece4fd;
+  --color-iris-400: #a57cf6;
+  --color-iris-500: #8c59f2;
+  --color-iris-600: #734df2;
+  --color-iris-700: #5c29bf;
+  /* aliases kept for older screens */
   --color-violet: #8c59f2;
   --color-violet-deep: #5c29bf;
+
+  /* Semantic tokens (shadcn naming) so components in components/ui pick up the brand */
+  --color-background: #f6f4f0;
+  --color-foreground: #121217;
+  --color-card: rgba(255, 255, 255, 0.72);
+  --color-card-foreground: #121217;
+  --color-popover: rgba(255, 255, 255, 0.94);
+  --color-popover-foreground: #121217;
+  --color-primary: #2c58e6;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #fff1fb;
+  --color-secondary-foreground: #9c2e85;
+  --color-muted: rgba(18, 18, 23, 0.05);
+  --color-muted-foreground: #57534f;
+  --color-accent: #eef3ff;
+  --color-accent-foreground: #2243b8;
+  --color-destructive: #c8372d;
+  --color-border: rgba(18, 18, 23, 0.1);
+  --color-input: rgba(18, 18, 23, 0.12);
+  --color-ring: #4073ff;
+
+  /* Radii, shadows */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 28px;
+  --shadow-brand: 0 18px 40px -18px rgba(64, 115, 255, 0.5);
+  --shadow-pink: 0 18px 40px -18px rgba(242, 128, 217, 0.6);
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* shadcn/ui semantic tokens (used by components/ui/*), mapped onto Sawa's palette */
+/* status tokens (21st.dev components); the rest of the shadcn tokens live in @theme above */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted-bg);
-  --color-muted-foreground: var(--muted);
-  --color-border: var(--border);
-  --color-ring: var(--accent);
-  --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
@@ -60,9 +110,13 @@
   --line: rgba(255, 255, 255, 0.72);
   --surface: rgba(255, 255, 255, 0.4);
   --surface-strong: rgba(255, 255, 255, 0.64);
-  --accent: #5185de;
+  --accent: #4073ff;
+  --pink: #f280d9;
+  --blue: #4073ff;
   --violet: #8c59f2;
   --grad-verify: linear-gradient(90deg, #f280d9 0%, #734df2 100%);
+  --grad-brand: linear-gradient(100deg, #f280d9 0%, #a57cf6 48%, #4073ff 100%);
+  --grad-brand-soft: linear-gradient(100deg, #fff1fb 0%, #f3eefe 50%, #eef3ff 100%);
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 14px 34px -18px rgba(52, 40, 28, 0.42);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -76,8 +130,8 @@
   --border: rgba(18, 18, 23, 0.12);
   --destructive: #d0453b;
   --destructive-foreground: #a3271f;
-  --info: #5185de;
-  --info-foreground: #2d5aa8;
+  --info: #4073ff;
+  --info-foreground: #2243b8;
   --success: #2e9e6b;
   --success-foreground: #1f7a50;
   --warning: #d9822b;
@@ -97,6 +151,14 @@ body {
   min-height: 100dvh;
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
+}
+
+/* Brand aurora: soft pink and blue light over the silk background (fixed, behind everything) */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(42rem 30rem at -8% -6%, rgba(242, 128, 217, .22), transparent 60%),
+    radial-gradient(46rem 34rem at 108% 104%, rgba(64, 115, 255, .2), transparent 62%);
 }
 
 /* The design-system base layer styles headings and links for content pages;
@@ -179,7 +241,20 @@ body {
   .chip[aria-pressed="true"] { background: #121217; color: #fff; border-color: #121217; }
 
   /* Category chip — selected state from Figma (white + violet glow) */
-  .chip-cat[aria-pressed="true"] { background: rgba(255,255,255,.96); color: #5c29bf; border-color: #fff; box-shadow: 0 6px 16px rgba(102, 38, 204, .3); }
+  .chip-cat[aria-pressed="true"] { background: rgba(255,255,255,.96); color: #2243b8; border-color: #fff; box-shadow: 0 6px 16px rgba(64, 115, 255, .3); }
+  .chip:focus-visible, .btn-ink:focus-visible, .btn-ghost:focus-visible, .btn-glass:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  /* Brand gradient: hero words, celebratory moments, the primary call to action on the landing page */
+  .text-brand { background: var(--grad-brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .btn-brand {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    min-height: 52px; padding: 0 1.5rem; border-radius: 999px; color: #fff; font-weight: 600;
+    background: var(--grad-brand); box-shadow: var(--shadow-brand);
+    transition: transform .18s var(--ease), box-shadow .18s var(--ease), filter .18s;
+  }
+  .btn-brand:hover { filter: saturate(1.15); box-shadow: 0 20px 44px -16px rgba(64, 115, 255, .6); }
+  .btn-brand:active { transform: scale(.97); }
+  .btn-brand:disabled { opacity: .4; box-shadow: none; }
 
   .src { font-size: .6875rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; padding: .15rem .5rem; border-radius: 999px; }
 
@@ -188,14 +263,18 @@ body {
     background: rgba(255,255,255,.62); border: 1px solid rgba(255,255,255,.95);
     outline: none; transition: box-shadow .2s;
   }
-  .input:focus { box-shadow: 0 0 0 3px rgba(81, 133, 222, .35); }
+  .input:focus { box-shadow: 0 0 0 3px rgba(64, 115, 255, .3); border-color: #93b0ff; }
+  .input[aria-invalid="true"] { border-color: #c8372d; box-shadow: 0 0 0 3px rgba(200, 55, 45, .18); }
 
   .label-xs { font-size: .6875rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .section-title { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.01em; }
-  .link-info { color: #3b6fca; font-weight: 600; font-size: .8125rem; }
+  .link-info { color: #2c58e6; font-weight: 600; font-size: .8125rem; }
 }
 
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+/* In the base layer so components (e.g. components/ui/input) can swap the outline for their own ring */
+@layer base {
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+}
 
 /* Legacy keyframes still used by parent/teacher screens */
 .float { animation: float 5s ease-in-out infinite; }

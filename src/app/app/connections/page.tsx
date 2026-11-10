@@ -9,16 +9,17 @@ import { CLASSROOM_COURSES, CLASSROOM_WORK } from "@/lib/seed";
 import { useStore } from "@/lib/store";
 import { LogoCarousel } from "@/components/ui/logo-carousel";
 import { SYSTEM_MARKS } from "@/components/s/system-marks";
+import { BRAND } from "@/lib/brand";
 
 const APPS = [
   { key: "gclassroom", name: "Google Classroom", short: "GC", color: "#2E9E6B", desc: "Classes, assignments and due dates", demo: true },
   { key: "managebac", name: "ManageBac", short: "MB", color: "#D9822B", desc: "Not used at your school", unavailable: true },
-  { key: "lms", name: "Smart Learning Portal", short: "LMS", color: "#5185DE", desc: "Connected through your school login", viaSchool: true },
-  { key: "minhaji", name: "Minhaji e-books", short: "MH", color: "#8C59F2", desc: "Connected through your school login", viaSchool: true },
+  { key: "lms", name: "Smart Learning Portal", short: "LMS", color: BRAND.blue, desc: "Connected through your school login", viaSchool: true },
+  { key: "minhaji", name: "Minhaji e-books", short: "MH", color: BRAND.pink, desc: "Connected through your school login", viaSchool: true },
 ] as const;
 
 const STATUS: Record<string, [string, string]> = {
-  assigned: ["Assigned", "bg-[#5185DE]/12 text-[#2d5aa8]"], submitted: ["Turned in", "bg-[#2E9E6B]/15 text-[#1F7A50]"],
+  assigned: ["Assigned", "bg-blue-500/12 text-blue-700"], submitted: ["Turned in", "bg-[#2E9E6B]/15 text-[#1F7A50]"],
   returned: ["Returned", "bg-black/8 text-[var(--ink-2)]"], missing: ["Missing", "bg-[#D0453B]/12 text-[#a3271f]"],
 };
 

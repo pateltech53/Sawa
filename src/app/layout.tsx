@@ -3,7 +3,7 @@ import "@fontsource-variable/inter";
 import "@fontsource/oranienbaum";
 import "@fontsource-variable/noto-kufi-arabic";
 import "./globals.css";
-import { StoreProvider } from "@/lib/store";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "Sawa · سوا — one front door to school life",
@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" dir="ltr">
       <body className="antialiased">
-        <StoreProvider>{children}</StoreProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
