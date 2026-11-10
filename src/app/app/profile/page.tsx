@@ -8,8 +8,15 @@ import { t } from "@/lib/i18n";
 import { INTERESTS, SCHOOLS } from "@/lib/seed";
 import { ageOf, tierOf, useStore } from "@/lib/store";
 import type { Role } from "@/lib/types";
+import { StudentProfile } from "@/components/s/StudentProfile";
 
 export default function Profile() {
+  const { me } = useStore();
+  if (me?.role === "student") return <StudentProfile />;
+  return <GuardianProfile />;
+}
+
+function GuardianProfile() {
   const { state, me, myChildren, setLang, signIn, signOut, reset } = useStore();
   const router = useRouter();
   const L = state.lang;
@@ -44,7 +51,7 @@ export default function Profile() {
       {me.role === "student" && (
         <Card>
           <h2 className="mb-2 font-bold">{ar ? "اهتماماتي" : "My interests"}</h2>
-          <div className="flex flex-wrap gap-2">{me.interests.map((i) => { const x = INTERESTS.find((y) => y.id === i); return <span key={i} className="chip">{x?.icon} {ar ? x?.ar : x?.en}</span>; })}</div>
+          <div className="flex flex-wrap gap-2">{me.interests.map((i) => { const x = INTERESTS.find((y) => y.id === i); return <span key={i} className="chip">{ar ? x?.ar : x?.en}</span>; })}</div>
         </Card>
       )}
       {me.role === "parent" && (

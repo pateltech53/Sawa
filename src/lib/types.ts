@@ -99,12 +99,23 @@ export interface School {
   source: string;
 }
 
+export type OpportunityType = "competition" | "workshop" | "club" | "hackathon" | "mun" | "volunteering" | "leadership" | "event";
 export interface Opportunity {
   id: string;
   schoolId: string;
   titleEn: string;
   titleAr: string;
-  type: "competition" | "workshop" | "club" | "hackathon" | "mun";
+  type: OpportunityType;
+  organiser?: string;
+  emirate?: string;
+  deadline?: string;
+  durationEn?: string;
+  fee?: string;
+  teamSize?: string;
+  maxAge?: number;
+  image?: string; // /figma/interests/*.png
+  tint?: string; // card wash colour
+  detailsEn?: string;
   startsAt: string;
   interests: string[];
   minAge: number;
@@ -123,6 +134,69 @@ export interface Community {
   members: number;
   interests: string[];
   emirate: string;
+  category?: "clubs" | "stem" | "creative" | "sports" | "leadership";
+  image?: string;
+  tint?: string;
+  aboutEn?: string;
+  online?: number;
+  moderators?: string[];
+}
+
+export interface CommunityPost {
+  id: string;
+  communityId: string;
+  author: string; // display name only, never a real student
+  role: "moderator" | "member" | "teacher";
+  kind: "announcement" | "discussion";
+  body: string;
+  createdAt: string;
+  status: "approved" | "pending";
+  helpful: number;
+}
+
+export interface CommunityActivity {
+  id: string;
+  communityId: string;
+  titleEn: string;
+  startsAt: string;
+  place: string;
+}
+
+export interface ClassroomCourse {
+  id: string;
+  name: string;
+  teacher: string;
+  room: string;
+  color: string;
+}
+
+export interface ClassroomWork {
+  id: string;
+  courseId: string;
+  title: string;
+  dueAt: string;
+  status: "assigned" | "submitted" | "returned" | "missing";
+  points?: number;
+  grade?: string;
+}
+
+export interface Reminder {
+  id: string;
+  userId: string;
+  title: string;
+  at: string;
+  done: boolean;
+  linkHref?: string;
+}
+
+export interface Project {
+  id: string;
+  userId: string;
+  title: string;
+  role: string;
+  progress: number;
+  due?: string;
+  image?: string;
 }
 
 export interface Approval {

@@ -84,7 +84,7 @@ export default function Onboarding() {
                 const on = interests.includes(i.id);
                 return (
                   <button key={i.id} aria-pressed={on} className="chip !py-2 !text-sm" onClick={() => setInterests(on ? interests.filter((x) => x !== i.id) : [...interests, i.id])}>
-                    <span aria-hidden>{i.icon}</span> {ar ? i.ar : i.en}
+                    {ar ? i.ar : i.en}
                   </button>
                 );
               })}

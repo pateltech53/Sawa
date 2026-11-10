@@ -36,6 +36,24 @@ Deploy: import the repo on Vercel and add `ANTHROPIC_API_KEY` as an environment 
 
 Tip: open the parent in one window and the teacher in another. Posts and approvals sync live between tabs.
 
+## Student experience (redesigned from the Figma file)
+
+Design source: the team's Figma export. Assets in `public/figma/` were extracted from it: silk background, 3D nav icons, interest objects and the mascot-with-skyline scene. Type is Inter plus Oranienbaum for the curved interest labels, self-hosted through `@fontsource` (no Google Fonts requests). Motion uses `motion` (Framer Motion) and respects reduced-motion settings.
+
+| Screen | Route | What it does |
+|---|---|---|
+| Onboarding | `/welcome` | Splash → Get Started → find your school → consent → setup → **ID scan → face match → verified** (sample IDs aged 14 or 16, clearly simulated) → **interest carousel** + "What else are you into?" sheet → **live matching** (real ranking over the catalogue) → personalised finish |
+| Home | `/app/today` | Weekly strip with per-day items, "needs you this week", Google Classroom card, matched opportunities, and the Feed Gate (swipe to unlock one moderated session a day) |
+| Calendar | `/app/calendar` | Month / week / agenda, navigation, date selection, detail sheet, reminders |
+| Opportunities | `/app/explore`, `/app/opportunities/[id]` | Filters, search, map, match % with reasons, eligibility check, save, register or ask guardian, deadline reminder |
+| Communities | `/app/communities`, `/app/communities/[id]` | Featured, your communities, trending grid; notices, moderated discussion (15+ only, held for review), activities that sync to the calendar |
+| School apps | `/app/connections` | Google Classroom connect (consent → sync → classes and classwork on Home and Calendar), disconnect. **Simulated with sample data** |
+| Profile | `/app/profile` | Figma header, achievements, interests editing, projects with progress, saved, communities |
+
+Not carried over from the Figma file on purpose: the Instagram-style feed with likes, direct messages, reels and real/stock photos of students. These conflict with the under-15 rules and student privacy.
+
+Tests: with the app running, `npm run e2e` (parent/teacher flow) and `npm run e2e:student` (full student journey). Screenshots go to `e2e-screens/`.
+
 ## What is built (Winning Plan §4)
 
 | | Feature | Where |

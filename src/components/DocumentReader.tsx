@@ -92,7 +92,7 @@ export function ExtractedFields({ result, values, setValues, current }: {
   return (
     <div className="grid gap-4 md:grid-cols-[220px_1fr]">
       <div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        { }
         <img src={result.preview} alt={ar ? "الوثيقة المرفوعة" : "Uploaded document"} className="w-full rounded-2xl border border-white shadow" />
         <div className="mt-2 flex flex-wrap gap-1.5">
           <Pill tone="gold"><FileImage size={12} /> {result.docType ?? (ar ? "وثيقة" : "Document")}</Pill>

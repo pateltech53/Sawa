@@ -1,74 +1,65 @@
 "use client";
 
-import Link from "next/link";
-import { GraduationCap, ShieldCheck, Users, Sparkles, Database, Repeat2 } from "lucide-react";
-import { Card, LangToggle, Logo, Mascot } from "@/components/ui";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
+import { ArrowRight, GraduationCap, ShieldCheck, Users } from "lucide-react";
+import { EASE, MascotLive } from "@/components/s/kit";
+import { LangToggle } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 
 export default function Landing() {
   const { state } = useStore();
+  const router = useRouter();
   const L = state.lang;
+  const ar = L === "ar";
+  const [leaving, setLeaving] = useState<string | null>(null);
   const roles = [
-    { role: "parent", icon: ShieldCheck, label: t(L, "parent"), hint: L === "ar" ? "يدخل بالهوية الرقمية ويربط أبناءه" : "Verifies with UAE PASS, links children" },
-    { role: "student", icon: GraduationCap, label: t(L, "student"), hint: L === "ar" ? "فئة دون 15 أو 15 فما فوق" : "Under-15 or 15+ tier" },
-    { role: "teacher", icon: Users, label: t(L, "teacher"), hint: L === "ar" ? "ينشر مرة واحدة ليصل للجميع" : "Posts once, reaches everyone" },
-  ] as const;
-  const pillars = [
-    { icon: Repeat2, en: "Tell us once — AI reads documents and fills every form", ar: "أخبرنا مرة واحدة — الذكاء الاصطناعي يقرأ الوثائق ويعبّئ النماذج" },
-    { icon: Sparkles, en: "Ask Sawa — answers in Arabic & English, with sources", ar: "اسأل سوا — إجابات بالعربية والإنجليزية مع المصادر" },
-    { icon: Database, en: "Built on UAE open data and the UAE Design System", ar: "مبني على البيانات المفتوحة ونظام التصميم الإماراتي" },
+    { role: "student", href: "/welcome", icon: GraduationCap, label: t(L, "student"), hint: ar ? "اكتشف الفرص والمجتمعات وجدولك" : "Your week, opportunities and communities" },
+    { role: "parent", href: "/signin?role=parent", icon: ShieldCheck, label: t(L, "parent"), hint: ar ? "يدخل بالهوية الرقمية ويربط أبناءه" : "Verify with UAE PASS and link your children" },
+    { role: "teacher", href: "/signin?role=teacher", icon: Users, label: t(L, "teacher"), hint: ar ? "ينشر مرة واحدة ليصل للجميع" : "Post once, reach every student and parent" },
   ];
+  const go = (role: string, href: string) => { setLeaving(role); setTimeout(() => router.push(href), 420); };
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-5xl flex-col px-4 pb-10 pt-5">
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-6">
       <header className="flex items-center justify-between">
-        <Logo />
+        <span className="label-xs">UAE Hackathon 2026 · Rising Stars</span>
         <LangToggle />
       </header>
 
-      <div className="mt-6 grid items-center gap-8 md:grid-cols-[1.1fr_.9fr]">
-        <div className="rise">
-          <p className="chip mb-4 w-fit">🇦🇪 UAE Hackathon 2026 · Rising Stars</p>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
-            {t(L, "tagline")}
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-[var(--ink-2)]">{t(L, "pitch")}</p>
-          <ul className="mt-6 space-y-2">
-            {pillars.map((p, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm font-medium">
-                <span className="jelly h-8 w-8 rounded-xl"><p.icon size={16} /></span>
-                {L === "ar" ? p.ar : p.en}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="relative mx-auto">
-          <div className="absolute inset-x-6 bottom-2 h-10 rounded-full bg-black/15 blur-2xl" />
-          <Mascot size={300} />
-        </div>
-      </div>
+      <motion.div className="mt-8 flex flex-col items-center text-center" initial={{ opacity: 0, y: 12 }} animate={{ opacity: leaving ? 0 : 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
+        { }
+        <img src="/brand/logo-full.png" alt="Sawa · سوا" className="w-[96px]" />
+        <h1 className="mt-6 text-[30px] font-bold leading-[1.12] tracking-tight">{t(L, "tagline")}</h1>
+        <p className="mt-3 max-w-sm text-[15px] text-[var(--muted)]">{t(L, "pitch")}</p>
+      </motion.div>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-[var(--muted)]">{t(L, "iAm")}</h2>
-        <div className="grid gap-3 sm:grid-cols-3">
+      <motion.div className="my-6 flex justify-center" animate={{ opacity: leaving && leaving !== "student" ? 0 : 1, y: leaving === "student" ? -30 : 0, scale: leaving === "student" ? 1.08 : 1 }} transition={{ duration: 0.45, ease: EASE }}>
+        <MascotLive size={170} delay={0.2} />
+      </motion.div>
+
+      <section className="mt-auto" aria-labelledby="iam">
+        <h2 id="iam" className="label-xs mb-2.5 px-1">{t(L, "iAm")}</h2>
+        <ul className="space-y-2.5">
           {roles.map((r, i) => (
-            <Link key={r.role} href={`/signin?role=${r.role}`} className="rise" style={{ animationDelay: `${i * 80}ms` }}>
-              <Card className="flex h-full items-center gap-4 transition hover:-translate-y-0.5 hover:bg-white/60">
-                <span className="jelly h-14 w-14 shrink-0"><r.icon size={26} /></span>
-                <span>
-                  <span className="block text-lg font-bold">{r.label}</span>
-                  <span className="block text-sm text-[var(--muted)]">{r.hint}</span>
+            <motion.li key={r.role} initial={{ opacity: 0, y: 14 }} animate={{ opacity: leaving && leaving !== r.role ? 0 : 1, y: 0, scale: leaving === r.role ? 1.02 : 1 }} transition={{ delay: leaving ? 0 : 0.15 + i * 0.07, duration: 0.4, ease: EASE }}>
+              <motion.button whileTap={{ scale: 0.98 }} onClick={() => go(r.role, r.href)}
+                className={`flex w-full items-center gap-3.5 rounded-[24px] border p-3.5 text-start transition-colors ${r.role === "student" ? "border-[#121217] bg-[#121217] text-white" : "glass"}`}>
+                <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${r.role === "student" ? "bg-white/12" : "bg-white/70"}`}><r.icon size={22} /></span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[17px] font-semibold">{r.label}</span>
+                  <span className={`block text-[13px] ${r.role === "student" ? "text-white/70" : "text-[var(--muted)]"}`}>{r.hint}</span>
                 </span>
-              </Card>
-            </Link>
+                <ArrowRight size={18} className="shrink-0 opacity-60 rtl:rotate-180" />
+              </motion.button>
+            </motion.li>
           ))}
-        </div>
+        </ul>
       </section>
 
-      <p className="mt-auto pt-10 text-center text-xs text-[var(--muted)]">
-        {t(L, "sampleData")} · {L === "ar" ? "الدخول بالهوية الرقمية محاكاة" : "UAE PASS sign-in is simulated"}
-      </p>
+      <p className="mt-6 text-center text-xs text-[var(--muted)]">{t(L, "sampleData")} · {ar ? "الدخول بالهوية الرقمية محاكاة" : "UAE PASS and school sign-in are simulated"}</p>
     </main>
   );
 }

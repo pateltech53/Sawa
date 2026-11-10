@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as seed from "./seed";
 import type {
-  AgeTier, Announcement, Approval, Lang, Notice, Profile, ProfileFact, RequestStatus, Role, ServiceRequest,
+  AgeTier, Announcement, Approval, CommunityPost, Lang, Notice, Profile, ProfileFact, Project, Reminder, RequestStatus, Role, ServiceRequest,
 } from "./types";
 
 const KEY = "sawa-demo-v1";
@@ -23,6 +23,17 @@ export interface State {
   joined: Record<string, string[]>;
   registered: Record<string, string[]>;
   aiLog: { q: string; mode: string; at: string; flagged?: boolean }[];
+  // ── student experience ──
+  saved: Record<string, string[]>;
+  integrations: Record<string, Record<string, { connectedAt: string }>>;
+  reminders: Reminder[];
+  posts: CommunityPost[];
+  helpfulBy: Record<string, string[]>;
+  activitiesJoined: Record<string, string[]>;
+  projects: Project[];
+  verification: Record<string, { verifiedAt: string; method: "sample_id_simulated" }>;
+  feedUnlockedOn: Record<string, string>;
+  bios: Record<string, { handle: string; bio: string }>;
 }
 
 export const initialState = (): State => ({
@@ -40,6 +51,19 @@ export const initialState = (): State => ({
   joined: { "stu-sara": ["c1"] },
   registered: {},
   aiLog: [],
+  saved: { "stu-sara": ["op-10"] },
+  integrations: {},
+  reminders: [],
+  posts: structuredClone(seed.COMMUNITY_POSTS),
+  helpfulBy: {},
+  activitiesJoined: {},
+  projects: [
+    { id: "pr-1", userId: "stu-sara", title: "Line-follower robot", role: "Robotics Club · Builder", progress: 45, due: seed.at(20), image: "/figma/interests/coding.png" },
+    { id: "pr-2", userId: "stu-sara", title: "Reflections photo series", role: "Photography Club", progress: 30, due: seed.at(28), image: "/figma/interests/photography.png" },
+  ],
+  verification: {},
+  feedUnlockedOn: {},
+  bios: { "stu-sara": { handle: "sara.builds", bio: "Grade 8 · robots, cameras and code." } },
 });
 
 export const ageOf = (p?: Profile) => (p?.birthYear ? new Date().getFullYear() - p.birthYear : 30);
@@ -105,14 +129,15 @@ function useBuildStore() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) setState(evaluateNudges(JSON.parse(raw)));
+      // merge so older saved demo data picks up new fields
+      if (raw) setState(evaluateNudges({ ...initialState(), ...JSON.parse(raw), v: 1 }));
     } catch {}
     setReady(true);
     // Cross-tab sync: a teacher posting in one window updates the parent's window live.
     const onStorage = (e: StorageEvent) => {
       if (e.key !== KEY || !e.newValue) return;
       try {
-        const incoming = JSON.parse(e.newValue) as State;
+        const incoming = { ...initialState(), ...JSON.parse(e.newValue) } as State;
         skipSave.current = true;
         setState((cur) => ({ ...incoming, sessionUserId: cur.sessionUserId, lang: cur.lang }));
       } catch {}
@@ -286,6 +311,68 @@ function useBuildStore() {
           notices: [n, ...s.notices.map((x) => (x.id === `apn-${ap.id}` ? { ...x, status: "done" as const } : x))],
         };
       }),
+    // ── student actions ──
+    /** Interactive onboarding: verified (simulated) DOB, interests and school are written to the profile. */
+    completeStudentOnboarding: (patch: { interests: string[]; birthYear?: number; schoolId?: string }) =>
+      update((s) => {
+        const id = s.sessionUserId!;
+        return {
+          ...s,
+          onboarded: { ...s.onboarded, [id]: true },
+          profiles: s.profiles.map((p) => (p.id === id ? { ...p, interests: patch.interests, ...(patch.birthYear ? { birthYear: patch.birthYear } : {}), ...(patch.schoolId ? { schoolId: patch.schoolId } : {}) } : p)),
+        };
+      }),
+    recordVerification: () =>
+      update((s) => ({ ...s, verification: { ...s.verification, [s.sessionUserId!]: { verifiedAt: now(), method: "sample_id_simulated" } } })),
+    setInterests: (interests: string[]) =>
+      update((s) => ({ ...s, profiles: s.profiles.map((p) => (p.id === s.sessionUserId ? { ...p, interests } : p)) })),
+    updateBio: (handle: string, bio: string) => update((s) => ({ ...s, bios: { ...s.bios, [s.sessionUserId!]: { handle, bio } } })),
+    toggleSave: (opId: string) =>
+      update((s) => {
+        const id = s.sessionUserId!; const cur = s.saved[id] ?? [];
+        return { ...s, saved: { ...s.saved, [id]: cur.includes(opId) ? cur.filter((x) => x !== opId) : [...cur, opId] } };
+      }),
+    connectIntegration: (key: string) =>
+      update((s) => ({ ...s, integrations: { ...s.integrations, [s.sessionUserId!]: { ...(s.integrations[s.sessionUserId!] ?? {}), [key]: { connectedAt: now() } } } })),
+    disconnectIntegration: (key: string) =>
+      update((s) => {
+        const cur = { ...(s.integrations[s.sessionUserId!] ?? {}) }; delete cur[key];
+        return { ...s, integrations: { ...s.integrations, [s.sessionUserId!]: cur } };
+      }),
+    addReminder: (title: string, at: string, linkHref?: string) => {
+      const id = `rem-${uid()}`;
+      update((s) => ({ ...s, reminders: [...s.reminders, { id, userId: s.sessionUserId!, title, at, done: false, linkHref }] }));
+      return id;
+    },
+    toggleReminder: (id: string) => update((s) => ({ ...s, reminders: s.reminders.map((r) => (r.id === id ? { ...r, done: !r.done } : r)) })),
+    removeReminder: (id: string) => update((s) => ({ ...s, reminders: s.reminders.filter((r) => r.id !== id) })),
+    leaveCommunity: (cid: string) =>
+      update((s) => ({ ...s, joined: { ...s.joined, [s.sessionUserId!]: (s.joined[s.sessionUserId!] ?? []).filter((x) => x !== cid) } })),
+    /** 15+ only. Posts enter a moderation queue; they are never published instantly. */
+    createPost: (communityId: string, body: string): "pending" | "blocked" => {
+      const meP = state.profiles.find((p) => p.id === state.sessionUserId)!;
+      if (ageOf(meP) < 15) return "blocked";
+      update((s) => ({
+        ...s,
+        posts: [{ id: `post-${uid()}`, communityId, author: `${meP.name} (you)`, role: "member", kind: "discussion", body: body.slice(0, 500), createdAt: now(), status: "pending", helpful: 0 }, ...s.posts],
+      }));
+      return "pending";
+    },
+    toggleHelpful: (postId: string) =>
+      update((s) => {
+        const id = s.sessionUserId!; const cur = s.helpfulBy[postId] ?? [];
+        return { ...s, helpfulBy: { ...s.helpfulBy, [postId]: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id] } };
+      }),
+    toggleActivity: (activityId: string) =>
+      update((s) => {
+        const id = s.sessionUserId!; const cur = s.activitiesJoined[id] ?? [];
+        return { ...s, activitiesJoined: { ...s.activitiesJoined, [id]: cur.includes(activityId) ? cur.filter((x) => x !== activityId) : [...cur, activityId] } };
+      }),
+    addProject: (title: string, role: string) =>
+      update((s) => ({ ...s, projects: [...s.projects, { id: `pr-${uid()}`, userId: s.sessionUserId!, title, role, progress: 0 }] })),
+    setProjectProgress: (id: string, progress: number) =>
+      update((s) => ({ ...s, projects: s.projects.map((p) => (p.id === id ? { ...p, progress: Math.max(0, Math.min(100, progress)) } : p)) })),
+    unlockFeed: () => update((s) => ({ ...s, feedUnlockedOn: { ...s.feedUnlockedOn, [s.sessionUserId!]: new Date().toDateString() } })),
     logAi: (q: string, mode: string, flagged?: boolean) =>
       update((s) => ({ ...s, aiLog: [{ q: q.slice(0, 80), mode, flagged, at: now() }, ...s.aiLog].slice(0, 50) })),
   };

@@ -8,8 +8,15 @@ import { fmtDate, relDays, t } from "@/lib/i18n";
 import { OPPORTUNITIES } from "@/lib/seed";
 import { useStore } from "@/lib/store";
 import type { Notice } from "@/lib/types";
+import { StudentHome } from "@/components/s/StudentHome";
 
 export default function Today() {
+  const { me } = useStore();
+  if (me?.role === "student") return <StudentHome />;
+  return <GuardianToday />;
+}
+
+function GuardianToday() {
   const { state, me, myChildren, visibleNotices, toggleNotice, markSeen } = useStore();
   const L = state.lang;
   const ar = L === "ar";

@@ -3,10 +3,12 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BadgeCheck, Building2, CalendarCheck, Compass, Home, Megaphone, MessageCircleQuestion, ShieldCheck, UserRound } from "lucide-react";
+import { BadgeCheck, Building2, Home, Megaphone, MessageCircleQuestion, ShieldCheck, UserRound } from "lucide-react";
 import { LangToggle, Logo, SampleFooter } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
+import { StudentShell } from "@/components/s/StudentShell";
+import { ToastProvider } from "@/components/s/kit";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { state, ready, me, myChildren } = useStore();
@@ -16,8 +18,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (ready && !me) router.replace("/");
-  }, [ready, me, router]);
+    if (ready && me?.role === "student" && !state.onboarded[me.id]) router.replace("/welcome");
+  }, [ready, me, router, state.onboarded]);
   if (!ready || !me) return <div className="grid min-h-dvh place-items-center"><div className="shimmer h-10 w-40 rounded-full" /></div>;
+  if (me.role === "student") return <ToastProvider><StudentShell>{children}</StudentShell></ToastProvider>;
 
   const pendingApprovals = state.approvals.filter((a) => a.guardianId === me.id && a.status === "pending").length;
 
@@ -30,15 +34,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           { href: "/app/approvals", label: t(L, "approvals"), icon: BadgeCheck, badge: pendingApprovals },
           { href: "/app/profile", label: t(L, "profile"), icon: UserRound },
         ]
-      : me.role === "student"
-        ? [
-            { href: "/app/today", label: t(L, "today"), icon: Home },
-            { href: "/app/explore", label: t(L, "explore"), icon: Compass },
-            { href: "/app/ask", label: t(L, "ask"), icon: MessageCircleQuestion, center: true },
-            { href: "/app/calendar", label: L === "ar" ? "التقويم" : "Calendar", icon: CalendarCheck },
-            { href: "/app/profile", label: t(L, "profile"), icon: UserRound },
-          ]
-        : [
+      : [
             { href: "/app/today", label: t(L, "today"), icon: Home },
             { href: "/app/post", label: t(L, "post"), icon: Megaphone },
             { href: "/app/ask", label: t(L, "ask"), icon: MessageCircleQuestion, center: true },
@@ -47,6 +43,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           ];
 
   return (
+    <ToastProvider>
     <div className="mx-auto min-h-dvh max-w-3xl pb-32">
       <header className="sticky top-0 z-30 px-4 pt-3">
         <div className="glass flex items-center justify-between gap-2 rounded-full py-2 pe-2 ps-4">
@@ -86,5 +83,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </ul>
       </nav>
     </div>
+    </ToastProvider>
   );
 }
