@@ -33,6 +33,13 @@ export function useAgenda() {
     const classroomConnected = Boolean(state.integrations[me.id]?.gclassroom);
     const items: AgendaItem[] = [];
 
+    // Teacher-hosted events land in invited students' weeks (class 8A = grade 8, sample).
+    if (me.role === "student") {
+      for (const e of state.events) {
+        if (!e.classes.some((c) => c.startsWith(me.grade ?? "8"))) continue;
+        items.push({ id: e.id, title: e.title, at: e.startsAt, source: "School", kind: "event", done: false, detail: `${e.place} · invited by your teacher`, color: KIND_COLOR.event });
+      }
+    }
     for (const n of visibleNotices) {
       if (!n.dueAt) continue;
       const kind: AgendaKind = n.kind === "assignment" ? "assignment" : n.kind === "exam" ? "exam" : n.kind === "event" ? "event" : n.kind === "proactive" ? "proactive" : "notice";

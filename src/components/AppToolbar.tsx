@@ -34,16 +34,22 @@ export function AppToolbar() {
   const urgent = open.filter((n) => n.priority === 1 || n.kind === "proactive").length + pendingApprovals + pendingRequests;
 
   const quick =
-    me.role === "parent"
+    me.role === "student"
+      ? [
+          { href: "/app/calendar?new=reminder", icon: Plus, label: ar ? "إضافة تذكير" : "Add a reminder" },
+          { href: "/app/profile?tab=projects", icon: FileCheck2, label: ar ? "بدء مشروع" : "Start a project" },
+          { href: "/app/connections", icon: Building2, label: ar ? "ربط تطبيق مدرسي" : "Connect a school app" },
+        ]
+      : me.role === "parent"
       ? [
           { href: "/app/services/school-file", icon: FileCheck2, label: ar ? "تحديث ملف الطالب" : "Update school file" },
           { href: "/app/documents", icon: FileUp, label: ar ? "رفع مستند" : "Upload a document" },
           { href: "/app/ask", icon: MessageCircleQuestion, label: t(L, "ask") },
         ]
       : [
-          { href: "/app/post", icon: Megaphone, label: ar ? "نشر إعلان" : "Post an announcement" },
-          { href: "/app/office", icon: Building2, label: ar ? "مراجعة الطلبات" : "Review requests" },
-          { href: "/app/ask", icon: MessageCircleQuestion, label: t(L, "ask") },
+          { href: "/app/post", icon: Megaphone, label: ar ? "نشر إعلان" : "Post once to classes" },
+          { href: "/app/students?new=event", icon: Plus, label: ar ? "استضافة فعالية" : "Host an event" },
+          { href: "/app/office", icon: Building2, label: ar ? "مراجعة الطلبات" : "Review parent requests" },
         ];
 
   const items: BottomMenuItem[] = [

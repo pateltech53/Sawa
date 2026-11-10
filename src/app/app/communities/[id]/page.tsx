@@ -9,13 +9,14 @@ import { Avatar, EASE, useToast } from "@/components/s/kit";
 import { COMMUNITIES, COMMUNITY_ACTIVITIES } from "@/lib/seed";
 import { ageOf, useStore } from "@/lib/store";
 
-type Tab = "announcements" | "discussion" | "activities" | "about";
+type Tab = "board" | "chat" | "activities" | "about";
 
 export default function CommunityDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { state, me, joinCommunity, leaveCommunity, createPost, toggleHelpful, toggleActivity } = useStore();
+  const { state, me, joinCommunity, leaveCommunity, createPost, toggleHelpful, toggleActivity, sendChat } = useStore();
   const toast = useToast();
-  const [tab, setTab] = useState<Tab>("announcements");
+  const [tab, setTab] = useState<Tab>("board");
+  const [msg, setMsg] = useState("");
   const [draft, setDraft] = useState("");
   const c = COMMUNITIES.find((x) => x.id === id);
   if (!me) return null;
@@ -31,18 +32,20 @@ export default function CommunityDetail({ params }: { params: Promise<{ id: stri
   const going = state.activitiesJoined[me.id] ?? [];
   const canPost = joined && age >= 15;
 
-  const tabs: [Tab, string, typeof Megaphone][] = [["announcements", "Notices", Megaphone], ["discussion", "Discussion", MessageSquare], ["activities", "Activities", CalendarDays], ["about", "About", Users]];
+  const board = [...announcements, ...discussion].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const chat = state.chat.filter((m) => m.communityId === c.id && (m.status === "visible" || m.authorId === me.id));
+  const tabs: [Tab, string, typeof Megaphone][] = [["board", "Board", Megaphone], ["chat", "Chat", MessageSquare], ["activities", "Activities", CalendarDays], ["about", "About", Users]];
 
   return (
     <div className="space-y-4">
       <Link href="/app/communities" className="inline-flex items-center gap-1 text-sm font-semibold"><ArrowLeft size={16} className="rtl:rotate-180" /> Communities</Link>
 
       <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ ease: EASE }} className="glass relative overflow-hidden rounded-[28px] p-4">
-        <div aria-hidden className="absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-60" style={{ background: c.tint, filter: "blur(30px)" }} />
+        {c.photo && <div className="-mx-4 -mt-4 mb-3 h-36 overflow-hidden lg:h-48"><img src={c.photo} alt="" className="h-full w-full object-cover" /></div>}
         <div className="relative flex items-center gap-3">
           <CommunityBadge c={c} size={68} />
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-bold text-[var(--muted)]">{c.emirate} · {c.scope === "school" ? "School club" : "Cross-school"}</p>
+            <p className="text-[13px] font-bold text-[var(--muted)]">{c.emirate} · {c.schools ?? 1} schools</p>
             <h1 className="text-[22px] font-bold leading-tight tracking-tight">{c.name}</h1>
             <p className="mt-0.5 text-xs text-[var(--muted)]">{c.members.toLocaleString()} members · <span className="text-[#2E9E6B]">{c.online} online</span></p>
           </div>
@@ -73,9 +76,39 @@ export default function CommunityDetail({ params }: { params: Promise<{ id: stri
 
       <AnimatePresence mode="wait">
         <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
-          {(tab === "announcements" || tab === "discussion") && (
+          {tab === "chat" && (
+            <div className="glass rounded-[26px] p-3">
+              <p className="mb-2 flex items-center gap-1.5 px-1 text-xs text-[var(--muted)]"><ShieldCheck size={12} /> Group chat · {c.schools ?? 1} schools · moderated, no private messages</p>
+              <ol className="space-y-2.5" aria-live="polite">
+                {chat.map((m) => {
+                  const mine = m.authorId === me.id;
+                  return (
+                    <li key={m.id} className={`flex gap-2 ${mine ? "flex-row-reverse" : ""}`}>
+                      {!mine && <Avatar name={m.author} size={32} />}
+                      <div className={`max-w-[78%] rounded-[20px] px-3.5 py-2.5 ${mine ? "rounded-br-md bg-[#121217] text-white" : "rounded-bl-md bg-white"}`}>
+                        {!mine && <p className="text-[11px] font-semibold text-[var(--muted)]">{m.author} · {m.school}</p>}
+                        <p className="text-[15px] leading-snug">{m.body}</p>
+                        {m.status === "pending" && <p className="mt-1 text-[10px] font-semibold uppercase opacity-70">Held for a moderator</p>}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+              {canPost ? (
+                <form className="mt-3 flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); if (!msg.trim()) return; const r = sendChat(c.id, msg.trim()); toast(r === "pending" ? "Sent — a moderator checks it first" : "Chat isn't available for under-15s"); setMsg(""); }}>
+                  <input className="input !min-h-11 !bg-white" value={msg} onChange={(e) => setMsg(e.target.value)} maxLength={300} placeholder={`Message ${c.name}`} aria-label="Chat message" />
+                  <button className="btn-ink !min-h-11 !px-4" disabled={!msg.trim()} aria-label="Send"><Send size={16} /></button>
+                </form>
+              ) : (
+                <p className="mt-3 flex items-start gap-2 rounded-2xl bg-white/55 p-3 text-sm text-[var(--muted)]"><Lock size={14} className="mt-0.5 shrink-0" />
+                  {age < 15 ? "You can read the chat. Sending messages opens at 15, as UAE rules for under-15s require." : "Join this community to chat."}</p>
+              )}
+            </div>
+          )}
+
+          {tab === "board" && (
             <div className="space-y-2.5">
-              {tab === "discussion" && (
+              {(
                 canPost ? (
                   <form className="glass rounded-[24px] p-3" onSubmit={(e) => { e.preventDefault(); if (!draft.trim()) return; const r = createPost(c.id, draft.trim()); toast(r === "pending" ? "Sent to moderators — it appears once approved" : "Posting isn't available for under-15s"); setDraft(""); }}>
                     <textarea value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={500} placeholder={`Share something with ${c.name}…`} className="w-full resize-none bg-transparent text-[15px] outline-none" rows={2} aria-label="New post" />
@@ -89,7 +122,7 @@ export default function CommunityDetail({ params }: { params: Promise<{ id: stri
                     {age < 15 ? "Under-15 accounts can read and mark posts helpful, but can't post or message. Ask your club teacher to share your ideas." : "Join this community to take part in discussions."}</p>
                 )
               )}
-              {(tab === "announcements" ? announcements : discussion).map((p, i) => {
+              {board.map((p, i) => {
                 const helped = (state.helpfulBy[p.id] ?? []).includes(me.id);
                 return (
                   <motion.article key={p.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass rounded-[24px] p-4">
@@ -108,7 +141,7 @@ export default function CommunityDetail({ params }: { params: Promise<{ id: stri
                   </motion.article>
                 );
               })}
-              {(tab === "announcements" ? announcements : discussion).length === 0 && <p className="glass rounded-[22px] p-4 text-sm text-[var(--muted)]">Nothing here yet.</p>}
+              {board.length === 0 && <p className="glass rounded-[22px] p-4 text-sm text-[var(--muted)]">Nothing here yet.</p>}
             </div>
           )}
 

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform, animate } from "motion/react";
 import { ArrowRight, Check, ChevronRight, KeyRound, Lock, LockOpen, Maximize2, Play, ShieldCheck, Sparkles, ThumbsUp } from "lucide-react";
 import { FlowButton } from "@/components/ui/flow-button";
-import { CurvedLabel, EASE, MascotLive, SectionHead, useToast } from "./kit";
+import { EASE, SectionHead, useToast } from "./kit";
+import { Mascot } from "@/components/ui";
 import { CommunityBadge, OppCard } from "./cards";
 import { addDays, sameDay, startOfDay, useAgenda, type AgendaItem } from "@/lib/agenda";
 import { COMMUNITIES, OPPORTUNITIES } from "@/lib/seed";
@@ -28,94 +29,131 @@ export function StudentHome() {
   const joined = COMMUNITIES.filter((c) => (state.joined[me.id] ?? []).includes(c.id));
   const matches = rankOpportunities(me, OPPORTUNITIES).filter((m) => m.score > 20).slice(0, 6);
 
+  const needs = open.slice(0, 6);
   return (
-    <div className="space-y-6">
-      {/* greeting */}
-      <section className="flex items-end gap-2">
-        <div className="min-w-0 flex-1 pb-2">
-          <p className="text-sm font-medium text-[var(--muted)]">{greeting()}, {me.name}</p>
-          <h1 className="mt-1 text-[28px] font-bold leading-[1.1] tracking-tight">
-            <motion.span key={open.length} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="inline-block">{open.length}</motion.span> things need you this week
-          </h1>
-          <p className="mt-1 text-xs text-[var(--muted)]">From {new Set(open.map((i) => i.source)).size || 1} sources, in one place</p>
-        </div>
-        <MascotLive size={92} />
-      </section>
-
-      {/* communities row (Figma stories, adapted: your communities, curved names) */}
-      {joined.length > 0 && (
-        <section aria-label="Your communities" className="no-scrollbar -mx-4 flex gap-4 overflow-x-auto px-4 pb-1">
-          {joined.map((c) => (
-            <Link key={c.id} href={`/app/communities/${c.id}`} className="flex w-[66px] shrink-0 flex-col items-center">
-              <CommunityBadge c={c} size={60} />
-              <div className="-mt-1"><CurvedLabel text={c.name.replace(/^Al Noor /, "").split(" ")[0]} width={78} size={12} curve={-6} color="#14140F" /></div>
-            </Link>
-          ))}
-          <Link href="/app/communities" className="flex w-[66px] shrink-0 flex-col items-center">
-            <span className="grid h-[60px] w-[60px] place-items-center rounded-full border-2 border-dashed border-black/25 text-2xl text-black/50">+</span>
-            <span className="mt-1.5 text-[11px] font-medium text-[var(--muted)]">Find</span>
-          </Link>
-        </section>
-      )}
-
-      {/* weekly overview */}
-      <section className="glass rounded-[28px] p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <h2 className="section-title">This week</h2>
-            <p className="text-xs text-[var(--muted)]">{today.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</p>
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+      <div className="min-w-0 space-y-5">
+        {/* greeting */}
+        <section className="glass glass-strong relative overflow-hidden rounded-[30px] p-5">
+          <div className="pe-28">
+            <p className="text-sm font-medium text-[var(--muted)]">{greeting()}, {me.name}</p>
+            <h1 className="mt-1 text-[28px] font-bold leading-[1.1] tracking-tight">
+              <motion.span key={open.length} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="inline-block">{open.length}</motion.span> things need you this week
+            </h1>
+            <p className="mt-1 text-xs text-[var(--muted)]">From {new Set(open.map((i) => i.source)).size || 1} sources, in one place</p>
           </div>
-          <Link href="/app/calendar" className="btn-ghost !min-h-9 !px-3 text-sm" aria-label="Open full calendar"><Maximize2 size={14} /> Calendar</Link>
-        </div>
-        <div className="grid grid-cols-7 gap-1.5" role="tablist" aria-label="Days">
-          {days.map((d) => {
-            const sel = sameDay(d, day);
-            const n = items.filter((i) => sameDay(new Date(i.at), d) && !i.done);
-            return (
-              <button key={d.toISOString()} role="tab" aria-selected={sel} onClick={() => setDay(d)} className="relative flex flex-col items-center rounded-2xl py-2">
-                {sel && <motion.span layoutId="day-pill" className="absolute inset-0 rounded-2xl bg-[#121217]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-                <span className={`relative text-[10px] font-semibold uppercase ${sel ? "text-white/70" : "text-[var(--muted)]"}`}>{d.toLocaleDateString("en-GB", { weekday: "short" })}</span>
-                <span className={`relative text-lg font-bold ${sel ? "text-white" : ""}`}>{d.getDate()}</span>
-                <span className="relative mt-0.5 flex h-1.5 gap-0.5">{n.slice(0, 3).map((i) => <span key={i.id} className="h-1.5 w-1.5 rounded-full" style={{ background: sel ? "#fff" : i.color }} />)}</span>
-              </button>
-            );
-          })}
-        </div>
-        <AnimatePresence mode="wait">
-          <motion.ul key={day.toISOString()} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.22 }} className="mt-3 space-y-1.5">
-            {dayItems.length === 0 ? (
-              <li className="rounded-2xl bg-white/40 px-3 py-3 text-sm text-[var(--muted)]">Nothing on {sameDay(day, today) ? "today" : day.toLocaleDateString("en-GB", { weekday: "long" })}.</li>
-            ) : dayItems.map((i) => <AgendaRow key={i.id} i={i} />)}
-          </motion.ul>
-        </AnimatePresence>
-      </section>
+          <div className="pointer-events-none absolute -bottom-2 end-1"><Mascot size={118} /></div>
+        </section>
 
-      {/* what needs you */}
-      <section>
-        <SectionHead title="Needs you this week" action={<Link href="/app/calendar" className="link-info">See all</Link>} />
-        <ul className="space-y-2">
-          {open.slice(0, 5).map((i) => <AgendaRow key={i.id} i={i} glass />)}
-          {open.length === 0 && <li className="glass rounded-[22px] p-4 text-sm text-[var(--muted)]">You&apos;re all caught up.</li>}
-        </ul>
-      </section>
+        {/* weekly overview */}
+        <section className="glass rounded-[28px] p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h2 className="section-title">This week</h2>
+              <p className="text-xs text-[var(--muted)]">{today.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</p>
+            </div>
+            <Link href="/app/calendar" className="btn-ghost !min-h-9 !px-3 text-sm" aria-label="Open full calendar"><Maximize2 size={14} /> Calendar</Link>
+          </div>
+          <div className="grid grid-cols-7 gap-1.5" role="tablist" aria-label="Days">
+            {days.map((d) => {
+              const sel = sameDay(d, day);
+              const n = items.filter((i) => sameDay(new Date(i.at), d) && !i.done);
+              return (
+                <button key={d.toISOString()} role="tab" aria-selected={sel} onClick={() => setDay(d)} className="relative flex h-[68px] flex-col items-center justify-center rounded-2xl">
+                  {sel && <motion.span layoutId="day-pill" className="absolute inset-0 rounded-2xl bg-[#121217]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+                  <span className={`relative text-[10px] font-semibold uppercase leading-none ${sel ? "text-white/70" : "text-[var(--muted)]"}`}>{d.toLocaleDateString("en-GB", { weekday: "short" })}</span>
+                  <span className={`relative mt-1 text-lg font-bold leading-none ${sel ? "text-white" : ""}`}>{d.getDate()}</span>
+                  <span className="relative mt-1.5 flex h-1.5 justify-center gap-0.5">{n.slice(0, 3).map((i) => <span key={i.id} className="h-1.5 w-1.5 rounded-full" style={{ background: sel ? "#fff" : i.color }} />)}</span>
+                </button>
+              );
+            })}
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.ul key={day.toISOString()} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.22 }} className="mt-3 space-y-1.5">
+              {dayItems.length === 0 ? (
+                <li className="rounded-2xl bg-white/40 px-3 py-3 text-sm text-[var(--muted)]">Nothing on {sameDay(day, today) ? "today" : day.toLocaleDateString("en-GB", { weekday: "long" })}.</li>
+              ) : dayItems.map((i) => <AgendaRow key={i.id} i={i} />)}
+            </motion.ul>
+          </AnimatePresence>
+        </section>
 
-      {/* school integration */}
-      <ClassroomCard connected={classroomConnected} items={items} />
+        {/* what needs you: clickable task cards */}
+        <section>
+          <SectionHead title="Needs you this week" action={<Link href="/app/calendar" className="link-info">See all</Link>} />
+          {needs.length === 0 ? <p className="glass rounded-[22px] p-4 text-sm text-[var(--muted)]">You&apos;re all caught up.</p> : (
+            <ul className="grid gap-2.5 sm:grid-cols-2">
+              {needs.map((i, k) => (
+                <motion.li key={i.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: k * 0.04, ease: EASE }}><TaskCard i={i} /></motion.li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
 
-      {/* matched opportunities */}
-      <section>
-        <SectionHead title="Matched for you" action={<Link href="/app/explore" className="link-info">See all</Link>} />
-        <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-2" style={{ scrollSnapType: "x mandatory" }}>
-          {matches.map((m, i) => (
-            <motion.div key={m.o.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05, ease: EASE }} style={{ scrollSnapAlign: "start" }}>
-              <OppCard m={m} compact />
-            </motion.div>
-          ))}
-        </div>
-        <div className="mt-3 flex justify-center"><FlowButton text="Explore all opportunities" href="/app/explore" size="sm" /></div>
-      </section>
+      <div className="min-w-0 space-y-5">
+        <ClassroomCard connected={classroomConnected} items={items} />
 
-      <FeedGate />
+        {/* matched opportunities */}
+        <section>
+          <SectionHead title="Matched for you" action={<Link href="/app/explore" className="link-info">See all</Link>} />
+          <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-2 lg:mx-0 lg:px-0" style={{ scrollSnapType: "x mandatory" }}>
+            {matches.map((m, i) => (
+              <motion.div key={m.o.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05, ease: EASE }} style={{ scrollSnapAlign: "start" }}>
+                <OppCard m={m} compact />
+              </motion.div>
+            ))}
+          </div>
+          <div className="mt-3 flex justify-center"><FlowButton text="Explore all opportunities" href="/app/explore" size="sm" /></div>
+        </section>
+
+        {/* your communities: cross-school, as photo cards */}
+        <section>
+          <SectionHead title="Your communities" action={<Link href="/app/communities" className="link-info">Find more</Link>} />
+          {joined.length === 0 ? (
+            <Link href="/app/communities" className="glass flex items-center gap-3 rounded-[22px] p-4 text-sm"><Sparkles size={18} /> Join a community with students from other schools</Link>
+          ) : (
+            <ul className="grid grid-cols-2 gap-2.5">
+              {joined.slice(0, 4).map((c) => (
+                <li key={c.id}>
+                  <Link href={`/app/communities/${c.id}`} className="group relative block h-[120px] overflow-hidden rounded-[22px]">
+                    {c.photo ? <img src={c.photo} alt="" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <span className="absolute inset-0" style={{ background: c.tint }} />}
+                    <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+                    <span className="absolute inset-x-3 bottom-2.5 text-white"><span className="block text-sm font-bold leading-tight">{c.name}</span><span className="block text-[11px] text-white/80">{c.schools ?? 1} schools · {c.online ?? 0} online</span></span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <FeedGate />
+      </div>
+    </div>
+  );
+}
+
+/** "Needs you" card: big tap target, colour-coded by source, check to complete. */
+function TaskCard({ i }: { i: AgendaItem }) {
+  const toast = useToast();
+  const due = new Date(i.at);
+  const inner = (
+    <span className="flex min-w-0 flex-1 flex-col">
+      <span className="mb-1 inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white" style={{ background: i.color }}>{i.source}</span>
+      <span className={`line-clamp-2 font-semibold leading-snug ${i.done ? "line-through opacity-50" : ""}`}>{i.title}</span>
+      <span className="mt-1 text-xs text-[var(--muted)]">{due.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · {due.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+    </span>
+  );
+  return (
+    <div className="glass flex h-full items-start gap-3 rounded-[22px] p-3.5 transition hover:bg-white/60">
+      {i.toggle ? (
+        <button onClick={() => { i.toggle!(); if (!i.done) toast("Marked done"); }} aria-label={i.done ? "Mark not done" : "Mark done"} aria-pressed={i.done}
+          className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 transition ${i.done ? "border-[#121217] bg-[#121217] text-white" : "border-black/25 hover:border-black"}`}>
+          {i.done && <Check size={14} strokeWidth={3} />}
+        </button>
+      ) : (
+        <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full" style={{ background: `${i.color}22`, color: i.color }} title={`Mark done in ${i.source}`}><ChevronRight size={14} className="rtl:rotate-180" /></span>
+      )}
+      {i.href ? <Link href={i.href} className="flex min-w-0 flex-1 items-start gap-2">{inner}<ChevronRight size={16} className="mt-1 shrink-0 opacity-40 rtl:rotate-180" /></Link> : inner}
     </div>
   );
 }

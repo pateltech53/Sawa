@@ -9,6 +9,7 @@ import { INTERESTS, SCHOOLS } from "@/lib/seed";
 import { ageOf, tierOf, useStore } from "@/lib/store";
 import type { Role } from "@/lib/types";
 import { StudentProfile } from "@/components/s/StudentProfile";
+import { Avatar } from "@/components/s/kit";
 
 export default function Profile() {
   const { me } = useStore();
@@ -27,16 +28,18 @@ function GuardianProfile() {
   const switchTo = (r: Role) => { signIn(r); router.push("/app/today"); };
   const links = [
     { href: "/app/documents", icon: FileCheck2, label: t(L, "tellUsOnce") },
+    ...(me.role === "parent" ? [{ href: "/app/services", icon: Users, label: t(L, "services") }] : [{ href: "/app/classes", icon: Users, label: ar ? "صفوفي" : "My classes" }]),
+  ];
+  const about = [
     { href: "/app/impact", icon: BarChart3, label: t(L, "impact") },
     { href: "/app/data", icon: Database, label: t(L, "dataSources") },
-    ...(me.role === "parent" ? [{ href: "/app/services", icon: Users, label: t(L, "services") }] : []),
   ];
 
   return (
     <div className="space-y-4">
       <PageTitle title={t(L, "profile")} />
       <Card strong className="flex items-center gap-4">
-        <span className="jelly h-16 w-16 rounded-full text-2xl font-bold">{me.avatar}</span>
+        <Avatar name={me.name} size={68} ring verified />
         <div className="min-w-0">
           <p className="text-xl font-bold">{ar ? me.nameAr : me.name}</p>
           <p className="text-sm text-[var(--muted)]">{ar ? school?.nameAr : school?.name}{me.grade ? ` · ${ar ? "الصف" : "Grade"} ${me.grade}` : ""}</p>
@@ -67,6 +70,15 @@ function GuardianProfile() {
             <li key={l.href}><Link href={l.href} className="flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-white/60"><l.icon size={18} /> <span className="flex-1 font-semibold">{l.label}</span><ChevronRight size={16} className="rtl:rotate-180" /></Link></li>
           ))}
           <li><button onClick={() => setLang(ar ? "en" : "ar")} className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 hover:bg-white/60"><Languages size={18} /> <span className="flex-1 text-start font-semibold">{ar ? "اللغة" : "Language"}</span><span className="chip">{t(L, "language")}</span></button></li>
+        </ul>
+      </Card>
+
+      <Card className="!p-2">
+        <p className="label-xs px-3 pb-1 pt-2">{ar ? "عن هذا النموذج" : "About this prototype"}</p>
+        <ul>
+          {about.map((l) => (
+            <li key={l.href}><Link href={l.href} className="flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-white/60"><l.icon size={18} /> <span className="flex-1 font-semibold">{l.label}</span><ChevronRight size={16} className="rtl:rotate-180" /></Link></li>
+          ))}
         </ul>
       </Card>
 

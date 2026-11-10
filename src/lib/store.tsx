@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as seed from "./seed";
 import type {
-  AgeTier, Announcement, Approval, CommunityPost, Lang, Notice, Profile, ProfileFact, Project, Reminder, RequestStatus, Role, ServiceRequest,
+  AgeTier, Announcement, Approval, ChatMsg, CommunityPost, ParentControls, SchoolBrand, TeacherEvent, Lang, Notice, Profile, ProfileFact, Project, Reminder, RequestStatus, Role, ServiceRequest,
 } from "./types";
 
 const KEY = "sawa-demo-v2"; // bumped with each redesign so an old saved demo cannot hide the new screens
@@ -34,6 +34,12 @@ export interface State {
   verification: Record<string, { verifiedAt: string; method: "sample_id_simulated" }>;
   feedUnlockedOn: Record<string, string>;
   bios: Record<string, { handle: string; bio: string }>;
+  // ── whole-app pass ──
+  schoolBrand?: SchoolBrand;
+  parentControls: Record<string, ParentControls>;
+  events: TeacherEvent[];
+  chat: ChatMsg[];
+  payments: { id: string; approvalId?: string; amountAed: number; at: string; label: string }[];
 }
 
 export const initialState = (): State => ({
@@ -47,7 +53,7 @@ export const initialState = (): State => ({
   requests: [],
   facts: structuredClone(seed.PROFILE_FACTS),
   announcements: [],
-  approvals: [],
+  approvals: structuredClone(seed.SEED_APPROVALS),
   joined: { "stu-sara": ["c1"] },
   registered: {},
   aiLog: [],
@@ -64,6 +70,10 @@ export const initialState = (): State => ({
   verification: {},
   feedUnlockedOn: {},
   bios: { "stu-sara": { handle: "sara.builds", bio: "Grade 8 · robots, cameras and code." } },
+  parentControls: {},
+  events: structuredClone(seed.TEACHER_EVENTS),
+  chat: structuredClone(seed.COMMUNITY_CHAT),
+  payments: [],
 });
 
 export const ageOf = (p?: Profile) => (p?.birthYear ? new Date().getFullYear() - p.birthYear : 30);
@@ -295,7 +305,9 @@ function useBuildStore() {
       update((s) => {
         const ap = s.approvals.find((a) => a.id === approvalId);
         if (!ap) return s;
-        const op = seed.OPPORTUNITIES.find((o) => o.id === ap.opportunityId)!;
+        const op = seed.OPPORTUNITIES.find((o) => o.id === ap.opportunityId);
+        if (!op) // school-originated approvals (trip, fees, media): just record the decision
+          return { ...s, approvals: s.approvals.map((a) => (a.id === approvalId ? { ...a, status: approve ? "approved" : "denied", decidedAt: now() } : a)) };
         const n: Notice = {
           id: `apd-${ap.id}`, userId: ap.childId, sourceSystem: "Sawa", kind: "notice", priority: 2, status: "open",
           titleEn: approve ? `Approved! You're registered for ${op.titleEn}` : `Your guardian declined: ${op.titleEn}`,
@@ -373,6 +385,41 @@ function useBuildStore() {
     setProjectProgress: (id: string, progress: number) =>
       update((s) => ({ ...s, projects: s.projects.map((p) => (p.id === id ? { ...p, progress: Math.max(0, Math.min(100, progress)) } : p)) })),
     unlockFeed: () => update((s) => ({ ...s, feedUnlockedOn: { ...s.feedUnlockedOn, [s.sessionUserId!]: new Date().toDateString() } })),
+    payFee: (label: string, amountAed: number, approvalId?: string) =>
+      update((s) => ({
+        ...s,
+        payments: [...s.payments, { id: `pay-${uid()}`, approvalId, amountAed, label, at: now() }],
+        approvals: approvalId ? s.approvals.map((a) => (a.id === approvalId ? { ...a, status: "approved", decidedAt: now() } : a)) : s.approvals,
+      })),
+    setSchoolBrand: (b: SchoolBrand) => update((s) => ({ ...s, schoolBrand: b })),
+    setParentControls: (c: ParentControls) => update((s) => ({ ...s, parentControls: { ...s.parentControls, [s.sessionUserId!]: c } })),
+    decideApproval: (id: string, ok: boolean) =>
+      update((s) => ({ ...s, approvals: s.approvals.map((a) => (a.id === id ? { ...a, status: ok ? "approved" : "denied", decidedAt: now() } : a)) })),
+    createEvent: (e: Pick<TeacherEvent, "title" | "startsAt" | "place" | "classes">) => {
+      const id = `ev-${uid()}`;
+      update((s) => ({ ...s, events: [{ ...e, id, hostId: s.sessionUserId! }, ...s.events] }));
+      return id;
+    },
+    inviteClasses: (eventId: string, classes: string[]) =>
+      update((s) => ({ ...s, events: s.events.map((e) => (e.id === eventId ? { ...e, classes: [...new Set([...e.classes, ...classes])] } : e)) })),
+    requestSponsorship: (eventId: string, amountAed: number, reason: string) =>
+      update((s) => ({ ...s, events: s.events.map((e) => (e.id === eventId ? { ...e, sponsorship: { amountAed, reason, status: "requested", history: [{ status: "requested", at: now() }] } } : e)) })),
+    advanceSponsorship: (eventId: string) =>
+      update((s) => ({
+        ...s,
+        events: s.events.map((e) => {
+          if (e.id !== eventId || !e.sponsorship) return e;
+          const nextStatus = e.sponsorship.status === "requested" ? "reviewing" : "approved";
+          return { ...e, sponsorship: { ...e.sponsorship, status: nextStatus, history: [...e.sponsorship.history, { status: nextStatus, at: now() }] } };
+        }),
+      })),
+    sendChat: (communityId: string, body: string): "visible" | "pending" | "blocked" => {
+      const me = state.profiles.find((p) => p.id === state.sessionUserId);
+      if (!me || (me.role === "student" && ageOf(me) < 15)) return "blocked";
+      const school = seed.SCHOOLS.find((x) => x.id === me.schoolId)?.name.replace(" (sample)", "") ?? "";
+      update((s) => ({ ...s, chat: [...s.chat, { id: `m-${uid()}`, communityId, authorId: me.id, author: me.name, school, body, at: now(), status: "pending" }] }));
+      return "pending";
+    },
     logAi: (q: string, mode: string, flagged?: boolean) =>
       update((s) => ({ ...s, aiLog: [{ q: q.slice(0, 80), mode, flagged, at: now() }, ...s.aiLog].slice(0, 50) })),
   };

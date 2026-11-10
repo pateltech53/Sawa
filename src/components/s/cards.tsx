@@ -33,8 +33,9 @@ export function OppCard({ m, compact = false }: { m: Match; compact?: boolean })
       <motion.article whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} transition={{ type: "spring", stiffness: 400, damping: 28 }}
         className="glass relative overflow-hidden rounded-[26px]">
         <div className="relative h-[132px] overflow-hidden" style={{ background: `linear-gradient(180deg, ${o.tint ?? "#ddd"}cc 0%, ${o.tint ?? "#ddd"}55 100%)` }}>
-          {o.image ? (
-             
+          {o.photo ? (
+            <><img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /><span className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" /></>
+          ) : o.image ? (
             <img src={o.image} alt="" className="absolute -bottom-3 right-3 h-[130px] w-[130px] object-contain drop-shadow-[0_10px_12px_rgba(0,0,0,.18)] transition-transform duration-500 group-hover:scale-105" />
           ) : (
             <span className="absolute bottom-4 right-5 font-[family-name:var(--font-serif)] text-[44px] leading-none text-black/70">{TYPE_LABEL[o.type]}</span>
@@ -56,29 +57,31 @@ export function OppCard({ m, compact = false }: { m: Match; compact?: boolean })
   );
 }
 
-/** Community tile — Figma "Trending near you" grid card. */
+/** Community tile: photo-led, cross-school. */
 export function CommunityTile({ c }: { c: Community }) {
   const { state, me, joinCommunity } = useStore();
   const toast = useToast();
   const locked = ageOf(me ?? undefined) < c.minAge;
   const joined = (state.joined[me?.id ?? ""] ?? []).includes(c.id);
   return (
-    <Link href={`/app/communities/${c.id}`} className="block">
-      <motion.article whileTap={{ scale: 0.98 }} className="glass flex h-full flex-col gap-2 rounded-[24px] p-3">
-        <div className="flex items-start justify-between">
-          <CommunityBadge c={c} size={50} />
-          <span className="inline-flex items-center gap-0.5 rounded-full bg-white/60 px-2 py-0.5 text-[10px] font-bold text-[var(--muted)]"><MapPin size={10} /> {c.emirate}</span>
+    <Link href={`/app/communities/${c.id}`} className="block h-full">
+      <motion.article whileTap={{ scale: 0.98 }} className="glass flex h-full flex-col overflow-hidden rounded-[24px]">
+        <div className="relative h-[96px] shrink-0" style={{ background: c.tint }}>
+          {c.photo && <img src={c.photo} alt="" className="h-full w-full object-cover" />}
+          <span className="absolute start-2 top-2 inline-flex items-center gap-0.5 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-bold"><MapPin size={10} /> {c.emirate}</span>
         </div>
-        <h3 className="line-clamp-2 text-[15px] font-bold leading-tight">{c.name}</h3>
-        <p className="flex items-center gap-1 text-[11px] text-[var(--muted)]"><Users size={12} /> {c.members.toLocaleString()} members{c.scope === "school" ? " · your school" : ""}</p>
-        <div className="mt-auto">
-          {locked ? (
-            <span className="flex h-8 items-center justify-center gap-1 rounded-[18px] bg-white/45 text-xs font-bold text-[var(--muted)]"><Lock size={12} /> Opens at 15</span>
-          ) : joined ? (
-            <span className="flex h-8 items-center justify-center gap-1 rounded-[18px] bg-white/60 text-xs font-bold"><Check size={13} /> Joined</span>
-          ) : (
-            <button onClick={(e) => { e.preventDefault(); joinCommunity(c.id); toast(`Joined ${c.name}`); }} className="h-8 w-full rounded-[18px] bg-[#121217] text-xs font-bold text-white transition active:scale-95">Join</button>
-          )}
+        <div className="flex flex-1 flex-col gap-1.5 p-3">
+          <h3 className="line-clamp-2 text-[15px] font-bold leading-tight">{c.name}</h3>
+          <p className="flex items-center gap-1 text-[11px] text-[var(--muted)]"><Users size={12} /> {c.schools ?? 1} schools · {c.members.toLocaleString()}</p>
+          <div className="mt-auto pt-1">
+            {locked ? (
+              <span className="flex h-8 items-center justify-center gap-1 rounded-[18px] bg-white/45 text-xs font-bold text-[var(--muted)]"><Lock size={12} /> Opens at {c.minAge}</span>
+            ) : joined ? (
+              <span className="flex h-8 items-center justify-center gap-1 rounded-[18px] bg-white/60 text-xs font-bold"><Check size={13} /> Joined</span>
+            ) : (
+              <button onClick={(e) => { e.preventDefault(); joinCommunity(c.id); toast(`Joined ${c.name}`); }} className="h-8 w-full rounded-[18px] bg-[#121217] text-xs font-bold text-white transition active:scale-95">Join</button>
+            )}
+          </div>
         </div>
       </motion.article>
     </Link>
@@ -88,8 +91,9 @@ export function CommunityTile({ c }: { c: Community }) {
 export function CommunityBadge({ c, size = 50 }: { c: Community; size?: number }) {
   return (
     <span className="grid shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white" style={{ width: size, height: size, background: c.tint ?? "#ddd", boxShadow: "inset 0 0 4px 2px rgba(0,0,0,.12), 0 4px 4px rgba(0,0,0,.12)" }}>
-      {c.image ? (
-         
+      {c.photo ? (
+        <img src={c.photo} alt="" className="h-full w-full object-cover" />
+      ) : c.image ? (
         <img src={c.image} alt="" className="h-[82%] w-[82%] object-contain" />
       ) : (
         <span className="font-[family-name:var(--font-serif)] font-normal text-black/75" style={{ fontSize: size * 0.5 }}>{c.name.replace(/^Al Noor /, "")[0]}</span>

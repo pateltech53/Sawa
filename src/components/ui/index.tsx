@@ -1,5 +1,7 @@
 "use client";
 
+import { MascotVideo, type MascotMood } from "@/components/shell/MascotVideo";
+
 import Image from "next/image";
 import Link from "next/link";
 import { t } from "@/lib/i18n";
@@ -16,17 +18,8 @@ export function Logo({ size = 40, full = false, compact = false }: { size?: numb
   );
 }
 
-export function Mascot({ size = 140, className = "", wave = false }: { size?: number; className?: string; wave?: boolean }) {
-  return (
-    <Image
-      src="/brand/mascot.png"
-      alt="Sawa's mascot waving"
-      width={size}
-      height={Math.round(size * 0.95)}
-      className={`${wave ? "wave" : "float"} drop-shadow-[0_18px_20px_rgba(0,0,0,.18)] ${className}`}
-      priority
-    />
-  );
+export function Mascot({ size = 140, className = "", wave = false, mood }: { size?: number; className?: string; wave?: boolean; mood?: MascotMood }) {
+  return <MascotVideo mood={mood ?? (wave ? "waving" : "idle")} size={size} className={className} />;
 }
 
 export function Card({ children, className = "", strong = false, as: As = "section" }: { children: React.ReactNode; className?: string; strong?: boolean; as?: "section" | "div" | "article" | "li" }) {
@@ -93,7 +86,7 @@ export function Pill({ children, tone = "default" }: { children: React.ReactNode
 export function Empty({ text }: { text: string }) {
   return (
     <div className="flex flex-col items-center gap-2 py-8 text-center">
-      <Mascot size={96} />
+      <Mascot size={110} mood="presenting" />
       <p className="text-sm text-[var(--muted)]">{text}</p>
     </div>
   );

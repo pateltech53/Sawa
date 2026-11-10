@@ -238,7 +238,7 @@ body::before {
     transition: background .2s var(--ease), color .2s, box-shadow .2s, transform .15s;
   }
   .chip:active { transform: scale(.97); }
-  .chip[aria-pressed="true"] { background: #121217; color: #fff; border-color: #121217; }
+  .chip[aria-pressed="true"], .chip[aria-checked="true"], .chip[aria-selected="true"] { background: #121217; color: #fff; border-color: #121217; }
 
   /* Category chip — selected state from Figma (white + violet glow) */
   .chip-cat[aria-pressed="true"] { background: rgba(255,255,255,.96); color: #2243b8; border-color: #fff; box-shadow: 0 6px 16px rgba(64, 115, 255, .3); }

@@ -12,7 +12,10 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens'); require('fs').
   await p.goto(B); await p.waitForTimeout(800); await shot('01-landing');
   await p.click('button:has-text("Parent / guardian")'); await p.waitForURL('**/signin**'); await p.waitForTimeout(500); await shot('02-signin');
   await p.click('button:has-text("Sign in with UAE PASS")'); await p.waitForURL('**/onboarding', { timeout: 8000 }); await p.waitForTimeout(400);
-  for (let i = 0; i < 4; i++) { await p.click('main button.btn-ink'); await p.waitForTimeout(300); }
+  await p.waitForTimeout(2600); await shot('02b-children-found'); await p.click('main button.btn-ink'); // children → controls
+  await p.waitForTimeout(600); await p.click('main button.btn-ink'); // controls → tools
+  await p.waitForTimeout(4200); await shot('02c-tools'); await p.click('main button.btn-ink'); // tools → done
+  await p.waitForTimeout(600); await p.click('main button.btn-ink'); // done → app
   await p.waitForURL('**/app/today'); await p.waitForTimeout(800); await shot('03-parent-today');
   await p.click('a:has-text("Update now")'); await p.waitForTimeout(600); await shot('04-journey-check');
   await p.click('button:has-text("Upload the renewed ID")');
@@ -24,6 +27,8 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens'); require('fs').
   await p.goto(B + '/app/profile'); await p.click('button:has-text("Teacher")'); await p.waitForURL('**/app/today');
   await p.goto(B + '/app/post'); await p.click('button:has-text("Post")>>nth=-1'); await p.waitForTimeout(400); await shot('08-teacher-post');
   await p.goto(B + '/app/office'); await p.click('button:has-text("Approve & complete")'); await p.waitForTimeout(300); await shot('09-office');
+  await p.goto(B + '/app/today'); await p.waitForTimeout(1000); await shot('09b-teacher-today');
+  await p.goto(B + '/app/students'); await p.waitForTimeout(600); await p.click('button:has-text("New event")'); await p.fill('input[placeholder*="Coding day"]', 'Coding day for Grade 8'); await p.click('button:has-text("Create and invite")'); await p.waitForTimeout(600); await shot('09c-teacher-event');
   // student
   await p.evaluate(() => { const k = 'sawa-demo-v2'; const s = JSON.parse(localStorage.getItem(k)); s.onboarded['stu-sara'] = true; localStorage.setItem(k, JSON.stringify(s)); });
   await p.goto(B + '/app/profile'); await p.click('button:has-text("Student")'); await p.waitForURL('**/app/today'); await p.waitForTimeout(500); await shot('10-student-today');
@@ -31,7 +36,8 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens'); require('fs').
   await p.click('button:has-text("Ask my guardian")'); await p.waitForTimeout(500); await shot('11-explore');
   // parent approves
   await p.goto(B + '/app/profile'); await p.click('button:has-text("parent")'); await p.waitForURL('**/app/today'); await p.waitForTimeout(500); await shot('13-parent-today2');
-  await p.goto(B + '/app/approvals'); await p.waitForTimeout(300); await shot('14-approvals'); await p.click('button:has-text("Approve")');
+  await p.goto(B + '/app/services'); await p.waitForTimeout(900); await shot('13b-services');
+  await p.goto(B + '/app/approvals'); await p.waitForTimeout(500); await shot('14-approvals'); await p.click('button:has-text("Approve") >> nth=0');
   // ask in arabic
   await p.goto(B + '/app/ask'); await p.click(`button:has-text("ابنتي")`); await p.waitForSelector("text=Sources", { timeout: 15000 }); await p.waitForTimeout(400); await shot('15-ask');
   // arabic RTL

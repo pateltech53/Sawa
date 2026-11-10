@@ -36,6 +36,18 @@ Deploy: import the repo on Vercel and add `ANTHROPIC_API_KEY` as an environment 
 
 Tip: open the parent in one window and the teacher in another. Posts and approvals sync live between tabs.
 
+## Whole-app pass (v3): one design language for students, parents and teachers
+
+Spec: [`docs/REDESIGN_BRIEF.md`](docs/REDESIGN_BRIEF.md). Highlights:
+
+- **One shell for every role** (`src/components/shell/AppShell.tsx`): liquid-glass toolbar, glass tab bar with **Ask Sawa in the centre** (no more "+"), and real desktop layouts (dashboards use 2-column grids up to 1200px).
+- **Mascot animations** (`public/mascot/*.webm`, background keyed out, no audio; MP4 fallback): waving on sign-in, thinking in Ask, celebrating on success, presenting on empty states.
+- **Real photos** for clubs, communities, opportunities and services (`public/photos/`, Unsplash, activity/object shots only, bundled for offline demos).
+- **Parent**: UAE PASS → "finding your children" → parental controls → connect tools. Home answers "What would you like to do today?": child, age, grade, days to the next fee, Pay fee / Re-enrol, every upcoming deadline, done this term, switch-school enquiry. Services are a swipeable card carousel; approvals come seeded (trip, fees, competition).
+- **Teacher**: school set-up with **logo upload and colour palette**, class invite code, connect tools; Today / Classes / Students & events (invite classes, ask the school to sponsor, status timeline) / Career (KHDA directory, jobs, PD). The map uses CARTO tiles with a fallback notice (the OSM tile servers block many embedded hosts).
+- **Student**: tidied Home (no overlapping circles, task cards grid), matching results you can open (no auto-advance), **cross-school communities** with a moderated group chat (posting 15+), **Discover** swipe deck for opportunities, and a **Sourced from** strip (MyMUN, CloudHub, Eventbrite, dev.events, UAE Hackathon, Bayanat, Dubai Pulse). Listings are samples; nothing is fetched.
+- **Ask Sawa**: purple stage with depth (dot pattern, glows), topic-grouped suggestions, shining "Thinking" state.
+
 ## Student experience (redesigned from the Figma file)
 
 Design source: the team's Figma export. Assets in `public/figma/` were extracted from it: silk background, 3D nav icons, interest objects and the mascot-with-skyline scene. Type is Inter plus Oranienbaum for the curved interest labels, self-hosted through `@fontsource` (no Google Fonts requests). Motion uses `motion` (Framer Motion) and respects reduced-motion settings.

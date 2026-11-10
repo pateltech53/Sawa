@@ -114,6 +114,8 @@ export interface Opportunity {
   teamSize?: string;
   maxAge?: number;
   image?: string; // /figma/interests/*.png
+  photo?: string; // /photos/*.jpg (Unsplash, bundled)
+  source?: string; // where a real listing like this would come from
   tint?: string; // card wash colour
   detailsEn?: string;
   startsAt: string;
@@ -140,6 +142,8 @@ export interface Community {
   aboutEn?: string;
   online?: number;
   moderators?: string[];
+  photo?: string;
+  schools?: number;
 }
 
 export interface CommunityPost {
@@ -203,7 +207,15 @@ export interface Approval {
   id: string;
   childId: string;
   guardianId: string;
-  opportunityId: string;
+  /** set for "opportunity" approvals (from Explore); other kinds come from the school */
+  opportunityId?: string;
+  kind?: "opportunity" | "trip" | "fees" | "media";
+  titleEn?: string;
+  titleAr?: string;
+  detailEn?: string;
+  detailAr?: string;
+  fromEn?: string;
+  dueAt?: string;
   status: "pending" | "approved" | "denied";
   createdAt: string;
   decidedAt?: string;
@@ -229,3 +241,11 @@ export interface DataSource {
   lastUpdated: string;
   status: "sample" | "imported";
 }
+
+export interface SchoolBrand { name: string; logo: string; accent: string; inviteCode: string }
+export interface ParentControls { outsideSchool: boolean; autoApproveSchoolClubs: boolean; messages: "school_only" | "nobody"; feedWindow: "after_school" | "weekends" | "off" }
+export interface TeacherEvent {
+  id: string; title: string; startsAt: string; place: string; classes: string[]; hostId: string;
+  sponsorship?: { amountAed: number; reason: string; status: "requested" | "reviewing" | "approved"; history: { status: string; at: string }[] };
+}
+export interface ChatMsg { id: string; communityId: string; authorId: string; author: string; school: string; body: string; at: string; status: "visible" | "pending" }

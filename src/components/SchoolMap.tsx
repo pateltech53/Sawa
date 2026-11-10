@@ -1,19 +1,25 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type { Opportunity, School } from "@/lib/types";
 
-/** Leaflet + OpenStreetMap tiles (free, no key). Schools come from the schools table (KHDA dataset format). */
+/** Leaflet + CARTO light basemap (OpenStreetMap data; the OSM tile servers block many embedded/preview hosts). Schools come from the schools table (KHDA dataset format). */
 export default function SchoolMap({ schools, opportunities, homeSchoolId, lang }: { schools: School[]; opportunities: Opportunity[]; homeSchoolId: string; lang: "en" | "ar" }) {
   const el = useRef<HTMLDivElement>(null);
+  const [tilesFailed, setTilesFailed] = useState(false);
   useEffect(() => {
     let map: import("leaflet").Map | undefined;
     let cancelled = false;
     import("leaflet").then((L) => {
       if (cancelled || !el.current) return;
       map = L.map(el.current, { scrollWheelZoom: false }).setView([25.17, 55.28], 11);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap contributors", maxZoom: 18 }).addTo(map);
+      let errors = 0;
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        attribution: "© OpenStreetMap contributors © CARTO", maxZoom: 19, subdomains: "abcd",
+      })
+        .on("tileerror", () => { errors += 1; if (errors > 6) setTilesFailed(true); })
+        .addTo(map);
       for (const s of schools) {
         const ops = opportunities.filter((o) => o.schoolId === s.id);
         const home = s.id === homeSchoolId;
@@ -30,5 +36,14 @@ export default function SchoolMap({ schools, opportunities, homeSchoolId, lang }
     });
     return () => { cancelled = true; map?.remove(); };
   }, [schools, opportunities, homeSchoolId, lang]);
-  return <div ref={el} className="h-[340px] w-full overflow-hidden rounded-3xl border border-white" role="region" aria-label="Map of schools and opportunities" />;
+  return (
+    <div className="relative">
+      <div ref={el} className="h-[340px] w-full overflow-hidden rounded-3xl border border-white bg-[#e9e6df]" role="region" aria-label="Map of schools and opportunities" />
+      {tilesFailed && (
+        <p className="absolute inset-x-3 bottom-3 z-[500] rounded-2xl bg-white/90 px-3 py-2 text-xs text-[var(--muted)] shadow">
+          {lang === "ar" ? "تعذّر تحميل خريطة الخلفية على هذه الشبكة. المواقع ما زالت ظاهرة، والقائمة أدناه كاملة." : "The background map couldn't load on this network. School pins still work, and the list below is complete."}
+        </p>
+      )}
+    </div>
+  );
 }

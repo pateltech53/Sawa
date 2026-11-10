@@ -478,7 +478,8 @@ function MatchingStep({ profile, onDone }: { profile: Profile; onDone: () => voi
   const school = SCHOOLS.find((s) => s.id === profile.schoolId)!;
   const communities = COMMUNITIES.filter((c) => c.interests.some((i) => profile.interests.includes(i))).length;
   const [stage, setStage] = useState(0);
-  const done = useLatest(onDone);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const opened = top.find((x) => x.o.id === openId);
   const stages = [
     `Reading your ${profile.interests.length} interests`,
     `Checking ${OPPORTUNITIES.length} opportunities for age ${new Date().getFullYear() - (profile.birthYear ?? 2012)}`,
@@ -487,8 +488,8 @@ function MatchingStep({ profile, onDone }: { profile: Profile; onDone: () => voi
   ];
   useEffect(() => {
     const ts = stages.map((_, i) => setTimeout(() => setStage(i + 1), (reduce ? 150 : 900) * (i + 1)));
-    const end = setTimeout(() => done.current(), reduce ? 900 : 4900);
-    return () => { ts.forEach(clearTimeout); clearTimeout(end); };
+    // No auto-advance: the student reads the matches, opens any of them, then continues.
+    return () => { ts.forEach(clearTimeout); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -516,7 +517,7 @@ function MatchingStep({ profile, onDone }: { profile: Profile; onDone: () => voi
       </div>
       <div className="relative mt-6 flex-1">
         {top.map((m, i) => (
-          <motion.div key={m.o.id} className="glass mb-3 flex items-center gap-3 rounded-[22px] p-3"
+          <motion.button type="button" key={m.o.id} onClick={() => setOpenId(m.o.id)} aria-label={`${m.o.titleEn}, ${m.score}% match. Open details`} className="glass mb-3 flex w-full items-center justify-start gap-3 rounded-[22px] p-3 text-start"
             initial={{ opacity: 0, y: 40, scale: 0.94 }} animate={stage >= 3 ? { opacity: 1, y: 0, scale: 1 } : {}} transition={{ delay: i * 0.18, ...spring }}>
             <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl" style={{ background: m.o.tint }}>
               {m.o.image ? <img src={m.o.image} alt="" className="h-12 w-12 object-contain" /> : <Sparkles size={20} />}
@@ -526,11 +527,36 @@ function MatchingStep({ profile, onDone }: { profile: Profile; onDone: () => voi
               <p className="truncate font-semibold">{m.o.titleEn}</p>
               <p className="truncate text-xs text-[var(--muted)]">{m.reasons[0]}</p>
             </div>
-            <span className="text-lg font-bold text-iris-500">{m.score}%</span>
-          </motion.div>
+            <span className="flex shrink-0 items-center gap-1 text-lg font-bold text-iris-500">{m.score}%<ChevronRight size={16} className="text-black/30 rtl:rotate-180" /></span>
+          </motion.button>
         ))}
       </div>
-      <button className="mx-auto mt-2 text-sm font-semibold text-[var(--muted)] underline" onClick={onDone}>Skip</button>
+      <AnimatePresence>{stage >= 3 && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mt-2 space-y-2">
+          <p className="text-center text-xs text-[var(--muted)]">Tap a match to see why it fits you.</p>
+          <button className="btn-ink w-full" onClick={onDone}>See everything I matched <ArrowRight size={17} className="rtl:rotate-180" /></button>
+        </motion.div>
+      )}</AnimatePresence>
+      <Sheet open={Boolean(opened)} onClose={() => setOpenId(null)} title={opened?.o.titleEn}>
+        {opened && (
+          <div className="space-y-3">
+            {opened.o.photo && <img src={opened.o.photo} alt="" className="h-40 w-full rounded-[20px] object-cover" />}
+            <div className="flex flex-wrap gap-1.5">
+              <span className="chip !bg-[#121217] !text-white">{opened.score}% match</span>
+              <span className="chip">{TYPE_LABEL[opened.o.type]}</span>
+              <span className="chip">{new Date(opened.o.startsAt).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span>
+              <span className="chip">{opened.distance === 0 ? "Your school" : `${opened.distance} km away`}</span>
+            </div>
+            <p className="text-sm">{opened.o.descEn}</p>
+            <div className="rounded-[18px] bg-white p-3">
+              <p className="label-xs mb-1.5">Why it matched</p>
+              <ul className="space-y-1">{opened.reasons.map((r) => <li key={r} className="flex gap-2 text-sm"><Check size={15} className="mt-0.5 shrink-0 text-iris-500" />{r}</li>)}</ul>
+            </div>
+            {opened.o.needsConsent && <p className="flex gap-2 rounded-[16px] bg-aegold-50 p-3 text-xs text-aegold-800"><Lock size={14} className="shrink-0" /> Outside your school: your guardian approves before you register.</p>}
+            {opened.o.source && <p className="text-xs text-[var(--muted)]">Listing modelled on {opened.o.source} · sample</p>}
+          </div>
+        )}
+      </Sheet>
     </motion.section>
   );
 }
