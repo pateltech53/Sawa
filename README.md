@@ -110,7 +110,7 @@ Integration status is labelled everywhere: Google Classroom and Teams are **mock
 
 ## Before the pitch — still to do with real data
 
-- [ ] Download the KHDA schools CSV (Dubai Pulse) and run `npm run import:schools -- file.csv`, then set the status to "imported" in `src/app/app/data/page.tsx`.
+- [x] KHDA Private Schools Database imported: `python3 scripts/import-khda-xlsx.py data/khda_private_schools.xlsx` (171 schools, 2015-16 workbook, ratings from the 2014-15 inspection). Replace with a newer KHDA file when available.
 - [ ] Add the MOE open-data and Bayanat figures to the Data sources screen, with their last-updated dates.
 - [ ] Replace or extend `src/lib/kb.ts` with text from 15–30 public MOE / u.ae help pages, using their exact URLs.
 - [ ] Replace the **"Before"** estimates in `src/app/app/impact/page.tsx` with counts from your interviews.

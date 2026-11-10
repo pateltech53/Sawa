@@ -8,7 +8,7 @@ import type { DataSource } from "@/lib/types";
 // F7 — every dataset Sawa uses, its portal and freshness. Update `lastUpdated` and `status`
 // when the real files are imported (see scripts/import-schools.mjs and docs/sources.md).
 const SOURCES: DataSource[] = [
-  { name: "Dubai private schools (KHDA)", portal: "Dubai Pulse", url: "https://www.dubaipulse.gov.ae", usedFor: "School picker, opportunity map, distance matching", lastUpdated: "Check on download", status: "sample" },
+  { name: "Dubai private schools (KHDA) · 171 schools", portal: "KHDA Private Schools Database", url: "https://web.khda.gov.ae/en/Education-Directory/Schools", usedFor: "Teacher school explorer, SAWA AI school answers, map", lastUpdated: "2015-16 workbook (ratings: DSIB 2014-15)", status: "imported" },
   { name: "Students, schools, teachers & staff 2018–2024", portal: "MOE Open Data", url: "https://www.moe.gov.ae/En/OpenData", usedFor: "Impact sizing (how many families one front door serves)", lastUpdated: "Check on download", status: "sample" },
   { name: "Education statistics (federal)", portal: "Bayanat (FCSC)", url: "https://bayanat.ae", usedFor: "Third source for national figures", lastUpdated: "Check on download", status: "sample" },
 ];

@@ -41,19 +41,19 @@ function ClassesInner() {
           const s = classStats(c, state.tAssignments, state.tSubs);
           return (
             <li key={c.id}>
-              <Link href={`/app/classes/${c.id}`} className="glass group block h-full rounded-[24px] p-4 transition hover:-translate-y-0.5 hover:bg-white/60">
+              <Link href={`/app/classes/${c.id}`} className="t-card group block h-full rounded-[24px] p-4 transition hover:-translate-y-0.5 hover:bg-white/35">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="flex items-center gap-2 text-lg font-bold"><span className="h-3 w-3 rounded-full" style={{ background: c.color }} aria-hidden />{ar ? c.nameAr : c.name}</p>
-                    <p className="text-[13px] text-[var(--muted)]">{c.room} · {c.studentIds.length} {ar ? "طلاب" : "students"}</p>
+                    <p className="text-[13px] text-grey">{c.room} · {c.studentIds.length} {ar ? "طلاب" : "students"}</p>
                   </div>
                   <ArrowRight size={18} className="opacity-40 transition group-hover:opacity-90 rtl:rotate-180" aria-hidden />
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5"><SourceBadge status="mock" label={`${c.source} · mock`} /></div>
                 <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-xl bg-white/60 py-2"><dt className="text-[11px] text-[var(--muted)]">{ar ? "المتوسط" : "Average"}</dt><dd className="font-bold tabular-nums">{s.average ?? "-"}{s.average !== null && "%"}</dd></div>
-                  <div className="rounded-xl bg-white/60 py-2"><dt className="text-[11px] text-[var(--muted)]">{ar ? "للتصحيح" : "To grade"}</dt><dd className={`font-bold tabular-nums ${s.toGrade ? "text-pink-600" : ""}`}>{s.toGrade}</dd></div>
-                  <div className="rounded-xl bg-white/60 py-2"><dt className="text-[11px] text-[var(--muted)]">{ar ? "متأخر" : "Missing"}</dt><dd className={`font-bold tabular-nums ${s.missing ? "text-aered-600" : ""}`}>{s.missing}</dd></div>
+                  <div className="t-row py-2"><dt className="text-[11px] text-grey">{ar ? "المتوسط" : "Average"}</dt><dd className="font-bold tabular-nums">{s.average ?? "-"}{s.average !== null && "%"}</dd></div>
+                  <div className="t-row py-2"><dt className="text-[11px] text-grey">{ar ? "للتصحيح" : "To grade"}</dt><dd className={`font-bold tabular-nums ${s.toGrade ? "text-sawa" : ""}`}>{s.toGrade}</dd></div>
+                  <div className="t-row py-2"><dt className="text-[11px] text-grey">{ar ? "متأخر" : "Missing"}</dt><dd className={`font-bold tabular-nums ${s.missing ? "text-aered-600" : ""}`}>{s.missing}</dd></div>
                 </dl>
                 <div className="mt-3"><Meter value={s.submissionRate ?? 0} color={c.color} label={ar ? "نسبة التسليم" : "Submission rate"} /></div>
               </Link>
@@ -78,9 +78,9 @@ function ClassesInner() {
                     <span className="h-9 w-1 rounded-full" style={{ background: c.color }} aria-hidden />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{a.title}</span>
-                      <span className="block text-[12px] text-[var(--muted)]">{ar ? c.nameAr : c.name} · {KIND_LABEL[a.kind][ar ? 1 : 0]} · {a.points} {ar ? "درجة" : "pts"}</span>
+                      <span className="block text-[12px] text-grey">{ar ? c.nameAr : c.name} · {KIND_LABEL[a.kind][ar ? 1 : 0]} · {a.points} {ar ? "درجة" : "pts"}</span>
                     </span>
-                    <span className="text-end text-[12px]"><span className="block font-semibold">{relDays(a.dueAt, L)}</span><span className="text-[var(--muted)]">{handed}/{subs.length} {ar ? "سلّموا" : "in"} · {fmtDate(a.dueAt, L)}</span></span>
+                    <span className="text-end text-[12px]"><span className="block font-semibold">{relDays(a.dueAt, L)}</span><span className="text-grey">{handed}/{subs.length} {ar ? "سلّموا" : "in"} · {fmtDate(a.dueAt, L)}</span></span>
                   </button>
                 </li>
               );

@@ -3,16 +3,15 @@
 import { useId, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
-import { AlertTriangle, CheckCircle2, CircleDashed, PlugZap, Radio } from "lucide-react";
 import { Sheet } from "@/components/s/kit";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 
 export const useAr = () => useStore().state.lang === "ar";
 
-/** Shared panel surface for the teacher workspace (glass on the silk background). */
+/** Shared panel surface for the teacher workspace (t-card on the silk background). */
 export function Panel({ children, className = "", as: As = "section", ...rest }: { children: React.ReactNode; className?: string; as?: "section" | "div" | "article" | "li" } & React.HTMLAttributes<HTMLElement>) {
-  return <As className={cn("glass rounded-[24px] p-4 sm:p-5", className)} {...rest}>{children}</As>;
+  return <As className={cn("t-card rounded-[24px] p-4 sm:p-5", className)} {...rest}>{children}</As>;
 }
 
 export function PanelHead({ title, sub, action, id }: { title: string; sub?: string; action?: React.ReactNode; id?: string }) {
@@ -20,7 +19,7 @@ export function PanelHead({ title, sub, action, id }: { title: string; sub?: str
     <div className="mb-3 flex items-start justify-between gap-3">
       <div className="min-w-0">
         <h2 id={id} className="text-[17px] font-bold tracking-tight">{title}</h2>
-        {sub && <p className="mt-0.5 text-[13px] text-[var(--muted)]">{sub}</p>}
+        {sub && <p className="mt-0.5 text-[13px] text-grey">{sub}</p>}
       </div>
       {action}
     </div>
@@ -33,39 +32,39 @@ export function PageHead({ title, sub, right, eyebrow }: { title: string; sub?: 
       <div className="min-w-0">
         {eyebrow && <p className="label-xs mb-1">{eyebrow}</p>}
         <h1 className="text-[26px] font-bold leading-tight tracking-tight sm:text-[30px]">{title}</h1>
-        {sub && <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">{sub}</p>}
+        {sub && <p className="mt-1 max-w-2xl text-sm text-grey">{sub}</p>}
       </div>
       {right}
     </div>
   );
 }
 
-/** Data provenance badge. Every integration-backed number in the teacher UI carries one. */
+/** Data provenance label. Quiet by design: a coloured dot and a word. */
 export function SourceBadge({ status, label }: { status: "live" | "mock" | "sample" | "awaiting" | "imported"; label?: string }) {
   const ar = useAr();
   const map = {
-    live: { icon: Radio, cls: "bg-aegreen-100 text-aegreen-800", en: "Live", ar: "مباشر" },
-    imported: { icon: CheckCircle2, cls: "bg-aegreen-100 text-aegreen-800", en: "Imported", ar: "مستورد" },
-    mock: { icon: PlugZap, cls: "bg-blue-100 text-blue-800", en: "Mock integration", ar: "تكامل تجريبي" },
-    sample: { icon: CircleDashed, cls: "bg-aegold-100 text-aegold-800", en: "Sample data", ar: "بيانات عينة" },
-    awaiting: { icon: AlertTriangle, cls: "bg-zinc-200 text-zinc-700", en: "Awaiting credentials", ar: "بانتظار بيانات الاعتماد" },
+    live: { dot: "bg-aegreen-600", en: "Live", ar: "مباشر" },
+    imported: { dot: "bg-aegreen-600", en: "Official data", ar: "بيانات رسمية" },
+    mock: { dot: "bg-sawa", en: "Simulated", ar: "محاكاة" },
+    sample: { dot: "bg-aegold-500", en: "Sample", ar: "عينة" },
+    awaiting: { dot: "bg-zinc-400", en: "Not connected", ar: "غير متصل" },
   }[status];
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold", map.cls)}>
-      <map.icon size={11} aria-hidden /> {label ?? (ar ? map.ar : map.en)}
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/50 px-2 py-0.5 text-[11px] font-semibold text-grey">
+      <span className={cn("h-1.5 w-1.5 rounded-full", map.dot)} aria-hidden /> {label ?? (ar ? map.ar : map.en)}
     </span>
   );
 }
 
-export function Stat({ value, label, tone = "ink", href }: { value: React.ReactNode; label: string; tone?: "ink" | "pink" | "blue" | "green" | "red"; href?: string }) {
-  const tones = { ink: "text-ink", pink: "text-pink-600", blue: "text-blue-600", green: "text-aegreen-700", red: "text-aered-600" };
+export function Stat({ value, label, tone = "ink", href }: { value: React.ReactNode; label: string; tone?: "ink" | "blue" | "green" | "red"; href?: string }) {
+  const tones = { ink: "text-ink", blue: "text-sawa", green: "text-aegreen-700", red: "text-aered-600" };
   const inner = (
     <>
       <span className={cn("block text-[26px] font-bold leading-none tracking-tight tabular-nums", tones[tone])}>{value}</span>
-      <span className="mt-1.5 block text-[12px] font-medium leading-tight text-[var(--muted)]">{label}</span>
+      <span className="mt-1.5 block text-[12px] font-medium leading-tight text-grey">{label}</span>
     </>
   );
-  const cls = "block rounded-2xl bg-white/65 p-3.5 transition hover:bg-white/90";
+  const cls = "block t-row p-3.5";
   return href ? <Link href={href} className={cls}>{inner}</Link> : <div className={cls}>{inner}</div>;
 }
 
@@ -97,7 +96,7 @@ export function EmptyState({ icon: Icon, title, text, action }: { icon: React.Co
     <div className="flex flex-col items-center rounded-[24px] border border-dashed border-black/15 bg-white/35 px-5 py-9 text-center">
       <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/80 text-ink/70"><Icon size={22} /></span>
       <p className="mt-3 font-semibold">{title}</p>
-      {text && <p className="mt-1 max-w-sm text-sm text-[var(--muted)]">{text}</p>}
+      {text && <p className="mt-1 max-w-sm text-sm text-grey">{text}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

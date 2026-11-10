@@ -30,17 +30,22 @@ export function detectIntents(q: string): Intent[] {
 }
 
 /** Find schools named in the question. Also returns a name the teacher mentioned that we could not find. */
+const COMMON = new Set(["school", "schools", "public", "college", "private", "international", "dubai", "english", "american", "british", "indian", "high", "modern", "primary", "secondary", "the", "and", "for", "boys", "girls", "branch", "institute", "national", "community", "sample"]);
+const words = (s: string) => clean(s).toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2 && !COMMON.has(w) && w !== "al");
+
+/** Find the school named in the question (best match). Also returns a name the teacher mentioned that we could not find. */
 export function findSchools(q: string): { hits: School[]; unknown?: string } {
-  const t = q.toLowerCase();
-  const hits = SCHOOLS.filter((s) => {
-    const name = clean(s.name).toLowerCase();
-    if (t.includes(name)) return true;
-    const distinctive = name.split(/\s+/).filter((w) => w.length > 3 && !["school", "academy", "public", "college"].includes(w));
-    return distinctive.length > 0 && distinctive.filter((w) => t.includes(w)).length >= Math.min(2, distinctive.length);
-  });
   const m = q.match(/(?:from|at|with|about|join|joining|for)\s+(?:the\s+)?((?:[A-Z][\w'&.-]*\s+){0,5}(?:School|Academy|College|Institute|Schools)\b)/);
-  const unknown = m && !hits.some((h) => clean(h.name).toLowerCase() === m[1].toLowerCase()) ? m[1].trim() : undefined;
-  return { hits, unknown: hits.length ? undefined : unknown };
+  // Compare against the school name the teacher typed when there is one, otherwise the whole question.
+  const qWords = new Set(m ? words(m[1]) : q.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/));
+  const scored = SCHOOLS.map((s) => {
+    const w = words(s.name);
+    const hit = w.filter((x) => qWords.has(x)).length;
+    // symmetric overlap: "Horizon Valley" must not match "Horizon English"
+    const score = w.length ? hit / Math.max(w.length, m ? qWords.size : w.length) : 0;
+    return { s, score, hit };
+  }).filter((x) => x.hit > 0 && x.score >= 0.75).sort((a, b) => b.score - a.score || b.hit - a.hit);
+  return { hits: scored.slice(0, 1).map((x) => x.s), unknown: scored.length ? undefined : m?.[1].trim() };
 }
 
 export function parseAges(q: string): { min?: number; max?: number } {
@@ -127,12 +132,13 @@ export function retrieveForTeacher(q: string, teacher: { name: string; subjects:
       if (ops.length) verified.push({ label: "Student opportunities hosted", value: ops.map((o) => o.titleEn).join(", "), source: "Sawa opportunity listings (sample)" });
       if (peers.length) verified.push({ label: "Educators on Sawa", value: peers.map((p) => `${p.name} (${p.subjects.join(", ")})`).join(", "), source: "Sawa teacher network (sample)" });
       for (const [k, v] of [["KHDA rating", s.rating], ["Fees", s.feeRange], ["Students", s.students]] as const) if (v === undefined) missing.push(`${k} is not in the dataset for this school.`);
+      if (schoolStatus(s) === "imported") missing.push("This KHDA data is from the 2015-16 workbook (ratings from the 2014-15 inspection). Check khda.gov.ae for the latest rating and fees before deciding.");
       missing.push("Salary, contract terms, workload and career progression are not in any SAWA dataset. Ask the school's HR in writing.");
       if (schoolStatus(s) === "sample") missing.push("This is a sample school row. Import the KHDA dataset to see real directory data.");
       ctx.school = s; ctx.jobs = jobs; ctx.opportunitiesHosted = ops.map((o) => o.titleEn); ctx.educators = peers.map((p) => ({ name: p.name, subjects: p.subjects }));
       answer = `Here's what SAWA's data says about ${clean(s.name)}, and what it can't tell you.`;
       advice.push(
-        `${s.curriculum} curriculum: check how your ${teacher.subjects.join("/")} experience maps to it, and whether they offer induction if it's new to you.`,
+        `${s.curriculum} curriculum (per the dataset): check how your ${teacher.subjects.join("/")} experience maps to it, and whether they offer induction if it's new to you.`,
         s.specialities?.length ? `Its listed strengths (${s.specialities.join(", ")}) are a natural place to contribute, for example leading a club or competition team.` : "Ask which programmes or clubs they want new staff to lead.",
         "Compare the offer with your current role on workload, timetable, leadership opportunities and professional development budget, not salary alone.",
       );

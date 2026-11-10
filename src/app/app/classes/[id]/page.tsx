@@ -36,7 +36,7 @@ function ClassInner({ id }: { id: string }) {
 
   return (
     <div className="space-y-4">
-      <Link href="/app/classes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--muted)] hover:text-ink"><ArrowLeft size={16} className="rtl:rotate-180" aria-hidden /> {ar ? "صفوفي" : "My classes"}</Link>
+      <Link href="/app/classes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-grey hover:text-ink"><ArrowLeft size={16} className="rtl:rotate-180" aria-hidden /> {ar ? "صفوفي" : "My classes"}</Link>
       <PageHead
         eyebrow={`${cls.subject} · ${ar ? "الصف" : "Grade"} ${cls.grade} · ${cls.room}`}
         title={ar ? cls.nameAr : cls.name}
@@ -89,23 +89,23 @@ function Overview({ clsId, stats, students, onStudent, onGrade }: { clsId: strin
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Stat value={stats.average !== null ? `${stats.average}%` : "-"} label={ar ? "متوسط الصف" : "Class average"} />
         <Stat value={`${stats.submissionRate ?? 0}%`} label={ar ? "نسبة التسليم" : "Handed in"} tone="blue" />
-        <Stat value={stats.toGrade} label={ar ? "بانتظار التصحيح" : "Waiting for a grade"} tone={stats.toGrade ? "pink" : "ink"} />
+        <Stat value={stats.toGrade} label={ar ? "بانتظار التصحيح" : "Waiting for a grade"} tone={stats.toGrade ? "blue" : "ink"} />
         <Stat value={stats.missing} label={ar ? "أعمال متأخرة" : "Overdue, not handed in"} tone={stats.missing ? "red" : "ink"} />
       </div>
       {stats.toGrade > 0 && (
-        <button onClick={onGrade} className="flex w-full items-center gap-3 rounded-2xl bg-pink-50 px-4 py-3 text-start text-sm font-semibold text-pink-700 transition hover:bg-pink-100">
+        <button onClick={onGrade} className="flex w-full items-center gap-3 rounded-2xl bg-white/40 px-4 py-3 text-start text-sm font-semibold text-sawa transition hover:bg-white/60">
           <ClipboardCheck size={18} aria-hidden /> <span className="flex-1">{ar ? `${stats.toGrade} تسليمات جاهزة للتصحيح` : `${stats.toGrade} submissions are ready to grade`}</span> <span aria-hidden>{ar ? "←" : "→"}</span>
         </button>
       )}
       <div className="grid gap-4 md:grid-cols-2">
         <Panel>
           <PanelHead title={ar ? "يستحقون متابعة" : "Worth a check-in"} sub={ar ? "عملان متأخران أو أكثر، أو متوسط أقل من 60٪" : "2+ overdue pieces, or average under 60%"} />
-          {checkIn.length === 0 ? <p className="text-sm text-[var(--muted)]">{ar ? "لا أحد الآن. رائع." : "Nobody right now."}</p> : (
+          {checkIn.length === 0 ? <p className="text-sm text-grey">{ar ? "لا أحد الآن. رائع." : "Nobody right now."}</p> : (
             <ul className="space-y-1.5">
               {checkIn.map((r) => (
-                <li key={r.s.id}><button onClick={() => onStudent(r.s.id)} className="flex w-full items-center gap-2.5 rounded-2xl bg-white/60 px-3 py-2 text-start hover:bg-white">
+                <li key={r.s.id}><button onClick={() => onStudent(r.s.id)} className="flex w-full items-center gap-2.5 t-row px-3 py-2 text-start">
                   <Initials name={r.s.name} size={30} /><span className="flex-1 text-sm font-semibold">{ar ? r.s.nameAr : r.s.name}</span>
-                  <span className="text-[12px] text-[var(--muted)]">{r.missing} {ar ? "متأخر" : "missing"} · {r.average ?? "-"}%</span>
+                  <span className="text-[12px] text-grey">{r.missing} {ar ? "متأخر" : "missing"} · {r.average ?? "-"}%</span>
                 </button></li>
               ))}
             </ul>
@@ -113,12 +113,12 @@ function Overview({ clsId, stats, students, onStudent, onGrade }: { clsId: strin
         </Panel>
         <Panel>
           <PanelHead title={ar ? "جاهزون لتحدٍّ أكبر" : "Ready for a stretch"} sub={ar ? "متوسط 85٪ فأكثر أو مسار إثرائي" : "85%+ average or on an extension pathway"} />
-          {stretch.length === 0 ? <p className="text-sm text-[var(--muted)]">-</p> : (
+          {stretch.length === 0 ? <p className="text-sm text-grey">-</p> : (
             <ul className="flex flex-wrap gap-1.5">{stretch.map((r) => <li key={r.s.id}><button onClick={() => onStudent(r.s.id)} className="chip">{ar ? r.s.nameAr : r.s.name}</button></li>)}</ul>
           )}
           {opp && (
-            <Link href={`/app/opportunities?open=${opp.o.id}&class=${clsId}`} className="mt-3 flex items-center gap-2.5 rounded-2xl bg-[image:var(--grad-brand-soft)] px-3 py-2.5 text-sm">
-              <Telescope size={17} className="text-blue-600" aria-hidden />
+            <Link href={`/app/opportunities?open=${opp.o.id}&class=${clsId}`} className="mt-3 flex items-center gap-2.5 t-row px-3 py-2.5 text-sm">
+              <Telescope size={17} className="text-sawa" aria-hidden />
               <span className="flex-1"><b>{ar ? opp.o.titleAr : opp.o.titleEn}</b> · {ar ? `${opp.e.matched.length} طلاب مهتمون` : `${opp.e.matched.length} students match`}</span>
             </Link>
           )}
@@ -142,13 +142,13 @@ function AssignmentList({ assignments, clsId, onOpen, onNew }: { assignments: TA
         const toGrade = subs.filter((x) => x?.status === "submitted" || x?.status === "late").length;
         return (
           <li key={a.id}>
-            <button onClick={() => onOpen(a.id)} className="glass flex w-full flex-wrap items-center gap-3 rounded-[20px] p-3.5 text-start transition hover:bg-white/60">
+            <button onClick={() => onOpen(a.id)} className="t-card flex w-full flex-wrap items-center gap-3 rounded-[20px] p-3.5 text-start transition hover:bg-white/35">
               <span className="min-w-0 flex-1">
                 <span className="flex flex-wrap items-center gap-1.5"><span className="font-semibold">{a.title}</span>{a.returned && <span className="rounded-full bg-aegreen-100 px-2 py-0.5 text-[11px] font-semibold text-aegreen-800">{ar ? "أُعيدت" : "Returned"}</span>}</span>
-                <span className="block text-[12px] text-[var(--muted)]">{KIND_LABEL[a.kind][ar ? 1 : 0]} · {a.points} {ar ? "درجة" : "pts"} · {ar ? "التسليم" : "due"} {fmtDate(a.dueAt, L)} ({relDays(a.dueAt, L)})</span>
+                <span className="block text-[12px] text-grey">{KIND_LABEL[a.kind][ar ? 1 : 0]} · {a.points} {ar ? "درجة" : "pts"} · {ar ? "التسليم" : "due"} {fmtDate(a.dueAt, L)} ({relDays(a.dueAt, L)})</span>
               </span>
-              <span className="w-28"><Meter value={handed} max={cls.studentIds.length} color={cls.color} label={ar ? "سلّموا" : "Handed in"} /><span className="mt-1 block text-[11px] text-[var(--muted)]">{handed}/{cls.studentIds.length} {ar ? "سلّموا" : "handed in"}</span></span>
-              {toGrade > 0 && <span className="rounded-full bg-pink-500 px-2.5 py-1 text-[12px] font-bold text-white">{toGrade} {ar ? "للتصحيح" : "to grade"}</span>}
+              <span className="w-28"><Meter value={handed} max={cls.studentIds.length} color={cls.color} label={ar ? "سلّموا" : "Handed in"} /><span className="mt-1 block text-[11px] text-grey">{handed}/{cls.studentIds.length} {ar ? "سلّموا" : "handed in"}</span></span>
+              {toGrade > 0 && <span className="rounded-full bg-sawa px-2.5 py-1 text-[12px] font-bold text-white">{toGrade} {ar ? "للتصحيح" : "to grade"}</span>}
             </button>
           </li>
         );
@@ -159,7 +159,7 @@ function AssignmentList({ assignments, clsId, onOpen, onNew }: { assignments: TA
 
 const STATUS_STYLE: Record<string, string> = {
   graded: "bg-aegreen-100 text-aegreen-800",
-  submitted: "bg-blue-100 text-blue-800",
+  submitted: "bg-sawa/12 text-sawa",
   late: "bg-aegold-100 text-aegold-800",
   missing: "bg-aered-100 text-aered-800",
 };
@@ -181,7 +181,7 @@ function GradingSheet({ asgId, onClose }: { asgId: string | null; onClose: () =>
   return (
     <>
       <Sheet open={!!asgId} onClose={onClose} title={a.title}>
-        <p className="-mt-2 mb-3 text-sm text-[var(--muted)]">{ar ? cls.nameAr : cls.name} · {a.points} {ar ? "درجة" : "points"} · {graded}/{rows.length} {ar ? "مصحّح" : "graded"}</p>
+        <p className="-mt-2 mb-3 text-sm text-grey">{ar ? cls.nameAr : cls.name} · {a.points} {ar ? "درجة" : "points"} · {graded}/{rows.length} {ar ? "مصحّح" : "graded"}</p>
         <label className="mb-2 flex items-center gap-2 text-sm font-medium"><input type="checkbox" checked={onlyToGrade} onChange={(e) => setOnlyToGrade(e.target.checked)} className="rounded" /> {ar ? "أظهر غير المصحّح فقط" : "Only show work waiting for a grade"}</label>
         <ul className="space-y-1.5">
           {shown.map(({ s, sub }, i) => (
@@ -204,7 +204,7 @@ function GradingSheet({ asgId, onClose }: { asgId: string | null; onClose: () =>
                     }}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.querySelector<HTMLInputElement>(`[data-grade-row="${i + 1}"]`)?.focus(); } }}
                   />
-                  <span className="text-[var(--muted)]">/{a.points}</span>
+                  <span className="text-grey">/{a.points}</span>
                 </label>
               </div>
               {sub.status === "graded" && (
@@ -242,7 +242,7 @@ function Gradebook({ clsId, assignments, students, onStudent }: { clsId: string;
         <table className="w-full min-w-[640px] border-separate border-spacing-0 text-sm">
           <caption className="sr-only">{ar ? "سجل الدرجات" : "Gradebook"}</caption>
           <thead>
-            <tr className="text-[12px] text-[var(--muted)]">
+            <tr className="text-[12px] text-grey">
               <th scope="col" className="sticky start-0 z-10 bg-[#efece7] px-3 py-2.5 text-start font-semibold">{ar ? "الطالب" : "Student"}</th>
               {cols.map((a) => <th key={a.id} scope="col" className="min-w-[96px] px-2 py-2.5 text-center font-semibold"><span className="line-clamp-2">{a.title}</span><span className="font-normal">/{a.points}</span></th>)}
               <th scope="col" className="px-3 py-2.5 text-center font-semibold">{ar ? "المتوسط" : "Avg"}</th>
@@ -253,7 +253,7 @@ function Gradebook({ clsId, assignments, students, onStudent }: { clsId: string;
               const avg = studentAverage(s.id, cls, state.tAssignments, state.tSubs).average;
               return (
                 <tr key={s.id} className="group">
-                  <th scope="row" className="sticky start-0 z-10 border-t border-black/5 bg-[#f5f3ef] px-3 py-1.5 text-start font-semibold group-hover:bg-white">
+                  <th scope="row" className="sticky start-0 z-10 border-t border-black/5 bg-[#f5f3ef] px-3 py-1.5 text-start font-semibold group-hover:bg-white/70">
                     <button onClick={() => onStudent(s.id)} className="hover:underline">{ar ? s.nameAr : s.name}</button>
                   </th>
                   {cols.map((a) => {
@@ -263,7 +263,7 @@ function Gradebook({ clsId, assignments, students, onStudent }: { clsId: string;
                         <input
                           aria-label={`${s.name}, ${a.title}`}
                           inputMode="numeric"
-                          className={`w-14 rounded-lg px-1 py-1 text-center font-semibold tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-300 ${sub.status === "graded" ? "bg-white" : sub.status === "missing" ? "bg-aered-50 text-aered-700 placeholder:text-aered-400" : "bg-blue-50 placeholder:text-blue-500"}`}
+                          className={`w-14 rounded-lg px-1 py-1 text-center font-semibold tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-300 ${sub.status === "graded" ? "bg-white" : sub.status === "missing" ? "bg-aered-50 text-aered-700 placeholder:text-aered-400" : "bg-sawa/12 placeholder:text-blue-500"}`}
                           value={sub.score ?? ""}
                           placeholder={sub.status === "missing" ? "M" : sub.status === "late" ? "L" : "In"}
                           onChange={(e) => { const v = e.target.value.replace(/[^0-9]/g, ""); setSubmission(a.id, s.id, v === "" ? { score: undefined } : { score: Math.min(a.points, +v) }); }}
@@ -278,7 +278,7 @@ function Gradebook({ clsId, assignments, students, onStudent }: { clsId: string;
           </tbody>
         </table>
       </div>
-      <p className="flex flex-wrap gap-3 border-t border-black/5 px-3 py-2 text-[11px] text-[var(--muted)]">
+      <p className="flex flex-wrap gap-3 border-t border-black/5 px-3 py-2 text-[11px] text-grey">
         <span>M = {ar ? "لم يُسلّم" : "missing"}</span><span>L = {ar ? "متأخر" : "late"}</span><span>In = {ar ? "مُسلّم، بانتظار الدرجة" : "handed in, needs a grade"}</span><span>{ar ? "التعديلات تُحفظ تلقائياً" : "Changes save automatically"}</span>
       </p>
     </Panel>
@@ -318,7 +318,7 @@ function AttendanceTab({ clsId, students }: { clsId: string; students: RosterStu
         {students.map((s) => {
           const cur = marks[s.id] ?? "present";
           return (
-            <li key={s.id} className="flex flex-wrap items-center gap-2.5 rounded-2xl bg-white/65 px-3 py-2">
+            <li key={s.id} className="flex flex-wrap items-center gap-2.5 t-row px-3 py-2">
               <Initials name={s.name} size={30} />
               <span className="min-w-0 flex-1 text-sm font-semibold">{ar ? s.nameAr : s.name}</span>
               <div role="radiogroup" aria-label={ar ? `حضور ${s.nameAr}` : `Attendance for ${s.name}`} className="flex gap-1">
@@ -366,11 +366,11 @@ function Students({ clsId, students, onStudent }: { clsId: string; students: Ros
           const st = studentAverage(s.id, cls, state.tAssignments, state.tSubs);
           return (
             <li key={s.id}>
-              <button onClick={() => onStudent(s.id)} className="glass flex w-full items-center gap-3 rounded-[20px] p-3 text-start transition hover:bg-white/60">
+              <button onClick={() => onStudent(s.id)} className="t-card flex w-full items-center gap-3 rounded-[20px] p-3 text-start transition hover:bg-white/35">
                 <Initials name={s.name} size={40} />
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-1.5 font-semibold">{ar ? s.nameAr : s.name}{s.support && <span className="rounded-full bg-iris-100 px-1.5 text-[10.5px] font-semibold text-iris-700">{s.support === "extension" ? (ar ? "إثراء" : "Extension") : (ar ? "دعم" : "Support")}</span>}</span>
-                  <span className="block truncate text-[12px] text-[var(--muted)]">{ar ? "العمر" : "Age"} {ageOfRoster(s)} · {s.interests.join(", ")}</span>
+                  <span className="flex items-center gap-1.5 font-semibold">{ar ? s.nameAr : s.name}{s.support && <span className="rounded-full bg-white/60 px-1.5 text-[10.5px] font-semibold text-ink">{s.support === "extension" ? (ar ? "إثراء" : "Extension") : (ar ? "دعم" : "Support")}</span>}</span>
+                  <span className="block truncate text-[12px] text-grey">{ar ? "العمر" : "Age"} {ageOfRoster(s)} · {s.interests.join(", ")}</span>
                 </span>
                 <span className="text-end text-[12px]"><span className="block font-bold tabular-nums">{st.average ?? "-"}{st.average !== null && "%"}</span>{st.missing > 0 && <span className="text-aered-600">{st.missing} {ar ? "متأخر" : "missing"}</span>}</span>
               </button>
@@ -379,7 +379,7 @@ function Students({ clsId, students, onStudent }: { clsId: string; students: Ros
         })}
       </ul>
       {list.length === 0 && <EmptyState icon={UserX} title={ar ? "لا نتائج" : "No students match"} />}
-      <p className="text-[12px] text-[var(--muted)]">{ar ? "يرى المعلم فقط بيانات طلاب صفوفه. لا تُعرض معلومات صحية أو عائلية." : "You only see students in your own classes. No health or family details are shown."}</p>
+      <p className="text-[12px] text-grey">{ar ? "يرى المعلم فقط بيانات طلاب صفوفه. لا تُعرض معلومات صحية أو عائلية." : "You only see students in your own classes. No health or family details are shown."}</p>
     </div>
   );
 }
@@ -402,7 +402,7 @@ function StudentSheet({ sid, clsId, onClose }: { sid: string | null; clsId: stri
           <Initials name={s.name} size={52} />
           <div className="text-sm">
             <p>{ar ? cls.nameAr : cls.name} · {ar ? "العمر" : "Age"} {age}</p>
-            <p className="text-[var(--muted)]">{hasAccount ? (ar ? "يستخدم سوا" : "Uses Sawa") : (ar ? "لا يملك حساباً في سوا بعد" : "Not on Sawa yet (sample roster row)")}</p>
+            <p className="text-grey">{hasAccount ? (ar ? "يستخدم سوا" : "Uses Sawa") : (ar ? "لا يملك حساباً في سوا بعد" : "Not on Sawa yet (sample roster row)")}</p>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -420,16 +420,16 @@ function StudentSheet({ sid, clsId, onClose }: { sid: string | null; clsId: stri
         </div>
         <div>
           <p className="label-xs mb-1.5">{ar ? "فرص تناسبه" : "Opportunities that fit"}</p>
-          {matches.length === 0 ? <p className="text-sm text-[var(--muted)]">-</p> : (
+          {matches.length === 0 ? <p className="text-sm text-grey">-</p> : (
             <ul className="space-y-1">
-              {matches.map((o) => <li key={o.id}><Link href={`/app/opportunities?open=${o.id}&class=${cls.id}`} className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[13px] font-semibold hover:bg-blue-50"><Telescope size={14} className="text-blue-600" aria-hidden />{ar ? o.titleAr : o.titleEn}</Link></li>)}
+              {matches.map((o) => <li key={o.id}><Link href={`/app/opportunities?open=${o.id}&class=${cls.id}`} className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[13px] font-semibold hover:bg-sawa/12"><Telescope size={14} className="text-sawa" aria-hidden />{ar ? o.titleAr : o.titleEn}</Link></li>)}
             </ul>
           )}
         </div>
         <Link href={`/app/ask?q=${encodeURIComponent(ar ? `اكتب رسالة لطيفة لولي أمر طالب في ${cls.nameAr} لديه ${st.missing} أعمال متأخرة` : `Draft a kind message to the parent of a student in ${cls.name} who has ${st.missing} missing assignments`)}`} className="btn-ghost w-full !bg-white">
-          <MessageSquareText size={16} aria-hidden /> {ar ? "صياغة رسالة لولي الأمر" : "Draft a note to the guardian"} <Sparkles size={14} className="text-pink-500" aria-hidden />
+          <MessageSquareText size={16} aria-hidden /> {ar ? "صياغة رسالة لولي الأمر" : "Draft a note to the guardian"} <Sparkles size={14} className="text-sawa" aria-hidden />
         </Link>
-        <p className="text-[12px] text-[var(--muted)]">{ar ? "لا يُرسل اسم الطالب إلى الذكاء الاصطناعي." : "The student's name is not sent to the AI."}</p>
+        <p className="text-[12px] text-grey">{ar ? "لا يُرسل اسم الطالب إلى الذكاء الاصطناعي." : "The student's name is not sent to the AI."}</p>
       </div>
     </Sheet>
   );

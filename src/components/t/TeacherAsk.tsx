@@ -18,8 +18,8 @@ interface Msg { role: "user" | "sawa"; text: string; data?: TeacherAiAnswer; err
 
 const GROUPS: { icon: typeof Building; en: string; ar: string; qs: [string, string][] }[] = [
   { icon: Building, en: "Schools & career", ar: "المدارس والمسار المهني", qs: [
-    ["I've received a job offer from Creek Science Academy. Can you help me understand whether this school would be a good career move?", "تلقيت عرض عمل من أكاديمية الخور للعلوم. هل هي خطوة مهنية جيدة؟"],
-    ["I've received a job offer from Al Diyafah School in Dubai. What should I know before accepting?", "تلقيت عرض عمل من مدرسة الضيافة في دبي. ماذا يجب أن أعرف؟"],
+    ["I've received a job offer from Al Diyafah High School. Can you help me understand whether this school would be a good career move?", "تلقيت عرض عمل من مدرسة الضيافة الثانوية. هل هي خطوة مهنية جيدة؟"],
+    ["Which Outstanding-rated UK curriculum schools in Dubai have science roles?", "ما المدارس ذات التقييم المتميز بالمنهج البريطاني في دبي التي لديها وظائف علوم؟"],
     ["What career and PD options fit a science teacher with 7 years' experience?", "ما خيارات المسار المهني والتطوير المناسبة لمعلم علوم بخبرة 7 سنوات؟"],
   ] },
   { icon: Telescope, en: "Student opportunities", ar: "فرص الطلاب", qs: [
@@ -101,10 +101,10 @@ export function TeacherAsk() {
       {msgs.length === 0 && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-2">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[image:var(--grad-brand)] text-white shadow-[var(--shadow-brand)]"><Sparkles size={22} aria-hidden /></span>
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-white "><Sparkles size={22} aria-hidden /></span>
             <div>
               <h1 className="text-[26px] font-bold leading-tight tracking-tight">SAWA AI</h1>
-              <p className="text-sm text-[var(--muted)]">{ar ? "مساعدك في المدرسة: مبني على بيانات سوا المعتمدة، ويقول بوضوح ما لا يعرفه." : "Your school-day assistant. Grounded in approved SAWA data, and clear about what it doesn't know."}</p>
+              <p className="text-sm text-grey">{ar ? "مساعدك في المدرسة: مبني على بيانات سوا المعتمدة، ويقول بوضوح ما لا يعرفه." : "Your school-day assistant. Grounded in approved SAWA data, and clear about what it doesn't know."}</p>
             </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5 text-[12px]">
@@ -114,22 +114,22 @@ export function TeacherAsk() {
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {GROUPS.map((g) => (
-              <section key={g.en} className="glass rounded-[22px] p-3.5" aria-label={ar ? g.ar : g.en}>
+              <section key={g.en} className="t-card rounded-[22px] p-3.5" aria-label={ar ? g.ar : g.en}>
                 <p className="mb-2 flex items-center gap-1.5 text-[13px] font-bold"><g.icon size={15} aria-hidden /> {ar ? g.ar : g.en}</p>
                 <div className="flex flex-col gap-1.5">
-                  {g.qs.map(([en, a]) => <button key={en} dir="auto" onClick={() => ask(ar ? a : en)} className="rounded-2xl bg-white/65 px-3 py-2.5 text-start text-[13.5px] font-medium transition hover:bg-white active:scale-[0.99]">{ar ? a : en}</button>)}
+                  {g.qs.map(([en, a]) => <button key={en} dir="auto" onClick={() => ask(ar ? a : en)} className="t-row px-3 py-2.5 text-start text-[13.5px] font-medium active:scale-[0.99]">{ar ? a : en}</button>)}
                 </div>
               </section>
             ))}
           </div>
-          <details className="mt-4 rounded-2xl bg-white/45 px-4 py-3 text-[13px]">
+          <details className="mt-4 t-row px-4 py-3 text-[13px]">
             <summary className="cursor-pointer font-semibold">{ar ? "ما الذي يمكن لـ SAWA AI رؤيته؟" : "What can SAWA AI see?"}</summary>
             <ul className="mt-2 space-y-1.5">
               <li className="flex items-center justify-between gap-2">{ar ? "دليل المدارس (صيغة KHDA)" : "School directory (KHDA format)"} <SourceBadge status={SCHOOLS.some((s) => s.id.startsWith("khda-")) ? "imported" : "sample"} /></li>
               <li className="flex items-center justify-between gap-2">{ar ? "فرص ومسابقات الطلاب" : "Student opportunities & competitions"} <SourceBadge status="sample" /></li>
               <li className="flex items-center justify-between gap-2">{ar ? "الوظائف والتطوير المهني" : "Jobs & professional development"} <SourceBadge status="sample" /></li>
               <li className="flex items-center justify-between gap-2">{ar ? "مكتبة الموارد وشبكة المعلمين" : "Resource library & teacher network"} <SourceBadge status="sample" /></li>
-              <li className="flex items-center justify-between gap-2">{ar ? "سجلات الطلاب" : "Student records"} <span className="text-[11px] font-semibold text-[var(--muted)]">{ar ? "لا يراها" : "Not visible to the AI"}</span></li>
+              <li className="flex items-center justify-between gap-2">{ar ? "سجلات الطلاب" : "Student records"} <span className="text-[11px] font-semibold text-grey">{ar ? "لا يراها" : "Not visible to the AI"}</span></li>
             </ul>
           </details>
         </motion.div>
@@ -151,11 +151,11 @@ export function TeacherAsk() {
           </motion.li>
         ))}
         {busy && (
-          <li className="glass max-w-md rounded-3xl px-4 py-3" aria-label={ar ? "يعمل" : "Working"}>
+          <li className="t-card max-w-md rounded-3xl px-4 py-3" aria-label={ar ? "يعمل" : "Working"}>
             <ul className="space-y-1.5 text-[13px]">
               {steps.map((s, i) => (
                 <li key={s} className={`flex items-center gap-2 transition-opacity ${i <= step ? "opacity-100" : "opacity-35"}`}>
-                  {i < Math.min(step, steps.length - 1) ? <BadgeCheck size={14} className="text-aegreen-700" aria-hidden /> : <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" aria-hidden />}
+                  {i < Math.min(step, steps.length - 1) ? <BadgeCheck size={14} className="text-aegreen-700" aria-hidden /> : <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-sawa border-t-transparent" aria-hidden />}
                   {STEPS[s][ar ? 1 : 0]}
                 </li>
               ))}
@@ -166,10 +166,10 @@ export function TeacherAsk() {
       <div ref={end} />
 
       <form onSubmit={(e) => { e.preventDefault(); ask(q); }} className="sticky bottom-28 mt-4">
-        <div className="glass glass-strong flex items-center gap-2 rounded-full p-1.5 ps-4 shadow-lg">
-          <Sparkles size={17} className="shrink-0 text-pink-500" aria-hidden />
+        <div className="t-card flex items-center gap-2 rounded-full p-1.5 ps-4 shadow-lg">
+          <Sparkles size={17} className="shrink-0 text-sawa" aria-hidden />
           <input dir="auto" className="min-w-0 flex-1 bg-transparent py-2 outline-none" placeholder={ar ? "اسأل عن مدرسة، مسابقة، أو اطلب مسودة..." : "Ask about a school, a competition, or request a draft..."} value={q} onChange={(e) => setQ(e.target.value)} aria-label={ar ? "سؤالك" : "Your question"} maxLength={800} />
-          {msgs.length > 0 && <button type="button" onClick={() => setMsgs([])} className="grid h-10 w-10 place-items-center rounded-full text-ink/50 hover:bg-white/70 hover:text-ink" aria-label={ar ? "محادثة جديدة" : "New conversation"}><Trash2 size={17} /></button>}
+          {msgs.length > 0 && <button type="button" onClick={() => setMsgs([])} className="grid h-10 w-10 place-items-center rounded-full text-ink/50 hover:text-ink" aria-label={ar ? "محادثة جديدة" : "New conversation"}><Trash2 size={17} /></button>}
           <button className="grid h-10 w-10 place-items-center rounded-full bg-ink text-white transition disabled:opacity-30" aria-label={ar ? "إرسال" : "Send"} disabled={!!busy || !q.trim()}><ArrowUp size={18} /></button>
         </div>
       </form>
@@ -184,13 +184,13 @@ function AnswerCard({ d, onCopy, onAsk }: { d: TeacherAiAnswer; onCopy: (t: stri
   const live = d.mode.startsWith("ai:");
   const ICON = { school: Building, opportunity: Telescope, job: Briefcase, pd: BadgeCheck, educator: Users, resource: FileText } as const;
   return (
-    <article className="glass glass-strong rounded-[26px] rounded-es-md p-4 sm:p-5">
+    <article className="t-card rounded-[26px] rounded-es-md p-4 sm:p-5">
       <p className="text-[15.5px] leading-relaxed" dir="auto">{d.answer}</p>
 
       {d.verified.length > 0 && (
         <section className="mt-4 rounded-2xl bg-white/80 p-3" aria-label={ar ? "معلومات موثقة" : "Verified information"}>
           <button className="flex w-full items-center justify-between gap-2 text-start" onClick={() => setShowFacts((v) => !v)} aria-expanded={showFacts}>
-            <span className="flex items-center gap-1.5 text-[13px] font-bold text-aegreen-800"><BadgeCheck size={15} aria-hidden /> {ar ? "من بيانات سوا" : "From SAWA data"} <span className="font-normal text-[var(--muted)]">({d.verified.length})</span></span>
+            <span className="flex items-center gap-1.5 text-[13px] font-bold text-aegreen-800"><BadgeCheck size={15} aria-hidden /> {ar ? "من بيانات سوا" : "From SAWA data"} <span className="font-normal text-grey">({d.verified.length})</span></span>
             <ChevronDown size={16} className={`transition ${showFacts ? "rotate-180" : ""}`} aria-hidden />
           </button>
           <AnimatePresence initial={false}>
@@ -198,8 +198,8 @@ function AnswerCard({ d, onCopy, onAsk }: { d: TeacherAiAnswer; onCopy: (t: stri
               <motion.dl initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-2 overflow-hidden">
                 {d.verified.map((v, i) => (
                   <div key={i} className="border-t border-black/5 py-1.5 first:border-0">
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-3"><dt className="text-[12.5px] text-[var(--muted)]">{v.label}</dt><dd className="text-[13.5px] font-semibold">{v.value}</dd></div>
-                    <p className="text-[11px] text-[var(--muted)]">{v.source}</p>
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3"><dt className="text-[12.5px] text-grey">{v.label}</dt><dd className="text-[13.5px] font-semibold">{v.value}</dd></div>
+                    <p className="text-[11px] text-grey">{v.source}</p>
                   </div>
                 ))}
               </motion.dl>
@@ -209,14 +209,14 @@ function AnswerCard({ d, onCopy, onAsk }: { d: TeacherAiAnswer; onCopy: (t: stri
       )}
 
       {d.advice.length > 0 && (
-        <section className="mt-3 rounded-2xl bg-[image:var(--grad-brand-soft)] p-3" aria-label={ar ? "إرشاد بالذكاء الاصطناعي" : "AI guidance"}>
-          <p className="flex items-center gap-1.5 text-[13px] font-bold text-iris-700"><Lightbulb size={15} aria-hidden /> {ar ? "إرشاد (ليس حقائق موثقة)" : "Guidance (advice, not verified fact)"}</p>
+        <section className="mt-3 t-row p-3" aria-label={ar ? "إرشاد بالذكاء الاصطناعي" : "AI guidance"}>
+          <p className="flex items-center gap-1.5 text-[13px] font-bold text-ink"><Lightbulb size={15} aria-hidden /> {ar ? "إرشاد (ليس حقائق موثقة)" : "Guidance (advice, not verified fact)"}</p>
           <ul className="mt-1.5 list-disc space-y-1 ps-5 text-[14px]">{d.advice.map((a, i) => <li key={i} dir="auto">{a}</li>)}</ul>
         </section>
       )}
 
       {!!d.questions?.length && (
-        <section className="mt-3 rounded-2xl bg-white/70 p-3">
+        <section className="mt-3 t-row p-3">
           <p className="text-[13px] font-bold">{ar ? "أسئلة تطرحها قبل القبول" : "Questions to ask before you accept"}</p>
           <ol className="mt-1.5 list-decimal space-y-1 ps-5 text-[14px]">{d.questions.map((x, i) => <li key={i} dir="auto">{x}</li>)}</ol>
         </section>
@@ -238,7 +238,7 @@ function AnswerCard({ d, onCopy, onAsk }: { d: TeacherAiAnswer; onCopy: (t: stri
 
       {d.records.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {d.records.map((r) => { const I = ICON[r.type]; return <Link key={`${r.type}-${r.id}`} href={r.href} className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[12.5px] font-semibold hover:bg-white"><I size={13} aria-hidden /> {r.title.replace(" (sample)", "")}</Link>; })}
+          {d.records.map((r) => { const I = ICON[r.type]; return <Link key={`${r.type}-${r.id}`} href={r.href} className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[12.5px] font-semibold"><I size={13} aria-hidden /> {r.title.replace(" (sample)", "")}</Link>; })}
         </div>
       )}
 
@@ -247,20 +247,20 @@ function AnswerCard({ d, onCopy, onAsk }: { d: TeacherAiAnswer; onCopy: (t: stri
           {d.actions.map((a) => (
             <div key={a.href} className="flex flex-col">
               <Link href={a.href} className="btn-ink !min-h-10 text-sm">{a.label}</Link>
-              {a.confirm && <span className="mt-1 text-[11px] text-[var(--muted)]">{a.confirm}</span>}
+              {a.confirm && <span className="mt-1 text-[11px] text-grey">{a.confirm}</span>}
             </div>
           ))}
         </div>
       )}
 
-      <footer className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-black/10 pt-2 text-[11px] text-[var(--muted)]">
+      <footer className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-black/10 pt-2 text-[11px] text-grey">
         {d.sources.map((s) => (
           <a key={s.n} href={s.url} target={s.url.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="inline-flex items-center gap-1 hover:text-ink">[{s.n}] {s.title.replace(" (sample)", "")} {s.url.startsWith("http") && <ExternalLink size={10} aria-hidden />} <SourceBadge status={s.status} /></a>
         ))}
         <span className="ms-auto">{d.mode === "policy" ? (ar ? "سياسة الأمان" : "Safety policy") : live ? (ar ? "ذكاء اصطناعي مباشر" : "Live AI") : ar ? "وضع الاسترجاع فقط (بلا مفتاح)" : "Retrieval-only mode (no AI key)"}{d.tools.length ? ` · ${ar ? "أدوات" : "searched"}: ${d.tools.join(", ")}` : ""}</span>
       </footer>
       {d.records.some((r) => r.type === "school") && (
-        <button className="mt-2 text-[12.5px] font-semibold text-blue-700 hover:underline" onClick={() => onAsk(ar ? "ما المدارس المشابهة التي لديها وظائف علوم مفتوحة؟" : "Which similar schools have open science roles?")}>{ar ? "اعرض مدارس مشابهة لديها وظائف" : "Show similar schools that are hiring"}</button>
+        <button className="mt-2 text-[12.5px] font-semibold text-sawa hover:underline" onClick={() => onAsk(ar ? "ما المدارس المشابهة التي لديها وظائف علوم مفتوحة؟" : "Which similar schools have open science roles?")}>{ar ? "اعرض مدارس مشابهة لديها وظائف" : "Show similar schools that are hiring"}</button>
       )}
     </article>
   );

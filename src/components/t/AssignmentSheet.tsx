@@ -58,7 +58,7 @@ export function AssignmentSheet({ open, onClose, classId }: { open: boolean; onC
             <input type="number" min={1} max={200} className="input mt-1 !bg-white" value={points} onChange={(e) => setPoints(Math.max(0, +e.target.value))} />
           </label>
         </div>
-        <p className="rounded-2xl bg-white/80 px-3 py-2 text-[13px] text-[var(--muted)]">
+        <p className="rounded-2xl bg-white/80 px-3 py-2 text-[13px] text-grey">
           {ar ? `سيظهر في «اليوم» لـ ${c.studentIds.length} طلاب ويُرسل إلى ${c.source} (محاكاة).` : `Shows in ${c.studentIds.length} students' Today and syncs to ${c.source} (simulated). You only set it once.`}
         </p>
         <button className="btn-ink w-full" disabled={!valid}><ClipboardPlus size={17} aria-hidden /> {ar ? "انشر الواجب" : "Publish assignment"}</button>

@@ -75,15 +75,15 @@ const errs = [];
   });
   await step('growth', async () => {
     await p.click('nav button[aria-label="Career"]'); await p.waitForURL('**/app/growth'); await p.waitForTimeout(600); await shot('24-schools');
-    await p.click('button:has-text("Creek Science Academy")'); await p.waitForTimeout(500); await shot('25-school-detail'); await p.keyboard.press('Escape'); await p.waitForTimeout(300);
+    await p.fill('input[aria-label="Search schools"]', 'diyafah'); await p.waitForTimeout(300); await p.click('button:has-text("Al Diyafah")'); await p.waitForTimeout(500); await shot('25-school-detail'); await p.keyboard.press('Escape'); await p.waitForTimeout(300);
     await p.click('role=tab[name=/Jobs/]'); await p.waitForTimeout(300); await shot('26-jobs');
     await p.click('role=tab[name=/Network/]'); await p.waitForTimeout(300); await p.click('button:has-text("Connect") >> nth=0'); await p.waitForTimeout(2600); await shot('27-network');
   });
   await step('ai', async () => {
     await p.click('header a[aria-label="SAWA AI"]'); await p.waitForURL('**/app/ask'); await p.waitForTimeout(500); await shot('28-ai-empty');
-    await p.click('button:has-text("Al Diyafah")'); await p.waitForSelector('text=Not in SAWA', { timeout: 20000 }); await p.waitForTimeout(400); await shot('29-ai-unknown-school');
-    await p.fill('input[aria-label="Your question"]', "I've received a job offer from Creek Science Academy. What should I know?"); await p.keyboard.press('Enter');
-    await p.waitForSelector('text=Questions to ask', { timeout: 20000 }); await p.waitForTimeout(400); await shot('30-ai-school');
+    await p.click('button:has-text("Al Diyafah")'); await p.waitForSelector('text=Questions to ask', { timeout: 20000 }); await p.waitForTimeout(400); await shot('30-ai-school');
+    await p.fill('input[aria-label="Your question"]', "I've received a job offer from Horizon Valley School. What should I know?"); await p.keyboard.press('Enter');
+    await p.waitForSelector('text=is not in the school data', { timeout: 20000 }); await p.waitForTimeout(400); await shot('29-ai-unknown-school');
     await p.fill('input[aria-label="Your question"]', 'What competitions are available for students aged 14-16 in Dubai?'); await p.keyboard.press('Enter');
     await p.waitForTimeout(2500); await shot('31-ai-competitions');
     await p.fill('input[aria-label="Your question"]', "Draft a message to 8A parents about next week's science quiz"); await p.keyboard.press('Enter');

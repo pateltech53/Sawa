@@ -26,6 +26,10 @@
   --color-violet-100: #ede9fe; --color-violet-800: #5b21b6;
   --color-orange-100: #ffedd5; --color-orange-800: #9a3412;
   --color-ink: #121217;
+  /* Figma accent (badges, unread, links) and text greys */
+  --color-sawa: #5185de;
+  --color-grey: #756f6f;
+  --color-grey-2: #9e9999;
   /* zinc neutrals (used by 21st.dev components such as the filter bar) */
   --color-zinc-50: #fafafa; --color-zinc-100: #f4f4f5; --color-zinc-200: #e4e4e7; --color-zinc-300: #d4d4d8;
   --color-zinc-400: #a1a1aa; --color-zinc-500: #71717a; --color-zinc-600: #52525b; --color-zinc-700: #3f3f46;
@@ -147,6 +151,15 @@ body::before {
 }
 
 @layer components {
+  /* Teacher workspace surfaces, from the Figma community/messages frames */
+  .t-card {
+    background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.55); border-radius: 24px;
+    backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 12px 30px -20px rgba(40, 30, 20, 0.35);
+  }
+  .t-row { background: rgba(255, 255, 255, 0.42); border-radius: 18px; transition: background .18s var(--ease); }
+  .t-row:hover { background: rgba(255, 255, 255, 0.62); }
+
   .glass {
     background: var(--surface);
     border: 1px solid var(--line);

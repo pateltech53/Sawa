@@ -84,14 +84,14 @@ function OppsInner() {
 
       {view === "discover" ? (
         <>
-          <div className="glass space-y-2.5 rounded-[22px] p-3">
+          <div className="t-card space-y-2.5 rounded-[22px] p-3">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="label-xs me-1">{ar ? "طابق مع" : "Match against"}</span>
               {CLASSES.map((c) => <button key={c.id} className="chip !py-1.5" aria-pressed={classId === c.id} onClick={() => setClassId(c.id)}>{ar ? c.nameAr : c.name}</button>)}
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <label className="relative flex-1">
-                <Search size={16} className="absolute start-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" aria-hidden />
+                <Search size={16} className="absolute start-3 top-1/2 -translate-y-1/2 text-grey" aria-hidden />
                 <input className="input !min-h-10 !rounded-xl !bg-white/80 ps-9" value={q} onChange={(e) => setQ(e.target.value)} placeholder={ar ? "ابحث عن فرصة أو جهة" : "Search opportunities or organisers"} aria-label={ar ? "بحث" : "Search opportunities"} />
               </label>
               <FilterBar fields={fields} value={filters} onChange={setFilters} aria-label={ar ? "تصفية الفرص" : "Filter opportunities"} emptyLabel={ar ? "تصفية" : "Filter"} addLabel={ar ? "تصفية" : "Filter"} clearLabel={ar ? "مسح" : "Clear"} />
@@ -108,25 +108,25 @@ function OppsInner() {
                 const closed = o.deadline && +new Date(o.deadline) < Date.now();
                 return (
                   <motion.li key={o.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03 }}>
-                    <button onClick={() => setOpenId(o.id)} className="glass group flex h-full w-full flex-col rounded-[22px] p-4 text-start transition hover:-translate-y-0.5 hover:bg-white/60">
+                    <button onClick={() => setOpenId(o.id)} className="t-card group flex h-full w-full flex-col items-stretch rounded-[22px] p-4 text-start transition hover:-translate-y-0.5 hover:bg-white/35">
                       <div className="flex items-start gap-3">
                         <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl" style={{ background: o.tint }}>{o.image ? <img src={o.image} alt="" className="h-10 w-10 object-contain" /> : <Trophy size={20} aria-hidden />}</span>
                         <span className="min-w-0 flex-1">
                           <span className="block font-semibold leading-snug">{ar ? o.titleAr : o.titleEn}</span>
-                          <span className="block text-[12px] text-[var(--muted)]">{o.organiser} · {o.emirate}</span>
+                          <span className="block text-[12px] text-grey">{o.organiser} · {o.emirate}</span>
                         </span>
                       </div>
                       <div className="mt-3 flex flex-wrap gap-1.5 text-[12px]">
                         <span className="rounded-full bg-white/70 px-2 py-0.5 font-semibold">{ar ? "العمر" : "Ages"} {o.minAge}{o.maxAge ? `-${o.maxAge}` : "+"}</span>
                         {o.teamSize && <span className="rounded-full bg-white/70 px-2 py-0.5">{o.teamSize}</span>}
                         {o.fee && <span className="rounded-full bg-white/70 px-2 py-0.5">{o.fee}</span>}
-                        {o.deadline && <span className={`rounded-full px-2 py-0.5 font-semibold ${closed ? "bg-zinc-200 text-zinc-600" : +new Date(o.deadline) - Date.now() < 7 * 86_400_000 ? "bg-pink-100 text-pink-700" : "bg-white/70"}`}>{closed ? (ar ? "أُغلق" : "Closed") : `${ar ? "يغلق" : "Closes"} ${relDays(o.deadline, L)}`}</span>}
+                        {o.deadline && <span className={`rounded-full px-2 py-0.5 font-semibold ${closed ? "bg-zinc-200 text-zinc-600" : +new Date(o.deadline) - Date.now() < 7 * 86_400_000 ? "bg-sawa/15 text-sawa" : "t-row"}`}>{closed ? (ar ? "أُغلق" : "Closed") : `${ar ? "يغلق" : "Closes"} ${relDays(o.deadline, L)}`}</span>}
                       </div>
                       <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-[12.5px]">
-                        <span><b className="text-blue-700">{e.eligible.length}</b>/{e.students.length} {ar ? "مؤهلون" : "eligible"} · <b className="text-pink-600">{e.matched.length}</b> {ar ? "مهتمون" : "interested"}</span>
+                        <span><b className="text-sawa">{e.eligible.length}</b>/{e.students.length} {ar ? "مؤهلون" : "eligible"} · <b className="text-sawa">{e.matched.length}</b> {ar ? "مهتمون" : "interested"}</span>
                         <span className="flex gap-1">
                           {rec && <span className="rounded-full bg-aegreen-100 px-2 py-0.5 text-[11px] font-semibold text-aegreen-800">{ar ? "رُشّح" : "Recommended"}</span>}
-                          {sp && <span className="rounded-full bg-iris-100 px-2 py-0.5 text-[11px] font-semibold text-iris-700">{ar ? "رعاية" : "Sponsorship"}: {sp.status}</span>}
+                          {sp && <span className="rounded-full bg-white/60 px-2 py-0.5 text-[11px] font-semibold text-ink">{ar ? "رعاية" : "Sponsorship"}: {sp.status}</span>}
                         </span>
                       </div>
                     </button>
@@ -163,13 +163,13 @@ function Tracking({ onOpen }: { onOpen: (id: string) => void }) {
             const reg = r.studentIds.filter((sid) => state.registered[sid]?.includes(o.id)).length;
             const pend = state.approvals.filter((a) => a.opportunityId === o.id && a.status === "pending" && r.studentIds.includes(a.childId)).length;
             return (
-              <li key={r.id}><button onClick={() => onOpen(o.id)} className="w-full rounded-2xl bg-white/65 px-3 py-2.5 text-start hover:bg-white">
+              <li key={r.id}><button onClick={() => onOpen(o.id)} className="w-full t-row px-3 py-2.5 text-start">
                 <p className="font-semibold">{ar ? o.titleAr : o.titleEn}</p>
-                <p className="text-[12px] text-[var(--muted)]">{ar ? c.nameAr : c.name} · {r.studentIds.length} {ar ? "طلاب" : "students"} · {fmtDate(r.at, L)} · {reg} {ar ? "سجّلوا" : "registered"}{pend ? ` · ${pend} ${ar ? "بانتظار ولي الأمر" : "awaiting guardian"}` : ""}</p>
+                <p className="text-[12px] text-grey">{ar ? c.nameAr : c.name} · {r.studentIds.length} {ar ? "طلاب" : "students"} · {fmtDate(r.at, L)} · {reg} {ar ? "سجّلوا" : "registered"}{pend ? ` · ${pend} ${ar ? "بانتظار ولي الأمر" : "awaiting guardian"}` : ""}</p>
               </button></li>
             );
           })}
-          {!state.tRecs.length && <li className="text-sm text-[var(--muted)]">-</li>}
+          {!state.tRecs.length && <li className="text-sm text-grey">-</li>}
         </ul>
       </Panel>
       <Panel>
@@ -178,7 +178,7 @@ function Tracking({ onOpen }: { onOpen: (id: string) => void }) {
           {state.tSponsor.map((s) => {
             const o = OPPORTUNITIES.find((x) => x.id === s.opportunityId)!;
             return (
-              <li key={s.id} className="rounded-2xl bg-white/65 p-3">
+              <li key={s.id} className="t-row p-3">
                 <div className="flex items-center justify-between gap-2"><p className="font-semibold">{ar ? o.titleAr : o.titleEn}</p>
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${s.status === "approved" ? "bg-aegreen-100 text-aegreen-800" : s.status === "declined" ? "bg-aered-100 text-aered-800" : "bg-aegold-100 text-aegold-800"}`}>{s.status}</span>
                 </div>
@@ -193,7 +193,7 @@ function Tracking({ onOpen }: { onOpen: (id: string) => void }) {
               </li>
             );
           })}
-          {!state.tSponsor.length && <li className="text-sm text-[var(--muted)]">-</li>}
+          {!state.tSponsor.length && <li className="text-sm text-grey">-</li>}
         </ul>
       </Panel>
     </div>
@@ -236,25 +236,25 @@ function OppSheet({ id, classId, onClose }: { id: string | null; classId: string
                 [ShieldCheck, ar ? "موافقة ولي الأمر" : "Guardian consent", o.needsConsent ? (ar ? "مطلوبة لمن دون 15" : "Required under 15") : ar ? "غير مطلوبة" : "Not required"],
               ].map(([I, k, v]) => {
                 const Icon = I as typeof Users;
-                return <div key={k as string} className="rounded-xl bg-white px-3 py-2"><dt className="flex items-center gap-1 text-[11px] text-[var(--muted)]"><Icon size={11} aria-hidden /> {k as string}</dt><dd className="font-semibold">{v as string}</dd></div>;
+                return <div key={k as string} className="rounded-xl bg-white px-3 py-2"><dt className="flex items-center gap-1 text-[11px] text-grey"><Icon size={11} aria-hidden /> {k as string}</dt><dd className="font-semibold">{v as string}</dd></div>;
               })}
             </dl>
-            <p className="flex flex-wrap items-center gap-2 text-[12px] text-[var(--muted)]"><SourceBadge status="sample" /> {ar ? "رابط التسجيل غير مباشر في النموذج." : "Registration link is not live in the prototype."} <span className="inline-flex items-center gap-0.5 opacity-60"><ExternalLink size={11} aria-hidden /> {ar ? "التسجيل" : "Register"}</span></p>
+            <p className="flex flex-wrap items-center gap-2 text-[12px] text-grey"><SourceBadge status="sample" /> {ar ? "رابط التسجيل غير مباشر في النموذج." : "Registration link is not live in the prototype."} <span className="inline-flex items-center gap-0.5 opacity-60"><ExternalLink size={11} aria-hidden /> {ar ? "التسجيل" : "Register"}</span></p>
 
             <div className="rounded-2xl bg-white p-3">
               <p className="text-sm font-semibold">{ar ? `رشّح لطلاب ${cls.nameAr}` : `Recommend to students in ${cls.name}`}</p>
-              <p className="text-[12px] text-[var(--muted)]">{e.eligible.length}/{e.students.length} {ar ? "مؤهلون حسب العمر" : "meet the age rules"} · {ar ? "محدد مسبقاً: من تطابق اهتماماتهم" : "pre-selected: students whose interests match"}</p>
+              <p className="text-[12px] text-grey">{e.eligible.length}/{e.students.length} {ar ? "مؤهلون حسب العمر" : "meet the age rules"} · {ar ? "محدد مسبقاً: من تطابق اهتماماتهم" : "pre-selected: students whose interests match"}</p>
               {e.eligible.length === 0 ? <p className="mt-2 text-sm text-aered-700">{ar ? "لا يوجد طلاب مؤهلون في هذا الصف." : "No one in this class meets the age rules."}</p> : (
                 <ul className="mt-2 flex flex-wrap gap-1.5">
                   {e.eligible.map((s) => {
                     const on = sel.includes(s.id);
                     const love = e.matched.some((m) => m.id === s.id);
-                    return <li key={s.id}><button className="chip !py-1.5" aria-pressed={on} onClick={() => setPicked(on ? sel.filter((x) => x !== s.id) : [...sel, s.id])}>{love && <Heart size={12} className={on ? "" : "text-pink-500"} aria-hidden />}{ar ? s.nameAr : s.name} <span className="opacity-60">{ageOfRoster(s)}</span></button></li>;
+                    return <li key={s.id}><button className="chip !py-1.5" aria-pressed={on} onClick={() => setPicked(on ? sel.filter((x) => x !== s.id) : [...sel, s.id])}>{love && <Heart size={12} className={on ? "" : "text-sawa"} aria-hidden />}{ar ? s.nameAr : s.name} <span className="opacity-60">{ageOfRoster(s)}</span></button></li>;
                   })}
                 </ul>
               )}
               <textarea className="input mt-3 min-h-20 !bg-zinc-50" maxLength={240} value={note} onChange={(ev) => setNote(ev.target.value)} placeholder={ar ? "ملاحظة شخصية (اختياري): لماذا يناسبهم؟" : "Personal note (optional): why it suits them"} />
-              {under15 > 0 && o.needsConsent && <p className="mt-2 flex items-center gap-1.5 text-[12px] text-iris-700"><ShieldCheck size={13} aria-hidden /> {ar ? `${under15} دون 15 سنة: سيحتاجون موافقة ولي الأمر عند التسجيل.` : `${under15} under 15: their guardian approves before they're registered.`}</p>}
+              {under15 > 0 && o.needsConsent && <p className="mt-2 flex items-center gap-1.5 text-[12px] text-ink"><ShieldCheck size={13} aria-hidden /> {ar ? `${under15} دون 15 سنة: سيحتاجون موافقة ولي الأمر عند التسجيل.` : `${under15} under 15: their guardian approves before they're registered.`}</p>}
               <button className="btn-ink mt-3 w-full" disabled={!sel.length} onClick={() => ask({
                 title: ar ? "إرسال الترشيح؟" : "Send recommendation?",
                 body: ar ? `ستظهر لـ ${sel.length} طلاب في «اليوم». الطلاب يقررون التسجيل بأنفسهم.` : `It appears in ${sel.length} students' Today with your note. They choose whether to register.`,
@@ -267,7 +267,7 @@ function OppSheet({ id, classId, onClose }: { id: string | null; classId: string
               <button className="btn-ghost !bg-white" disabled={!!existingSp} onClick={() => setMode("sponsor")}><HandCoins size={16} aria-hidden /> {existingSp ? (ar ? `الرعاية: ${existingSp.status}` : `Sponsorship ${existingSp.status}`) : ar ? "اطلب رعاية المدرسة" : "Ask school to sponsor"}</button>
               <button className="btn-ghost !bg-white" disabled={!o.deadline} onClick={() => { addReminder(`${o.titleEn}: registration closes`, new Date(+new Date(o.deadline!) - 2 * 86_400_000).toISOString()); toast(ar ? "أُضيف تذكير" : "Reminder set for 2 days before the deadline"); }}><BadgeCheck size={16} aria-hidden /> {ar ? "ذكّرني قبل الموعد" : "Remind me before it closes"}</button>
             </div>
-            <a href={`/app/ask?q=${encodeURIComponent(`Is ${o.titleEn} a good fit for my Grade ${cls.grade} students, and how should I prepare a team?`)}`} className="flex items-center justify-center gap-1.5 text-sm font-semibold text-blue-700"><Sparkles size={14} className="text-pink-500" aria-hidden /> {ar ? "اسأل SAWA AI عن هذه الفرصة" : "Ask SAWA AI about this"}</a>
+            <a href={`/app/ask?q=${encodeURIComponent(`Is ${o.titleEn} a good fit for my Grade ${cls.grade} students, and how should I prepare a team?`)}`} className="flex items-center justify-center gap-1.5 text-sm font-semibold text-sawa"><Sparkles size={14} className="text-sawa" aria-hidden /> {ar ? "اسأل SAWA AI عن هذه الفرصة" : "Ask SAWA AI about this"}</a>
           </div>
         ) : (
           <form className="space-y-3" onSubmit={(ev) => {
@@ -280,10 +280,10 @@ function OppSheet({ id, classId, onClose }: { id: string | null; classId: string
               run: () => { requestSponsorship({ opportunityId: o.id, classId: cls.id, students: sel.length || e.matched.length, budget: budget.trim() || (o.fee ?? "Not stated"), reason: reason.trim() }); toast(ar ? "أُرسل الطلب" : "Sponsorship request sent"); close(); },
             });
           }}>
-            <p className="text-sm text-[var(--muted)]">{ar ? "اطلب من المدرسة تغطية الرسوم أو النقل أو المستلزمات." : "Ask your school to cover fees, transport or kit, and to put the school's name behind the team."}</p>
+            <p className="text-sm text-grey">{ar ? "اطلب من المدرسة تغطية الرسوم أو النقل أو المستلزمات." : "Ask your school to cover fees, transport or kit, and to put the school's name behind the team."}</p>
             <div className="grid grid-cols-2 gap-2">
-              <div className="rounded-xl bg-white px-3 py-2 text-sm"><p className="text-[11px] text-[var(--muted)]">{ar ? "الطلاب" : "Students"}</p><p className="font-semibold">{sel.length || e.matched.length}</p></div>
-              <label className="block rounded-xl bg-white px-3 py-2 text-sm"><span className="text-[11px] text-[var(--muted)]">{ar ? "الميزانية المطلوبة" : "Budget needed"}</span><input className="w-full bg-transparent font-semibold outline-none" placeholder={o.fee ?? "AED"} value={budget} onChange={(ev) => setBudget(ev.target.value)} /></label>
+              <div className="rounded-xl bg-white px-3 py-2 text-sm"><p className="text-[11px] text-grey">{ar ? "الطلاب" : "Students"}</p><p className="font-semibold">{sel.length || e.matched.length}</p></div>
+              <label className="block rounded-xl bg-white px-3 py-2 text-sm"><span className="text-[11px] text-grey">{ar ? "الميزانية المطلوبة" : "Budget needed"}</span><input className="w-full bg-transparent font-semibold outline-none" placeholder={o.fee ?? "AED"} value={budget} onChange={(ev) => setBudget(ev.target.value)} /></label>
             </div>
             <label className="block text-sm font-semibold">{ar ? "لماذا؟" : "Why this matters"}<textarea required className="input mt-1 min-h-24 !bg-white" value={reason} onChange={(ev) => setReason(ev.target.value)} maxLength={400} placeholder={ar ? "مثال: يطوّر مهارات البرمجة ويمثّل المدرسة" : "e.g. Builds coding skills, links to our Grade 8 forces unit and represents the school"} /></label>
             <div className="flex gap-2"><button type="button" className="btn-ghost !bg-white" onClick={() => setMode("main")}>{ar ? "رجوع" : "Back"}</button><button className="btn-ink flex-1" disabled={!reason.trim()}><HandCoins size={16} aria-hidden /> {ar ? "أرسل الطلب" : "Send request"}</button></div>
