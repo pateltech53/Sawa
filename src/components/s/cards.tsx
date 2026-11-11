@@ -1,5 +1,6 @@
 "use client";
 
+import { uiLocale } from "@/lib/tr";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Bookmark, Check, Clock, Lock, MapPin, Users } from "lucide-react";
@@ -8,7 +9,7 @@ import { useToast } from "./kit";
 import { TYPE_LABEL, type Match } from "@/lib/match";
 import type { Community } from "@/lib/types";
 
-export const fmtShort = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+export const fmtShort = (iso: string) => new Date(iso).toLocaleDateString(uiLocale(), { weekday: "short", day: "numeric", month: "short" });
 
 export function SaveButton({ opId, dark = false }: { opId: string; dark?: boolean }) {
   const { state, me, toggleSave } = useStore();
@@ -41,7 +42,7 @@ export function OppCard({ m, compact = false }: { m: Match; compact?: boolean })
             <span className="absolute bottom-4 right-5 font-[family-name:var(--font-serif)] text-[44px] leading-none text-black/70">{TYPE_LABEL[o.type]}</span>
           )}
           <span className="absolute left-3 top-3 rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide">{TYPE_LABEL[o.type]}</span>
-          <span className="absolute bottom-3 left-3 rounded-full bg-[#121217] px-2.5 py-1 text-[12px] font-bold text-white">{m.score}% match</span>
+          <span className="absolute bottom-3 left-3 rounded-full bg-[#121217] px-2.5 py-1 text-[12px] font-bold text-white">{`${m.score}% match`}</span>
           <div className="absolute right-3 top-3"><SaveButton opId={o.id} /></div>
         </div>
         <div className="p-3.5">
@@ -72,7 +73,7 @@ export function CommunityTile({ c }: { c: Community }) {
         </div>
         <div className="flex flex-1 flex-col gap-1.5 p-3">
           <h3 className="line-clamp-2 text-[15px] font-bold leading-tight">{c.name}</h3>
-          <p className="flex items-center gap-1 text-[11px] text-[var(--muted)]"><Users size={12} /> {c.schools ?? 1} schools · {c.members.toLocaleString()}</p>
+          <p className="flex items-center gap-1 text-[11px] text-[var(--muted)]"><Users size={12} /> <span>{`${c.schools ?? 1} schools · ${c.members.toLocaleString()} members`}</span></p>
           <div className="mt-auto pt-1">
             {locked ? (
               <span className="flex h-8 items-center justify-center gap-1 rounded-[18px] bg-white/45 text-xs font-bold text-[var(--muted)]"><Lock size={12} /> Opens at {c.minAge}</span>

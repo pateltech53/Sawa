@@ -1,5 +1,6 @@
 "use client";
 
+import { uiLocale } from "@/lib/tr";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -41,7 +42,7 @@ export default function CalendarPage() {
   const on = (d: Date) => items.filter((i) => sameDay(new Date(i.at), d));
   const dayList = on(selected);
   const upcoming = items.filter((i) => new Date(i.at) >= today);
-  const title_ = view === "month" ? cursor.toLocaleDateString("en-GB", { month: "long", year: "numeric" }) : `${weekDays[0].toLocaleDateString("en-GB", { day: "numeric", month: "short" })} – ${weekDays[6].toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`;
+  const title_ = view === "month" ? cursor.toLocaleDateString(uiLocale(), { month: "long", year: "numeric" }) : `${weekDays[0].toLocaleDateString(uiLocale(), { day: "numeric", month: "short" })} – ${weekDays[6].toLocaleDateString(uiLocale(), { day: "numeric", month: "short" })}`;
 
   return (
     <div className="space-y-4">
@@ -100,19 +101,19 @@ export default function CalendarPage() {
       )}
 
       <section>
-        <h2 className="section-title mb-2 px-1">{view === "agenda" ? "Upcoming" : selected.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</h2>
+        <h2 className="section-title mb-2 px-1">{view === "agenda" ? "Upcoming" : selected.toLocaleDateString(uiLocale(), { weekday: "long", day: "numeric", month: "long" })}</h2>
         <AnimatePresence mode="wait">
           <motion.ul key={view === "agenda" ? "agenda" : selected.toDateString()} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-2">
             {(view === "agenda" ? upcoming : dayList).map((i, k) => (
               <li key={i.id}>
                 {view === "agenda" && (k === 0 || !sameDay(new Date(upcoming[k - 1].at), new Date(i.at))) && (
-                  <p className="label-xs mb-1.5 mt-3 px-1">{new Date(i.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" })}</p>
+                  <p className="label-xs mb-1.5 mt-3 px-1">{new Date(i.at).toLocaleDateString(uiLocale(), { weekday: "long", day: "numeric", month: "short" })}</p>
                 )}
                 <button onClick={() => setOpen(i)} className="glass flex w-full items-center gap-3 rounded-[20px] px-3 py-3 text-start">
                   <span className="h-10 w-1 shrink-0 rounded-full" style={{ background: i.color }} />
                   <span className="min-w-0 flex-1">
                     <span className={`block truncate font-semibold ${i.done ? "line-through opacity-50" : ""}`}>{i.title}</span>
-                    <span className="block truncate text-xs text-[var(--muted)]">{new Date(i.at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · {i.source}</span>
+                    <span className="block truncate text-xs text-[var(--muted)]">{new Date(i.at).toLocaleTimeString(uiLocale(), { hour: "2-digit", minute: "2-digit" })} · {i.source}</span>
                   </span>
                   {i.done && <Check size={16} className="text-[#2E9E6B]" />}
                 </button>
@@ -128,7 +129,7 @@ export default function CalendarPage() {
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               <span className="chip !bg-white"><span className="h-2 w-2 rounded-full" style={{ background: open.color }} />{open.source}</span>
-              <span className="chip !bg-white">{new Date(open.at).toLocaleString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+              <span className="chip !bg-white">{new Date(open.at).toLocaleString(uiLocale(), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
             </div>
             {open.detail && <p className="whitespace-pre-line text-[15px] text-[var(--ink-2)]">{open.detail}</p>}
             <div className="grid gap-2 pt-1">
@@ -142,7 +143,7 @@ export default function CalendarPage() {
 
       <Sheet open={adding} onClose={() => setAdding(false)} title="New reminder">
         <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); if (!title.trim()) return; const d = new Date(selected); d.setHours(16, 0, 0, 0); addReminder(title.trim(), d.toISOString()); toast("Reminder added"); setTitle(""); setAdding(false); }}>
-          <label className="block text-sm font-semibold">On {selected.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" })} at 4pm
+          <label className="block text-sm font-semibold">On {selected.toLocaleDateString(uiLocale(), { weekday: "long", day: "numeric", month: "short" })} at 4pm
             <input autoFocus className="input mt-1 !bg-white" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} placeholder="e.g. Pack robotics kit" />
           </label>
           <button className="btn-ink w-full" disabled={!title.trim()}>Add reminder</button>

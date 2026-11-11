@@ -1,15 +1,14 @@
 "use client";
 
 // UAE PASS sign-in for parents and teachers, in the same Figma language as the student
-// onboarding: silk background, glass card, mascot, gradient verification moment.
+// welcome: wordmark, the mascot in front of the skyline, one frosted action.
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, Check, Fingerprint, Smartphone } from "lucide-react";
-import { LangToggle, Logo } from "@/components/ui";
-import { MascotVideo } from "@/components/shell/MascotVideo";
-import { EASE } from "@/components/s/kit";
+import { LangToggle } from "@/components/ui";
+import { EASE, Sheet } from "@/components/s/kit";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import type { Role } from "@/lib/types";
@@ -27,64 +26,55 @@ function SignInInner() {
 
   const go = () => {
     setStep("waiting");
-    setTimeout(() => setStep("ok"), 1500);
+    setTimeout(() => setStep("ok"), 1600);
     setTimeout(() => {
       const id = signIn(role);
       router.push(state.onboarded[id] ? "/app/today" : "/onboarding");
-    }, 2600);
+    }, 2700);
   };
-  const name = role === "parent" ? (ar ? "خالد" : "Khalid") : ar ? "الأستاذة عائشة" : "Ms Aisha";
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-5">
-      <header className="flex items-center justify-between">
+    <main className="relative mx-auto flex min-h-dvh max-w-md flex-col items-center overflow-hidden px-6 pb-10 pt-6">
+      <header className="flex w-full items-center justify-between">
         <Link href="/" className="grid h-10 w-10 place-items-center rounded-full bg-white/45 backdrop-blur" aria-label="Back"><ArrowLeft size={18} className="rtl:rotate-180" /></Link>
-        <Logo size={28} />
         <LangToggle />
       </header>
 
-      <div className="mt-6 flex justify-center">
-        <MascotVideo mood={step === "ok" ? "celebrate" : "waving"} size={190} />
-      </div>
-
-      <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }} className="glass glass-strong -mt-4 rounded-[32px] p-6">
+      <motion.img src="/brand/logo-full.png" alt="Sawa · سوا" className="mt-2 h-auto w-[104px]" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease: EASE }} />
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5, ease: EASE }} className="mt-5 text-center">
         <p className="label-xs">{t(L, role)}</p>
-        <h1 className="mt-1 text-[26px] font-bold leading-tight tracking-tight">{ar ? "ادخل مرة واحدة، لكل شيء" : "One sign-in for everything"}</h1>
-        <p className="mt-2 text-[15px] text-[var(--muted)]">
-          {role === "parent"
-            ? ar ? "نتحقق من هويتك، ثم نجد أبناءك ونربطهم بك تلقائياً." : "We verify you, then find your children and link them to you automatically."
-            : ar ? "نتحقق منك كمعلم، ثم تجهّز مدرستك وصفوفك في دقيقة." : "We verify you as an educator, then you set up your school and classes in a minute."}
-        </p>
+        <h1 className="h-display mt-1 text-[30px] leading-tight">{role === "parent" ? (ar ? "كل ما يخص أبناءك، بدخول واحد" : "Your children's school life, one sign-in") : ar ? "صفوفك ومدرستك، بدخول واحد" : "Your classes and school, one sign-in"}</h1>
+      </motion.div>
 
-        <div className="mt-6 min-h-[64px]">
-          <AnimatePresence mode="wait">
-            {step === "idle" && (
-              <motion.button key="b" exit={{ opacity: 0, scale: 0.96 }} onClick={go} className="flex h-16 w-full items-center justify-center gap-3 rounded-[22px] bg-[#121217] text-[17px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(18,18,23,.7)] transition active:scale-[.98]">
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-aegold-500 text-white"><Fingerprint size={20} /></span>
-                {t(L, "continueUaePass")}
-              </motion.button>
-            )}
-            {step === "waiting" && (
-              <motion.div key="w" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-4 rounded-[22px] bg-white/75 p-4">
-                <span className="relative grid h-12 w-12 place-items-center rounded-full bg-white">
-                  <motion.span className="absolute inset-0 rounded-full border-2 border-aegold-500" animate={{ scale: [1, 1.45], opacity: [0.8, 0] }} transition={{ duration: 1.1, repeat: Infinity }} />
-                  <Smartphone size={20} />
-                </span>
-                <div className="text-sm"><p className="font-semibold">{ar ? "وافق على الطلب في تطبيق الهوية الرقمية" : "Approve the request in the UAE PASS app"}</p><p className="text-[var(--muted)]">{ar ? "محاكاة · لا يتم الاتصال بخدمة حقيقية" : "Simulated · no real service is contacted"}</p></div>
-              </motion.div>
-            )}
-            {step === "ok" && (
-              <motion.div key="o" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-3 rounded-[22px] p-4 text-white" style={{ background: "var(--grad-verify)" }}>
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-white/20"><Check size={20} strokeWidth={3} /></span>
-                <div><p className="font-semibold">{ar ? "تم التحقق من الهوية" : "Identity verified"}</p><p className="text-sm text-white/85">{name}</p></div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        <p className="mt-4 text-center text-xs text-[var(--muted)]">{ar ? "محاكاة · لا تُشارك أي بيانات حقيقية" : "Simulated · no real data is shared"}</p>
-      </motion.section>
+      <motion.div className="relative mt-auto w-[150%] max-w-none" initial={{ y: 200, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 1, ease: EASE }}>
+        <img src="/figma/bg/mascot-dubai.png" alt="" className="mx-auto w-full select-none" draggable={false} />
+      </motion.div>
 
-      <p className="mt-auto pt-6 text-center text-xs text-[var(--muted)]">{ar ? "في التجربة الفعلية: يتصل سوا بالهوية الرقمية وبالدخول الموحد لوزارة التربية والتعليم." : "In the pilot, Sawa connects to UAE PASS and MOE Unified Login (SSO)."}</p>
+      <motion.button initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.5, ease: EASE }}
+        onClick={go} disabled={step !== "idle"} className="btn-glass relative z-10 -mt-8 w-full max-w-[320px]">
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-aegold-600 text-white"><Fingerprint size={20} /></span>
+        {t(L, "continueUaePass")}
+      </motion.button>
+      <p className="mt-4 text-center text-xs text-[var(--muted)]">{ar ? "محاكاة · لا تُشارك أي بيانات حقيقية" : "Simulated · no real data is shared"}</p>
+
+      <Sheet open={step !== "idle"} onClose={() => {}} title="UAE PASS">
+        <AnimatePresence mode="wait">
+          {step === "waiting" ? (
+            <motion.div key="w" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-4 rounded-[22px] bg-white p-4">
+              <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-aegold-50">
+                <motion.span className="absolute inset-0 rounded-full border-2 border-aegold-500" animate={{ scale: [1, 1.45], opacity: [0.8, 0] }} transition={{ duration: 1.1, repeat: Infinity }} />
+                <Smartphone size={20} />
+              </span>
+              <div className="text-sm"><p className="font-semibold">{ar ? "وافق على الطلب في تطبيق الهوية الرقمية" : "Approve the request in the UAE PASS app"}</p><p className="text-[var(--muted)]">{ar ? "محاكاة · لا يتم الاتصال بخدمة حقيقية" : "Simulated · no real service is contacted"}</p></div>
+            </motion.div>
+          ) : (
+            <motion.div key="o" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-3 rounded-[22px] bg-[#121217] p-4 text-white">
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-white/15"><Check size={20} strokeWidth={3} /></span>
+              <div><p className="font-semibold">{ar ? "تم التحقق من الهوية" : "Identity verified"}</p><p className="text-sm text-white/75">{role === "parent" ? (ar ? "خالد" : "Khalid") : ar ? "الأستاذة عائشة" : "Ms Aisha"}</p></div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Sheet>
     </main>
   );
 }

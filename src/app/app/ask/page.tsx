@@ -7,11 +7,14 @@ import { ArrowUp, CalendarDays, ExternalLink, FileText, Mic, School, ShieldCheck
 import { MascotVideo } from "@/components/shell/MascotVideo";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { ShiningText } from "@/components/ui/shining-text";
+import { ToolCallsSection } from "@/components/ui/tool-calls-section";
+import { agentSteps } from "@/lib/agent-steps";
 import { useStore } from "@/lib/store";
 import { MessageLoading } from "@/components/ui/message-loading";
 
 interface Msg {
   role: "user" | "sawa";
+  q?: string;
   text: string;
   sources?: { n: number; title: string; url: string; name: string }[];
   actions?: { id: string; label: string; href: string }[];
@@ -56,7 +59,7 @@ function AskInner() {
       const today = visibleNotices.filter((n) => n.status === "open").map((n) => ({ title: ar ? n.titleAr : n.titleEn, source: n.sourceSystem, due: n.dueAt, kind: n.kind }));
       const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question, lang: state.lang, role: me?.role, today }) });
       const j = await res.json();
-      setMsgs((m) => [...m, { role: "sawa", text: j.answer, sources: j.sources, actions: j.actions, mode: j.mode }]);
+      setMsgs((m) => [...m, { role: "sawa", q: question, text: j.answer, sources: j.sources, actions: j.actions, mode: j.mode }]);
       logAi(question, j.mode, j.flagged);
     } catch {
       setMsgs((m) => [...m, { role: "sawa", text: ar ? "تعذّر الوصول إلى المساعد، حاول مرة أخرى." : "Couldn't reach the assistant — please try again." }]);
@@ -79,20 +82,17 @@ function AskInner() {
 
   return (
     <div className="relative -mx-4 -mt-4 min-h-[calc(100dvh-7.5rem)] overflow-hidden rounded-b-[36px] px-4 pb-40 pt-6 text-white sm:mx-0 sm:mt-0 sm:rounded-[36px] sm:px-6"
-      style={{ background: "radial-gradient(120% 80% at 50% 0%, #6d3fd9 0%, #3b1f8f 38%, #1b1240 72%, #120c2b 100%)" }}>
-      {/* depth: dot grid + two soft glows + a horizon line */}
-      <DotPattern width={22} height={22} cr={1} className="fill-white/[.07] [mask-image:radial-gradient(70%_60%_at_50%_30%,#000,transparent)]" />
-      <div aria-hidden className="pointer-events-none absolute -start-24 top-24 h-72 w-72 rounded-full bg-[#F280D9]/30 blur-[90px]" />
-      <div aria-hidden className="pointer-events-none absolute -end-20 top-72 h-80 w-80 rounded-full bg-[#4073FF]/30 blur-[100px]" />
+      style={{ background: "#21173a" }}>
+      {/* depth comes from layered surfaces and the mascot, not from glows */}
+      <DotPattern width={24} height={24} cr={1} className="fill-white/[.06]" />
 
       <div className="relative">
         {empty ? (
           <div className="flex flex-col items-center text-center">
             <div className="relative">
-              <div aria-hidden className="absolute inset-6 rounded-full bg-white/25 blur-2xl" />
               <MascotVideo mood="presenting" size={168} className="relative" />
             </div>
-            <h1 className="mt-1 text-[32px] font-bold tracking-tight">{ar ? "اسأل سوا" : "Ask Sawa"}</h1>
+            <h1 className="mt-1 text-[34px] text-white">{ar ? "اسأل سوا" : "Ask Sawa"}</h1>
             <p className="mt-1 max-w-sm text-[15px] text-white/75">{ar ? "أجيب بالعربية والإنجليزية من مصادر رسمية فقط، مع ذكر المصدر، وأفتح لك الخدمة الصحيحة معبّأة مسبقاً." : "Answers in Arabic or English from official sources only, with the source shown, and the right service opened pre-filled."}</p>
             <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[11px] font-semibold">
               <span className="inline-flex items-center gap-1 rounded-full bg-white/12 px-2.5 py-1 ring-1 ring-white/15"><ShieldCheck size={12} /> {ar ? "تُحذف الأسماء والأرقام قبل الإرسال" : "Names & IDs stripped before sending"}</span>
@@ -123,10 +123,19 @@ function AskInner() {
           {msgs.map((m, i) => (
             <li key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} pop`}>
               {m.role === "user" ? (
-                <p className="max-w-[85%] rounded-[24px] rounded-ee-md bg-[linear-gradient(135deg,#F280D9,#8C59F2)] px-4 py-3 text-white shadow-[0_10px_24px_-12px_rgba(242,128,217,.8)]" dir="auto">{m.text}</p>
+                <p className="max-w-[85%] rounded-[24px] rounded-ee-md bg-[#5c29bf] px-4 py-3 text-white" dir="auto">{m.text}</p>
               ) : (
                 <div className="max-w-[92%] rounded-[24px] rounded-es-md bg-white/95 px-4 py-3 text-[#121217] shadow-[0_16px_34px_-18px_rgba(0,0,0,.6)]">
-                  <p className="mb-1 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide text-[#5C29BF]"><Sparkles size={12} /> Sawa</p>
+                  <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-[#5C29BF]"><Sparkles size={12} /> Sawa</p>
+                  {m.q && m.mode !== "policy" && (() => {
+                    const steps = agentSteps(m.q, me?.role, m.sources, visibleNotices.filter((n) => n.status === "open").length, ar);
+                    return steps.length ? (
+                      <div className="mb-2 border-b border-black/8 pb-1">
+                        <ToolCallsSection iconSize={16} label={(n) => (ar ? `راجع سوا ${n} مصادر` : `Sawa checked ${n} source${n > 1 ? "s" : ""}`)}
+                          toolCalls={steps.map((x) => ({ tool_name: x.name, tool_category: x.system, message: x.message, color: x.color, output: x.output }))} />
+                      </div>
+                    ) : null;
+                  })()}
                   <p className="whitespace-pre-line" dir="auto">{m.text}</p>
                   {!!m.actions?.length && (
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -166,7 +175,7 @@ function AskInner() {
           <Sparkles size={18} className="shrink-0 text-[#8C59F2]" aria-hidden />
           <input dir="auto" className="min-w-0 flex-1 bg-transparent py-2 outline-none" placeholder={ar ? "اكتب سؤالك…" : "Ask about a school, a deadline, a competition…"} value={q} onChange={(e) => setQ(e.target.value)} aria-label={ar ? "سؤالك" : "Your question"} />
           <button type="button" className="grid h-10 w-10 place-items-center rounded-full opacity-40" title={ar ? "الإدخال الصوتي — قريباً" : "Voice input — coming next"} aria-label="Voice input (coming soon)" disabled><Mic size={18} /></button>
-          <button className="grid h-10 w-10 place-items-center rounded-full bg-[linear-gradient(135deg,#8C59F2,#5C29BF)] text-white disabled:opacity-40" aria-label={ar ? "إرسال" : "Send"} disabled={busy || !q.trim()}><ArrowUp size={18} /></button>
+          <button className="grid h-10 w-10 place-items-center rounded-full bg-[#5c29bf] text-white disabled:opacity-40" aria-label={ar ? "إرسال" : "Send"} disabled={busy || !q.trim()}><ArrowUp size={18} /></button>
         </div>
       </form>
     </div>

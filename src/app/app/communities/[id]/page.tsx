@@ -1,5 +1,6 @@
 "use client";
 
+import { uiLocale } from "@/lib/tr";
 import { use, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -130,7 +131,7 @@ export default function CommunityDetail({ params }: { params: Promise<{ id: stri
                       <Avatar name={p.author} size={36} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{p.author}</p>
-                        <p className="text-xs text-[var(--muted)]">{p.role === "teacher" ? "Teacher" : p.role === "moderator" ? "Moderator" : "Member"} · {new Date(p.createdAt).toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                        <p className="text-xs text-[var(--muted)]">{p.role === "teacher" ? "Teacher" : p.role === "moderator" ? "Moderator" : "Member"} · {new Date(p.createdAt).toLocaleString(uiLocale(), { weekday: "short", hour: "2-digit", minute: "2-digit" })}</p>
                       </div>
                       {p.status === "pending" && <span className="rounded-full bg-[#B68A35]/15 px-2 py-0.5 text-[10px] font-bold uppercase text-[#7d5d1f]">Awaiting review</span>}
                     </div>
@@ -152,11 +153,11 @@ export default function CommunityDetail({ params }: { params: Promise<{ id: stri
                 return (
                   <li key={a.id} className="glass flex items-center gap-3 rounded-[22px] p-3">
                     <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/70 text-center leading-none">
-                      <span><span className="block text-[10px] font-bold uppercase text-[var(--muted)]">{new Date(a.startsAt).toLocaleDateString("en-GB", { month: "short" })}</span><span className="block text-lg font-bold">{new Date(a.startsAt).getDate()}</span></span>
+                      <span><span className="block text-[10px] font-bold uppercase text-[var(--muted)]">{new Date(a.startsAt).toLocaleDateString(uiLocale(), { month: "short" })}</span><span className="block text-lg font-bold">{new Date(a.startsAt).getDate()}</span></span>
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{a.titleEn}</span>
-                      <span className="flex items-center gap-2 text-xs text-[var(--muted)]"><Clock size={11} /> {new Date(a.startsAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} <MapPin size={11} /> {a.place}</span>
+                      <span className="flex items-center gap-2 text-xs text-[var(--muted)]"><Clock size={11} /> {new Date(a.startsAt).toLocaleTimeString(uiLocale(), { hour: "2-digit", minute: "2-digit" })} <MapPin size={11} /> {a.place}</span>
                     </span>
                     <motion.button whileTap={{ scale: 0.92 }} disabled={!joined} onClick={() => { toggleActivity(a.id); toast(on ? "Removed from your calendar" : "Added to your calendar"); }} aria-pressed={on}
                       className={`rounded-full px-3 py-2 text-xs font-bold transition disabled:opacity-40 ${on ? "bg-[#2E9E6B]/15 text-[#1F7A50]" : "bg-[#121217] text-white"}`}>

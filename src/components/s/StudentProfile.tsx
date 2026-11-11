@@ -1,5 +1,6 @@
 "use client";
 
+import { uiLocale } from "@/lib/tr";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -108,7 +109,7 @@ export function StudentProfile() {
                       <span className="min-w-0 flex-1"><span className="block truncate text-sm font-bold">{p.title}</span><span className="block text-[11px] text-[var(--muted)]">{p.role}</span></span>
                     </div>
                     <div className="mt-2.5"><Progress value={p.progress} /></div>
-                    <p className="mt-1.5 text-[11px] text-[var(--muted)]">{p.progress}%{p.due ? ` · due ${new Date(p.due).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}` : ""}</p>
+                    <p className="mt-1.5 text-[11px] text-[var(--muted)]">{p.progress}%{p.due ? ` · due ${new Date(p.due).toLocaleDateString(uiLocale(), { day: "numeric", month: "short" })}` : ""}</p>
                   </button>
                 </li>
               ))}

@@ -12,7 +12,7 @@ import { Avatar, EASE, Sheet, useToast } from "@/components/s/kit";
 import { Mascot, SourceTag } from "@/components/ui";
 import { ProactiveCard, Row } from "@/components/shell/notices";
 import { fmtDate, relDays } from "@/lib/i18n";
-import { SCHOOLS } from "@/lib/seed";
+import { FEE_PLAN, SCHOOLS } from "@/lib/seed";
 import { ageOf, useStore } from "@/lib/store";
 
 type Deadline = { id: string; title: string; when: string; kind: "test" | "fee" | "form" | "approval" | "event"; href: string; source: string };
@@ -22,7 +22,7 @@ const KIND_TINT = { test: "#4073FF", fee: "#C23EA5", form: "#B68A35", approval: 
 const days = (iso?: string) => (iso ? Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000)) : 0);
 
 export function ParentHome() {
-  const { state, me, myChildren, visibleNotices, toggleNotice, payFee } = useStore();
+  const { state, me, myChildren, visibleNotices, toggleNotice, payFee, sendEnquiry, replyEnquiry } = useStore();
   const router = useRouter();
   const toast = useToast();
   const reduce = useReducedMotion();
@@ -33,7 +33,10 @@ export function ParentHome() {
   const [showInbox, setShowInbox] = useState(false);
   const child = myChildren[childIdx];
 
-  const feeApproval = state.approvals.find((a) => a.kind === "fees" && a.childId === child?.id && a.status === "pending");
+  const feeApproval = state.approvals.find((a) => a.kind === "fees" && a.childId === child?.id);
+  const paidFees = state.payments.filter((p) => p.label.startsWith("Activity fee")).length;
+  const nextFee = FEE_PLAN[paidFees];
+  const [enqSchool, setEnqSchool] = useState<string | null>(null);
 
   const deadlines = useMemo<Deadline[]>(() => {
     if (!child || !me) return [];
@@ -68,7 +71,7 @@ export function ParentHome() {
   const school = SCHOOLS.find((s) => s.id === child.schoolId);
   const proactive = visibleNotices.filter((n) => n.kind === "proactive" && n.status === "open" && n.userId === me.id && !n.id.startsWith("nudge-rereg"));
   const firstName = (ar ? child.nameAr : child.name).split(" ")[0];
-  const feeDays = feeApproval ? days(feeApproval.dueAt) : null;
+  const feeDays = nextFee ? days(nextFee.dueAt) : null;
   const allNotices = [...visibleNotices].sort((a, b) => (a.status === b.status ? 0 : a.status === "open" ? -1 : 1) || (a.dueAt ?? "9").localeCompare(b.dueAt ?? "9"));
 
   return (
@@ -76,7 +79,6 @@ export function ParentHome() {
       {/* ── left: the child ── */}
       <div className="min-w-0 space-y-4 lg:sticky lg:top-24">
         <motion.section initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }} className="glass glass-strong relative overflow-hidden rounded-[32px] p-5 text-center">
-          <div aria-hidden className="pointer-events-none absolute -top-24 left-1/2 h-56 w-[130%] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(242,128,217,.28),transparent)]" />
           <p className="relative text-sm font-medium text-[var(--muted)]">{ar ? `مرحباً ${me.nameAr.split(" ")[0]}` : `Hello ${me.name.split(" ")[0]}`}</p>
           <h1 className="relative mt-0.5 text-balance text-[22px] font-bold leading-tight tracking-tight sm:text-[24px]">{ar ? "ماذا تريد أن تنجز اليوم؟" : "What would you like to do today?"}</h1>
 
@@ -104,8 +106,8 @@ export function ParentHome() {
           </dl>
 
           <div className="relative mt-3 grid grid-cols-2 gap-2">
-            <button className="btn-ink w-full" onClick={() => setSheet("fee")} disabled={!feeApproval}><CreditCard size={17} /> {ar ? "دفع الرسوم" : "Pay fee"}</button>
-            <Link href="/app/services#svc-reregistration" className="btn-ghost w-full !bg-white"><FileSignature size={17} /> {ar ? "إعادة التسجيل" : "Re-enrol"}</Link>
+            <button className="btn-ink w-full" onClick={() => setSheet("fee")} disabled={!nextFee}><CreditCard size={17} /> {ar ? "دفع الرسوم" : "Pay fee"}</button>
+            <Link href="/app/services/re-enrol" className="btn-ghost w-full !bg-white"><FileSignature size={17} /> {ar ? "إعادة التسجيل" : "Re-enrol"}</Link>
           </div>
           <button onClick={() => setSheet("switch")} className="relative mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-700"><ArrowRightLeft size={15} /> {ar ? "الاستفسار عن نقل المدرسة" : "Ask about switching schools"}</button>
         </motion.section>
@@ -168,39 +170,79 @@ export function ParentHome() {
           {showInbox && <ul className="mt-2 space-y-2.5">{allNotices.map((n) => <Row key={n.id} n={n} onToggle={() => toggleNotice(n.id)} />)}</ul>}
         </section>
 
-        <Link href={`/app/ask?q=${encodeURIComponent(ar ? `ما المطلوب مني هذا الأسبوع لـ${firstName}؟` : `What do I need to do for ${firstName} this week?`)}`} className="group flex items-center gap-3 rounded-[28px] bg-[linear-gradient(120deg,#5C29BF,#8C59F2_55%,#F280D9)] p-4 text-white shadow-[0_18px_40px_-18px_rgba(92,41,191,.8)]">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/15 ring-1 ring-white/30"><Sparkles size={22} /></span>
+        <Link href={`/app/ask?q=${encodeURIComponent(ar ? `ما المطلوب مني هذا الأسبوع لـ${firstName}؟` : `What do I need to do for ${firstName} this week?`)}`} className="group flex items-center gap-3 rounded-[28px] bg-[#1d1530] p-4 text-white">
+          <img src="/figma/icons/wand.png" alt="" className="h-12 w-12 shrink-0 object-contain invert" />
           <span className="min-w-0 flex-1"><span className="block font-bold">{ar ? "اسأل سوا" : "Ask Sawa"}</span><span className="block text-sm text-white/80">{ar ? "عن الرسوم أو التسجيل أو أي خدمة" : "Fees, enrolment, any school service"}</span></span>
           <ArrowRight size={18} className="transition group-hover:translate-x-1 rtl:rotate-180" />
         </Link>
       </div>
 
       <Sheet open={sheet === "fee"} onClose={() => setSheet(null)} title={ar ? "دفع الرسوم" : "Pay a fee"}>
-        {feeApproval && (
-          <div className="space-y-3">
-            <div className="rounded-[20px] bg-white p-4">
-              <p className="font-semibold">{ar ? feeApproval.titleAr : feeApproval.titleEn}</p>
-              <p className="text-sm text-[var(--muted)]">{ar ? feeApproval.detailAr : feeApproval.detailEn}</p>
-              <p className="mt-3 flex items-baseline justify-between"><span className="text-sm">{ar ? "الدفعة الأولى" : "First instalment"}</span><span className="text-2xl font-bold">AED 150</span></p>
-            </div>
-            <p className="text-xs text-[var(--muted)]">{ar ? "محاكاة: لا يتم تحصيل أي مبلغ. في التجربة الفعلية يتم الدفع عبر بوابة الرسوم الحكومية." : "Simulated: no money moves. In the pilot this hands off to the school's fee portal."}</p>
-            <button className="btn-ink w-full" onClick={() => { payFee(ar ? "دفعة رسوم الأنشطة" : "Activity fee · instalment 1", 150, feeApproval.id); setSheet(null); toast(ar ? "تم الدفع (محاكاة)" : "Paid AED 150 (simulated)"); }}>
-              <CreditCard size={17} /> {ar ? "ادفع 150 درهم" : "Pay AED 150"}
-            </button>
+        <div className="space-y-3">
+          <div className="rounded-[20px] bg-white p-4">
+            <p className="font-semibold">{ar ? "رسوم أنشطة الفصل الثالث" : "Term 3 activity fee"}</p>
+            <p className="text-sm text-[var(--muted)]">{ar ? "450 درهم على 3 أقساط" : "AED 450 in 3 instalments"}</p>
+            <ol className="mt-3 divide-y divide-black/5">
+              {FEE_PLAN.map((f, i) => {
+                const paid = i < paidFees, isNext = i === paidFees;
+                return (
+                  <li key={f.n} className="flex items-center gap-3 py-2.5">
+                    <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${paid ? "bg-[#2E9E6B] text-white" : isNext ? "bg-[#121217] text-white" : "bg-black/8"}`}>{paid ? <Check size={14} strokeWidth={3} /> : f.n}</span>
+                    <span className="flex-1 text-sm">{ar ? `القسط ${f.n}` : `Instalment ${f.n}`} · {fmtDate(f.dueAt, L)}</span>
+                    <span className="text-sm font-semibold tabular-nums">AED {f.amountAed}</span>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
-        )}
+          <p className="text-xs text-[var(--muted)]">{ar ? "محاكاة: لا يتم تحصيل أي مبلغ. في التجربة الفعلية يتم الدفع عبر بوابة رسوم المدرسة." : "Simulated: no money moves. In the pilot this hands off to the school's fee portal."}</p>
+          {nextFee ? (
+            <button className="btn-ink w-full" onClick={() => {
+              payFee(`Activity fee · instalment ${nextFee.n}`, nextFee.amountAed, paidFees === 0 && feeApproval?.status === "pending" ? feeApproval.id : undefined);
+              setSheet(null); toast(ar ? `تم دفع القسط ${nextFee.n} (محاكاة) · الإيصال في «أنجزته»` : `Paid instalment ${nextFee.n} (simulated) · receipt in Done this term`);
+            }}>
+              <CreditCard size={17} /> {ar ? `ادفع ${nextFee.amountAed} درهم` : `Pay AED ${nextFee.amountAed}`}
+            </button>
+          ) : <p className="rounded-2xl bg-[#2E9E6B]/12 p-3 text-sm font-semibold text-[#1F7A50]">{ar ? "تم دفع كل الأقساط" : "All instalments paid"}</p>}
+        </div>
       </Sheet>
 
-      <Sheet open={sheet === "switch"} onClose={() => setSheet(null)} title={ar ? "نقل المدرسة" : "Switching schools"}>
-        <div className="space-y-3 text-sm">
-          <p>{ar ? "يجهّز سوا طلب النقل من ملف العائلة، ويخبرك بالمقاعد المتاحة والمستندات المطلوبة." : "Sawa pre-fills a transfer from your family profile and tells you which schools have seats and what documents they'll ask for."}</p>
-          <ul className="space-y-1.5">
-            {(ar ? ["لا حاجة لإعادة إدخال بيانات الطالب", "قائمة بالمدارس القريبة حسب المنهج", "متابعة الطلب خطوة بخطوة"] : ["No re-typing your child's details", "Nearby schools by curriculum and rating (KHDA data)", "Track the request step by step"]).map((x) => (
-              <li key={x} className="flex gap-2"><Check size={16} className="mt-0.5 shrink-0 text-[#2E9E6B]" /> {x}</li>
+      <Sheet open={sheet === "switch"} onClose={() => { setSheet(null); setEnqSchool(null); }} title={ar ? "نقل المدرسة" : "Switching schools"}>
+        <div className="space-y-4 text-sm">
+          <ol className="space-y-2">
+            {(ar
+              ? ["اختر مدارس فيها مقاعد في صف سارة ومنهجها", "اسأل المدرسة عن المقاعد واليوم المفتوح", "اطلب شهادة النقل، ويعبّئها سوا لك", "تُرسل الهوية والجواز وآخر تقرير من ملف العائلة"]
+              : [`Pick schools with seats in Grade ${child.grade} and the right curriculum`, "Ask the school about seats and an open day", "Request the transfer certificate — Sawa pre-fills it", "Your ID, passport and last report go from the family profile"]
+            ).map((x, i) => (
+              <li key={x} className="flex gap-3"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#121217] text-[11px] font-semibold text-white">{i + 1}</span><span className="pt-0.5">{x}</span></li>
             ))}
-          </ul>
-          <button className="btn-ink w-full" onClick={() => { setSheet(null); router.push(`/app/ask?q=${encodeURIComponent(ar ? `كيف أنقل ${firstName} إلى مدرسة أخرى؟` : `How do I transfer ${firstName} to another school?`)}`); }}>
-            <Sparkles size={17} /> {ar ? "اسأل سوا عن النقل" : "Ask Sawa about transferring"}
+          </ol>
+          <div>
+            <p className="mb-2 font-semibold">{ar ? "مدارس قريبة (بيانات هيئة المعرفة · عينة)" : "Nearby schools (KHDA data · sample)"}</p>
+            <ul className="space-y-1.5">
+              {SCHOOLS.filter((x) => x.id !== child.schoolId).slice(0, 3).map((x) => {
+                const sent = state.enquiries.find((e) => e.schoolId === x.id && e.ownerId === me.id);
+                return (
+                  <li key={x.id} className="flex items-center gap-3 rounded-[18px] bg-white p-3">
+                    <span className="min-w-0 flex-1"><span className="block truncate font-semibold">{ar ? x.nameAr : x.name.replace(" (sample)", "")}</span><span className="block text-xs text-[var(--muted)]">{x.area} · {x.curriculum}</span></span>
+                    {sent ? (
+                      <span className="shrink-0 rounded-full bg-[#2E9E6B]/12 px-2.5 py-1 text-xs font-semibold text-[#1F7A50]">{sent.status === "replied" ? (ar ? "ردّت المدرسة" : "Replied") : ar ? "أُرسل" : "Sent"}</span>
+                    ) : (
+                      <button className="btn-ink !min-h-9 shrink-0 !px-3 text-xs" disabled={enqSchool === x.id} onClick={() => {
+                        setEnqSchool(x.id);
+                        const id = sendEnquiry(x.id, "open_day", child.id);
+                        toast(ar ? "أُرسل استفسارك إلى مكتب القبول" : "Sent to the admissions office");
+                        setTimeout(() => replyEnquiry(id, ar ? "يوم مفتوح: الثلاثاء 9:00–11:00 · يوجد مقاعد في الصف الثامن" : "Open day: Tuesday 9:00–11:00 · seats available in Grade 8"), 2600);
+                      }}>{ar ? "اسأل عن الأيام المفتوحة" : "Ask about open days"}</button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-2 text-xs text-[var(--muted)]">{ar ? "تظهر الردود في العائلة › الاستفسارات. محاكاة." : "Replies appear under Family › Enquiries. Simulated."}</p>
+          </div>
+          <button className="btn-ghost w-full !bg-white" onClick={() => { setSheet(null); router.push(`/app/ask?q=${encodeURIComponent(ar ? `كيف أنقل ${firstName} إلى مدرسة أخرى؟` : `How do I transfer ${firstName} to another school?`)}`); }}>
+            <Sparkles size={17} /> {ar ? "اطلب من سوا الشرح" : "Ask Sawa to explain"}
           </button>
         </div>
       </Sheet>

@@ -3,6 +3,7 @@
 // Opportunities "Discover": a swipeable photo card stack (pattern from 21st.dev
 // ImageSwiper, rebuilt on motion so cards carry real content). Swipe right or tap
 // the bookmark to save, left to skip, tap the card to open. Arrow keys work too.
+import { uiLocale } from "@/lib/tr";
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform, type PanInfo } from "motion/react";
@@ -89,7 +90,7 @@ function DeckCard({ m, depth, onDecide }: { m: Match; depth: number; onDecide: (
       <div className="absolute inset-x-5 bottom-5">
         <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide backdrop-blur">{TYPE_LABEL[o.type]}</span>
         <h3 className="mt-2 text-2xl font-bold leading-tight">{o.titleEn}</h3>
-        <p className="mt-1 flex flex-wrap gap-x-3 text-sm text-white/80"><span className="inline-flex items-center gap-1"><Clock size={13} />{new Date(o.startsAt).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span><span className="inline-flex items-center gap-1"><MapPin size={13} />{m.distance === 0 ? "Your school" : `${m.distance} km`}</span></p>
+        <p className="mt-1 flex flex-wrap gap-x-3 text-sm text-white/80"><span className="inline-flex items-center gap-1"><Clock size={13} />{new Date(o.startsAt).toLocaleDateString(uiLocale(), { weekday: "short", day: "numeric", month: "short" })}</span><span className="inline-flex items-center gap-1"><MapPin size={13} />{m.distance === 0 ? "Your school" : `${m.distance} km`}</span></p>
         {m.reasons[0] && <p className="mt-2 text-sm text-white/90">Why: {m.reasons.slice(0, 2).join(" · ")}</p>}
         {o.source && <p className="mt-2 text-[11px] text-white/60">Modelled on {o.source} · sample</p>}
       </div>

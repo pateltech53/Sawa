@@ -40,6 +40,10 @@ export interface State {
   events: TeacherEvent[];
   chat: ChatMsg[];
   payments: { id: string; approvalId?: string; amountAed: number; at: string; label: string }[];
+  documents: { id: string; ownerId: string; childId?: string; kind: string; file: string; at: string; fields: number }[];
+  priorities: Record<string, string[]>;
+  enquiries: { id: string; ownerId: string; childId?: string; schoolId: string; topic: "open_day" | "transfer"; at: string; status: "sent" | "replied"; reply?: string }[];
+  eventSignups: Record<string, string[]>;
 }
 
 export const initialState = (): State => ({
@@ -74,6 +78,10 @@ export const initialState = (): State => ({
   events: structuredClone(seed.TEACHER_EVENTS),
   chat: structuredClone(seed.COMMUNITY_CHAT),
   payments: [],
+  documents: [],
+  priorities: {},
+  enquiries: [],
+  eventSignups: {},
 });
 
 export const ageOf = (p?: Profile) => (p?.birthYear ? new Date().getFullYear() - p.birthYear : 30);
@@ -391,6 +399,21 @@ function useBuildStore() {
         payments: [...s.payments, { id: `pay-${uid()}`, approvalId, amountAed, label, at: now() }],
         approvals: approvalId ? s.approvals.map((a) => (a.id === approvalId ? { ...a, status: "approved", decidedAt: now() } : a)) : s.approvals,
       })),
+    addDocument: (kind: string, file: string, fields: number, childId?: string) =>
+      update((s) => ({ ...s, documents: [...s.documents.filter((d) => !(d.ownerId === s.sessionUserId && d.kind === kind)), { id: `doc-${uid()}`, ownerId: s.sessionUserId!, childId, kind, file, fields, at: now() }] })),
+    setPriorities: (ids: string[]) => update((s) => ({ ...s, priorities: { ...s.priorities, [s.sessionUserId!]: ids } })),
+    sendEnquiry: (schoolId: string, topic: "open_day" | "transfer", childId?: string) => {
+      const id = `enq-${uid()}`;
+      update((s) => ({ ...s, enquiries: [{ id, ownerId: s.sessionUserId!, childId, schoolId, topic, at: now(), status: "sent" }, ...s.enquiries] }));
+      return id;
+    },
+    replyEnquiry: (id: string, reply: string) =>
+      update((s) => ({ ...s, enquiries: s.enquiries.map((e) => (e.id === id ? { ...e, status: "replied", reply } : e)) })),
+    toggleEventSignup: (key: string) =>
+      update((s) => {
+        const cur = s.eventSignups[s.sessionUserId!] ?? [];
+        return { ...s, eventSignups: { ...s.eventSignups, [s.sessionUserId!]: cur.includes(key) ? cur.filter((x) => x !== key) : [...cur, key] } };
+      }),
     setSchoolBrand: (b: SchoolBrand) => update((s) => ({ ...s, schoolBrand: b })),
     setParentControls: (c: ParentControls) => update((s) => ({ ...s, parentControls: { ...s.parentControls, [s.sessionUserId!]: c } })),
     decideApproval: (id: string, ok: boolean) =>
@@ -429,6 +452,8 @@ function useBuildStore() {
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const store = useBuildStore();
+  // Published during render so date formatting in children follows a language switch immediately.
+  if (typeof window !== "undefined") (window as unknown as { __sawaLang?: string }).__sawaLang = store.state.lang;
   return <StoreCtx.Provider value={store}>{children}</StoreCtx.Provider>;
 }
 

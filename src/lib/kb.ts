@@ -10,6 +10,55 @@ import type { KbDoc } from "./types";
  */
 export const KB: KbDoc[] = [
   {
+    id: "kb-transfer",
+    serviceId: "svc-transfer",
+    titleEn: "Transferring your child to another school",
+    titleAr: "نقل الطالب إلى مدرسة أخرى",
+    sourceName: "Sawa service guide (demo) — verify against MOE and KHDA",
+    sourceUrl: "https://www.moe.gov.ae",
+    keywords: ["transfer", "switch", "change school", "move school", "new school", "transferring", "another school", "نقل", "انتقال", "مدرسة أخرى", "تغيير المدرسة"],
+    textEn:
+      "To move schools: 1) Choose schools with seats in your child's grade and curriculum (Sawa lists nearby schools from the KHDA dataset). 2) Ask the new school about seats and an open day — use 'Ask the school about open days' in Sawa. 3) Once offered a seat, request a transfer certificate from the current school; Sawa pre-fills it from your family profile. 4) The new school needs the student's Emirates ID, passport, the last report card and the transfer certificate — documents you already added in Sawa are reused. Private-school transfers in Dubai follow KHDA rules; check the official page for your case.",
+    textAr:
+      "للانتقال إلى مدرسة أخرى: 1) اختر مدارس لديها مقاعد في صف الطالب ومنهجه (يعرض سوا المدارس القريبة من بيانات هيئة المعرفة). 2) اسأل المدرسة الجديدة عن المقاعد واليوم المفتوح عبر «اسأل المدرسة عن الأيام المفتوحة» في سوا. 3) بعد الحصول على مقعد، اطلب شهادة نقل من المدرسة الحالية ويعبّئها سوا مسبقاً من ملف العائلة. 4) تحتاج المدرسة الجديدة إلى الهوية والجواز وآخر تقرير وشهادة النقل، ويعيد سوا استخدام المستندات التي أضفتها. تخضع المدارس الخاصة في دبي لقواعد هيئة المعرفة؛ راجع الصفحة الرسمية لحالتك.",
+  },
+  {
+    id: "kb-open-days",
+    titleEn: "School open days and visits",
+    titleAr: "الأيام المفتوحة وزيارة المدارس",
+    sourceName: "Sawa service guide (demo)",
+    sourceUrl: "https://www.khda.gov.ae",
+    keywords: ["open day", "open days", "visit", "tour", "seats", "admission", "اليوم المفتوح", "الأيام المفتوحة", "زيارة", "مقاعد", "قبول"],
+    textEn:
+      "Most schools run open days each term for families thinking of joining. In Sawa, open 'Ask about switching schools' on your home screen, pick a school, and send 'Ask the school about open days'. The school's admissions office replies in Sawa with dates; the reply appears under Family › Enquiries and on your calendar.",
+    textAr:
+      "تنظم معظم المدارس أياماً مفتوحة كل فصل للأسر الراغبة في الانضمام. في سوا، افتح «الاستفسار عن نقل المدرسة» من الصفحة الرئيسية، واختر مدرسة، وأرسل «اسأل المدرسة عن الأيام المفتوحة». يرد مكتب القبول في سوا بالمواعيد، ويظهر الرد في العائلة › الاستفسارات وفي تقويمك.",
+  },
+  {
+    id: "kb-fees",
+    titleEn: "School fees, instalments and receipts",
+    titleAr: "الرسوم المدرسية والأقساط والإيصالات",
+    sourceName: "Sawa service guide (demo)",
+    sourceUrl: "https://www.moe.gov.ae",
+    keywords: ["fee", "fees", "pay", "payment", "instalment", "installment", "receipt", "cost", "رسوم", "دفع", "قسط", "أقساط", "إيصال"],
+    textEn:
+      "Sawa shows each instalment, its due date and how many days are left. Tap 'Pay fee' on your home screen to pay the next instalment; the receipt appears under 'Done this term'. Public schools charge activity and transport fees only; private-school tuition follows the school's KHDA-approved fee schedule.",
+    textAr:
+      "يعرض سوا كل قسط وتاريخ استحقاقه والأيام المتبقية. اضغط «دفع الرسوم» في الصفحة الرئيسية لدفع القسط التالي، ويظهر الإيصال في «أنجزته هذا الفصل». تفرض المدارس الحكومية رسوم الأنشطة والنقل فقط، أما رسوم المدارس الخاصة فتتبع الجدول المعتمد من هيئة المعرفة.",
+  },
+  {
+    id: "kb-events-consent",
+    titleEn: "Signing your child up for school events and trips",
+    titleAr: "تسجيل الطالب في الفعاليات والرحلات المدرسية",
+    sourceName: "Sawa service guide (demo)",
+    sourceUrl: "https://www.moe.gov.ae",
+    keywords: ["event", "events", "trip", "sign up", "signup", "consent", "permission", "club", "فعالية", "فعاليات", "رحلة", "تسجيل", "موافقة", "نادي"],
+    textEn:
+      "Under Family › Events you see every school event your child can join. Tap 'Sign Sara up' to register; trips that leave school need your consent, which you give once under Approvals. Students under 15 need a guardian's approval for anything outside their own school.",
+    textAr:
+      "في العائلة › الفعاليات ترى كل فعالية مدرسية يمكن لطفلك الانضمام إليها. اضغط «سجّل سارة» للتسجيل، والرحلات خارج المدرسة تحتاج موافقتك مرة واحدة من الموافقات. يحتاج الطلاب دون 15 سنة إلى موافقة ولي الأمر لأي نشاط خارج مدرستهم.",
+  },
+  {
     id: "kb-eid-update",
     serviceId: "svc-school-file",
     titleEn: "Updating a student's identity document on the school file",
@@ -29,7 +78,7 @@ export const KB: KbDoc[] = [
     titleAr: "إعادة التسجيل للفصل أو العام القادم",
     sourceName: "Sawa service guide (demo) — verify against MOE",
     sourceUrl: "https://www.moe.gov.ae",
-    keywords: ["re-registration", "reregistration", "re-enrolment", "reenrolment", "enrol", "enroll", "register", "next year", "next term", "documents", "required", "إعادة التسجيل", "التسجيل", "تسجيل", "قيد", "المستندات", "الوثائق", "مطلوب"],
+    keywords: ["re-registration", "reregistration", "re-enrolment", "reenrolment", "re-enrol", "reenrol", "prerequisite", "prerequisites", "what do i need", "need", "enrol", "enroll", "register", "next year", "next term", "documents", "required", "إعادة التسجيل", "التسجيل", "تسجيل", "قيد", "المستندات", "الوثائق", "مطلوب"],
     textEn:
       "Re-registration confirms your child's place for the next term or year during the window the school announces. Sawa reminds you when the window opens. Typically you confirm the student's details and make sure identity documents on the school file are valid (not expired). Sawa pre-fills the form from your family profile; check the official MOE page for the exact list of documents for your child's case.",
     textAr:

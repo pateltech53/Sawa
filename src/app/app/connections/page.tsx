@@ -1,5 +1,6 @@
 "use client";
 
+import { uiLocale } from "@/lib/tr";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -54,7 +55,7 @@ export default function Connections() {
               <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-sm font-bold text-white" style={{ background: a.color }}>{a.short}</span>
               <span className="min-w-0 flex-1">
                 <span className="block font-semibold">{a.name}</span>
-                <span className="block text-xs text-[var(--muted)]">{"viaSchool" in a ? a.desc : on ? `Connected (demo) · ${new Date(connected[a.key].connectedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}` : a.desc}</span>
+                <span className="block text-xs text-[var(--muted)]">{"viaSchool" in a ? a.desc : on ? `Connected (demo) · ${new Date(connected[a.key].connectedAt).toLocaleDateString(uiLocale(), { day: "numeric", month: "short" })}` : a.desc}</span>
               </span>
               {"viaSchool" in a ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-[#2E9E6B]/15 px-3 py-1.5 text-xs font-bold text-[#1F7A50]"><Check size={12} /> On</span>
@@ -101,7 +102,7 @@ export default function Connections() {
                     <span className="h-9 w-1 shrink-0 rounded-full" style={{ background: c.color }} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold">{w.title}</span>
-                      <span className="block truncate text-xs text-[var(--muted)]">{c.name} · due {new Date(w.dueAt).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}{w.grade ? ` · ${w.grade}` : ""}</span>
+                      <span className="block truncate text-xs text-[var(--muted)]">{c.name} · due {new Date(w.dueAt).toLocaleDateString(uiLocale(), { weekday: "short", day: "numeric", month: "short" })}{w.grade ? ` · ${w.grade}` : ""}</span>
                     </span>
                     <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${cls}`}>{label}</span>
                   </li>

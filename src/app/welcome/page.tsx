@@ -9,7 +9,6 @@ import { COMMUNITIES, INTERESTS, OPPORTUNITIES, SCHOOLS } from "@/lib/seed";
 import { rankOpportunities, TYPE_LABEL } from "@/lib/match";
 import { useStore } from "@/lib/store";
 import type { Profile } from "@/lib/types";
-import { SawaPreloader } from "@/components/s/SawaPreloader";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import { AiLoader } from "@/components/ui/ai-loader";
 import { BRAND } from "@/lib/brand";
@@ -30,21 +29,14 @@ const page = {
 
 export default function Welcome() {
   const router = useRouter();
-  const reduce = useReducedMotion();
   const { state, signIn, recordVerification, completeStudentOnboarding } = useStore();
-  const [step, setStep] = useState<Step>("splash");
+  const [step, setStep] = useState<Step>("start");
   const [schoolId, setSchoolId] = useState("sch-1");
   const [sample, setSample] = useState<(typeof SAMPLE_IDS)[number]>(SAMPLE_IDS[0]);
   const [interests, setInterests] = useState<string[]>([]);
   const go = (s: Step) => setStep(s);
   const back = () => setStep(ORDER[Math.max(0, ORDER.indexOf(step) - 1)]);
 
-  // splash → start (reduced motion skips the cinematic gate)
-  useEffect(() => {
-    if (step !== "splash" || !reduce) return;
-    const t = setTimeout(() => go("start"), 400);
-    return () => clearTimeout(t);
-  }, [step, reduce]);
 
   const student = state.profiles.find((p) => p.id === "stu-sara")!;
   const birthYear = new Date().getFullYear() - sample.age;
@@ -66,17 +58,6 @@ export default function Welcome() {
         </button>
       )}
       <AnimatePresence mode="wait">
-        {step === "splash" && (
-          <motion.section key="splash" className="relative min-h-dvh" exit={{ opacity: 0, transition: { duration: 0.4 } }}>
-            {reduce ? (
-              <div className="flex min-h-dvh items-center justify-center"><Icon3D name="logo3d" size={150} alt="Sawa" /></div>
-            ) : (
-              <SawaPreloader onComplete={() => go("start")} />
-            )}
-            <button onClick={() => go("start")} className="absolute end-4 top-5 z-50 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/25">Skip intro</button>
-          </motion.section>
-        )}
-
         {step === "start" && (
           <motion.section key="start" {...page} className="flex min-h-dvh flex-col items-center px-6 pb-10 pt-16">
             <motion.div layoutId="brand" initial={{ y: 40, scale: 1.2 }} animate={{ y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 120, damping: 18 }}>

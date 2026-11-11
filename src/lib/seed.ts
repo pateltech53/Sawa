@@ -268,6 +268,10 @@ export const SEED_APPROVALS: Approval[] = [
     titleEn: "Inter-school Maths Olympiad", titleAr: "أولمبياد الرياضيات بين المدارس", detailEn: "Outside school · individual problem-solving round · Sara asked to join", detailAr: "خارج المدرسة · جولة فردية لحل المسائل", fromEn: "Sara, via Sawa" },
   { id: "ap-fees", kind: "fees", childId: "stu-sara", guardianId: "par-khalid", status: "pending", createdAt: at(-3), dueAt: at(12, 12),
     titleEn: "Term 3 activity fee plan", titleAr: "خطة رسوم أنشطة الفصل الثالث", detailEn: "AED 450 in 3 instalments of AED 150 · first due in 12 days", detailAr: "450 درهم على 3 دفعات · الأولى خلال 12 يوماً", fromEn: "School finance office" },
+  { id: "ap-swim", kind: "trip", childId: "stu-sara", guardianId: "par-khalid", status: "pending", createdAt: at(-1), dueAt: at(6, 12),
+    titleEn: "Swimming lessons at Hamdan Sports Complex", titleAr: "دروس السباحة في مجمع حمدان الرياضي", detailEn: "6 Thursdays from next week · school bus both ways · lifeguard on duty", detailAr: "6 أيام خميس من الأسبوع القادم · حافلة المدرسة ذهاباً وإياباً", fromEn: "PE department · Al Noor" },
+  { id: "ap-pickup", kind: "media", childId: "stu-sara", guardianId: "par-khalid", status: "pending", createdAt: at(0), dueAt: at(2, 12),
+    titleEn: "Late pick-up after science fair practice", titleAr: "استلام متأخر بعد تدريب معرض العلوم", detailEn: "Sara stays until 15:30 on Monday · pick-up at Gate B", detailAr: "تبقى سارة حتى 15:30 يوم الاثنين · الاستلام من البوابة ب", fromEn: "Ms Aisha · Al Noor" },
   { id: "ap-media", kind: "media", childId: "stu-sara", guardianId: "par-khalid", status: "approved", createdAt: at(-20), decidedAt: at(-19),
     titleEn: "Photo consent: sports day", titleAr: "موافقة التصوير: اليوم الرياضي", detailEn: "Group photos on the school website only", fromEn: "School media team" },
 ];
@@ -284,4 +288,29 @@ export const COMMUNITY_CHAT: ChatMsg[] = [
   { id: "m3", communityId: "c1", authorId: "x3", author: "Noor", school: "Creek Science Academy", body: "That fixed it for us too. We're 2 people looking for a 3rd for the Challenge.", at: at(0, -1), status: "visible" },
   { id: "m4", communityId: "c3", authorId: "x4", author: "Hamdan", school: "Mirdif Future School", body: "Code review night is Thursday — post your repo link in Activities.", at: at(0, -5), status: "visible" },
   { id: "m5", communityId: "c2", authorId: "x5", author: "Ms Aisha", school: "Al Noor", body: "6 schools confirmed for the clean-up. Bring water and a hat!", at: at(0, -4), status: "visible" },
+];
+
+/** Term 3 activity fee plan (sample). Pay fee pays the next unpaid instalment. */
+export const FEE_PLAN = [
+  { n: 1, amountAed: 150, dueAt: at(12, 12) },
+  { n: 2, amountAed: 150, dueAt: at(42, 12) },
+  { n: 3, amountAed: 150, dueAt: at(72, 12) },
+];
+
+/** Sara's current marks (sample, from the Smart Learning Portal). */
+export const GRADES = [
+  { subject: "Science", subjectAr: "العلوم", mark: 91, prev: 86, teacher: "Ms Aisha", last: "Forces quiz · 18/20" },
+  { subject: "Maths", subjectAr: "الرياضيات", mark: 84, prev: 88, teacher: "Mr Omar", last: "Algebra test · 42/50" },
+  { subject: "English", subjectAr: "اللغة الإنجليزية", mark: 88, prev: 85, teacher: "Ms Rania", last: "Persuasive essay · B+" },
+  { subject: "Arabic", subjectAr: "اللغة العربية", mark: 93, prev: 92, teacher: "Ms Huda", last: "Reading comprehension · A" },
+  { subject: "Computing", subjectAr: "الحوسبة", mark: 96, prev: 90, teacher: "Ms Layla", last: "Scratch game · 24/25" },
+];
+
+/** School and inter-school events a parent can sign their child up for (sample). */
+export const SCHOOL_EVENTS = [
+  { id: "se-1", title: "Science fair", titleAr: "معرض العلوم", at: at(9, 9), place: "Main hall, Al Noor", photo: "/photos/lab.jpg", consent: false, seats: 40, by: "Al Noor Public School" },
+  { id: "se-2", title: "Museum of the Future trip", titleAr: "رحلة متحف المستقبل", at: at(3, 8), place: "Museum of the Future", photo: "/photos/auditorium.jpg", consent: true, seats: 25, by: "Grade 8 · Ms Aisha" },
+  { id: "se-3", title: "Inter-school robotics open build", titleAr: "بناء روبوتات مفتوح بين المدارس", at: at(3, 16), place: "Marina Innovation School", photo: "/photos/robot.jpg", consent: true, seats: 30, by: "UAE Young Roboticists" },
+  { id: "se-4", title: "Beach clean-up with 6 schools", titleAr: "تنظيف الشاطئ مع 6 مدارس", at: at(5, 8), place: "Kite Beach, Dubai", photo: "/photos/garden.jpg", consent: true, seats: 80, by: "Green Schools Network" },
+  { id: "se-5", title: "Parent–teacher evening", titleAr: "أمسية أولياء الأمور والمعلمين", at: at(4, 17), place: "Al Noor", photo: "/photos/classroom.jpg", consent: false, seats: 200, by: "Al Noor Public School" },
 ];

@@ -84,9 +84,8 @@ function ServiceCarousel({ list, ar, open, setOpen }: { list: typeof SERVICES; a
             <motion.li key={s.id} initial={reduce ? false : { opacity: 0, y: 18, rotate: i % 2 ? 1.5 : -1.5 }} animate={{ opacity: 1, y: 0, rotate: 0 }} transition={{ delay: Math.min(i, 5) * 0.05, type: "spring", stiffness: 240, damping: 24 }}
               className="w-[240px] shrink-0 snap-start sm:w-[260px]">
               <article className={`glass flex h-[340px] flex-col overflow-hidden rounded-[28px] ${s.isDemoFlow ? "ring-2 ring-[#121217]" : ""}`}>
-                <div className="relative h-[130px] shrink-0" style={{ background: `linear-gradient(135deg, ${look.tint}, ${look.tint}99)` }}>
-                  {look.photo && <img src={look.photo} alt="" className="absolute inset-0 h-full w-full object-cover opacity-90 mix-blend-luminosity" />}
-                  <span className="absolute inset-0" style={{ background: `linear-gradient(180deg, transparent 30%, ${look.tint}cc)` }} />
+                <div className="relative h-[130px] shrink-0" style={{ background: look.tint }}>
+                  {look.photo && <img src={look.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />}
                   <span className="absolute start-3 top-3 grid h-11 w-11 place-items-center rounded-2xl bg-white/90 text-[#121217]"><look.icon size={20} /></span>
                   {s.isDemoFlow && <span className="absolute end-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#121217] px-2.5 py-1 text-[11px] font-bold text-white"><Sparkles size={11} /> {ar ? "مسار كامل" : "Full journey"}</span>}
                   <span className="absolute bottom-3 start-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-bold">{s.ownerSystem}</span>

@@ -12,10 +12,12 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens'); require('fs').
   await p.goto(B); await p.waitForTimeout(800); await shot('01-landing');
   await p.click('button:has-text("Parent / guardian")'); await p.waitForURL('**/signin**'); await p.waitForTimeout(500); await shot('02-signin');
   await p.click('button:has-text("Sign in with UAE PASS")'); await p.waitForURL('**/onboarding', { timeout: 8000 }); await p.waitForTimeout(400);
-  await p.waitForTimeout(2600); await shot('02b-children-found'); await p.click('main button.btn-ink'); // children → controls
-  await p.waitForTimeout(600); await p.click('main button.btn-ink'); // controls → tools
-  await p.waitForTimeout(4200); await shot('02c-tools'); await p.click('main button.btn-ink'); // tools → done
-  await p.waitForTimeout(600); await p.click('main button.btn-ink'); // done → app
+  await p.waitForTimeout(2400); await shot('02b-family-match'); await p.click('main button.btn-glass'); // match → priorities
+  await p.waitForTimeout(700); await p.click('[role=option][aria-label="Fees"]'); await p.waitForTimeout(300); await shot('02c-priorities'); await p.click('main button.btn-glass');
+  await p.waitForTimeout(600); await p.click('main button.btn-glass'); // controls → documents
+  await p.waitForTimeout(600); await p.click('button:has-text("Sample") >> nth=0'); await p.waitForTimeout(1600); await shot('02d-documents'); await p.click('main button.btn-glass');
+  await p.waitForTimeout(4200); await shot('02e-tools'); await p.click('main button.btn-glass'); // tools → done
+  await p.waitForTimeout(700); await p.click('main button.btn-glass'); // done → app
   await p.waitForURL('**/app/today'); await p.waitForTimeout(800); await shot('03-parent-today');
   await p.click('a:has-text("Update now")'); await p.waitForTimeout(600); await shot('04-journey-check');
   await p.click('button:has-text("Upload the renewed ID")');

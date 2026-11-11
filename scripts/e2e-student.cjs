@@ -10,7 +10,7 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens', 'student'); req
   const shot = async (name) => { await p.screenshot({ path: `${OUT}/${String(++n).padStart(2,'0')}-${name}.png` }); };
   await p.goto(B); await p.waitForTimeout(1200); await shot('landing');
   await p.click('button:has-text("Student")'); await p.waitForURL('**/welcome'); await p.waitForTimeout(500); await shot('splash');
-  await p.waitForTimeout(2500); await shot('preloader'); await p.click('text=Skip intro'); await p.waitForSelector('button[aria-label="Get Started"]', { timeout: 6000 }); await p.waitForTimeout(1500); await shot('get-started');
+  await p.waitForSelector('button[aria-label="Get Started"]', { timeout: 6000 }); await p.waitForTimeout(1500); await shot('get-started');
   await p.click('button[aria-label="Get Started"]'); await p.waitForTimeout(800); await shot('school');
   await p.click('text=Continue with school login'); await p.waitForTimeout(700); await shot('consent');
   await p.click('text=Allow and continue'); await p.waitForTimeout(900); await shot('loading');
@@ -32,7 +32,7 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens', 'student'); req
   await p.waitForSelector("text=You're all set", { timeout: 10000 }); await p.waitForTimeout(900); await shot('done');
   await p.click('text=Enter Sawa'); await p.waitForURL('**/app/today'); await p.waitForTimeout(1500); await shot('home');
   await p.evaluate(() => window.scrollTo(0, 900)); await p.waitForTimeout(600); await shot('home-2');
-  await p.evaluate(() => window.scrollTo(0, 99999)); await p.waitForTimeout(600); await shot('home-feedgate');
+  await p.goto(B + '/app/communities'); await p.waitForTimeout(1000); await shot('communities-feedgate');
   await p.focus('[aria-label="Slide to open today\'s community highlights"]'); await p.keyboard.press('Enter'); await p.waitForTimeout(1500); await shot('feed-unlocked');
   await p.goto(B + '/app/calendar'); await p.waitForTimeout(1000); await shot('calendar');
   await p.click('[role=tab]:has-text("week")'); await p.waitForTimeout(500); await shot('calendar-week');

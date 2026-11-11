@@ -63,11 +63,11 @@ export function LangToggle({ className = "" }: { className?: string }) {
 export function PageTitle({ title, sub, right }: { title: string; sub?: string; right?: React.ReactNode }) {
   return (
     <div className="mb-4 flex items-end justify-between gap-3">
-      <div>
-        <h1 className="font-[family-name:var(--font-display)] text-2xl font-extrabold tracking-tight sm:text-3xl">{title}</h1>
+      <div className="min-w-0">
+        <h1 className="text-[28px] leading-tight sm:text-[34px]">{title}</h1>
         {sub && <p className="mt-1 text-sm text-[var(--muted)]">{sub}</p>}
       </div>
-      {right}
+      {right && <div className="shrink-0 whitespace-nowrap">{right}</div>}
     </div>
   );
 }

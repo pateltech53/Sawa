@@ -4,7 +4,7 @@
 // professional development, each attributed to where real listings would come from.
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { Briefcase, ExternalLink, GraduationCap, List, Map as MapIcon, School as SchoolIcon, Search } from "lucide-react";
+import { ExternalLink, GraduationCap, List, Map as MapIcon, School as SchoolIcon, Search } from "lucide-react";
 import { PageTitle } from "@/components/ui";
 import { useToast } from "@/components/s/kit";
 import { OPPORTUNITIES, SCHOOLS } from "@/lib/seed";
@@ -12,22 +12,22 @@ import { useStore } from "@/lib/store";
 
 const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false, loading: () => <div className="shimmer h-[340px] rounded-3xl" /> });
 
-const JOBS = [
-  { id: "j1", title: "Science teacher (Grade 6–8)", school: "Creek Science Academy (sample)", area: "Al Jaddaf", type: "Full time", posted: "3 days ago" },
-  { id: "j2", title: "Head of STEM", school: "Marina Innovation School (sample)", area: "Dubai Marina", type: "Full time", posted: "1 week ago" },
-  { id: "j3", title: "Robotics club coach", school: "Mirdif Future School (sample)", area: "Mirdif", type: "Part time", posted: "2 weeks ago" },
-];
-const PD = [
-  { id: "d1", title: "Teaching with open data", by: "UAE Hackathon (TDRA) toolkit", hours: 6, photo: "/photos/code.jpg" },
-  { id: "d2", title: "Inclusive classrooms", by: "School PD catalogue (sample)", hours: 4, photo: "/photos/classroom.jpg" },
-  { id: "d3", title: "Coaching student MUN delegates", by: "MyMUN resources", hours: 3, photo: "/photos/conference.jpg" },
+/** Workshops teachers can join for their own development (sample, attributed). */
+const WORKSHOPS = [
+  { id: "ws-1", title: "Teaching with open data", titleAr: "التدريس بالبيانات المفتوحة", by: "UAE Hackathon (TDRA) toolkit", at: 5, hours: 3, place: "Online", photo: "/photos/code.jpg" },
+  { id: "ws-2", title: "Inclusive classrooms in practice", titleAr: "الفصول الدامجة عملياً", by: "School PD catalogue (sample)", at: 8, hours: 2, place: "Al Noor · Room 12", photo: "/photos/classroom.jpg" },
+  { id: "ws-3", title: "Coaching student MUN delegates", titleAr: "تدريب مندوبي نموذج الأمم المتحدة", by: "MyMUN resources", at: 12, hours: 2, place: "Online", photo: "/photos/conference.jpg" },
+  { id: "ws-4", title: "Robotics kits for beginners", titleAr: "حقائب الروبوتات للمبتدئين", by: "UAE Young Roboticists mentors", at: 15, hours: 3, place: "Marina Innovation School", photo: "/photos/circuit.jpg" },
 ];
 
 export default function Career() {
   const { state, me } = useStore();
   const toast = useToast();
+  const { toggleEventSignup } = useStore();
+  const joined = state.eventSignups[me?.id ?? ""] ?? [];
+  const studentEvents = OPPORTUNITIES.filter((o) => ["competition", "hackathon", "mun", "workshop"].includes(o.type)).slice(0, 6);
   const ar = state.lang === "ar";
-  const [tab, setTab] = useState<"schools" | "jobs" | "pd">("schools");
+  const [tab, setTab] = useState<"pd" | "students" | "schools">("pd");
   const [view, setView] = useState<"list" | "map">("list");
   const [q, setQ] = useState("");
   const schools = useMemo(() => SCHOOLS.filter((s) => `${s.name} ${s.area} ${s.curriculum}`.toLowerCase().includes(q.toLowerCase())), [q]);
@@ -35,9 +35,9 @@ export default function Career() {
 
   return (
     <div className="space-y-4">
-      <PageTitle title={ar ? "مسيرتك" : "Your career"} sub={ar ? "استكشف المدارس والوظائف والتطوير المهني في الإمارات" : "Explore schools, roles and professional development, and connect with educators across the UAE."} />
+      <PageTitle title={ar ? "الفعاليات والورش" : "Events and workshops"} sub={ar ? "ورش لتطويرك، وفعاليات تأخذ إليها طلابك، ومدارس الإمارات" : "Workshops for your own growth, events to bring your classes to, and schools across the UAE"} />
       <div className="glass inline-flex rounded-full p-1" role="tablist">
-        {([["schools", ar ? "المدارس" : "Schools", SCHOOLS.length], ["jobs", ar ? "الوظائف" : "Jobs", JOBS.length], ["pd", ar ? "التطوير المهني" : "Professional development", PD.length]] as const).map(([k, label, n]) => (
+        {([["pd", ar ? "لك" : "For you", WORKSHOPS.length], ["students", ar ? "لطلابك" : "For your students", studentEvents.length], ["schools", ar ? "المدارس" : "Schools", SCHOOLS.length]] as const).map(([k, label, n]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${tab === k ? "bg-[#121217] text-white" : "text-[var(--ink-2)]"}`}>{label} <span className="opacity-60">{n}</span></button>
         ))}
       </div>
@@ -67,28 +67,46 @@ export default function Career() {
         </>
       )}
 
-      {tab === "jobs" && (
-        <ul className="grid gap-2.5 sm:grid-cols-2">
-          {JOBS.map((j) => (
-            <li key={j.id} className="glass rounded-[22px] p-4">
-              <div className="flex items-start gap-3">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[#121217] text-white"><Briefcase size={17} /></span>
-                <div className="min-w-0 flex-1"><p className="font-semibold">{j.title}</p><p className="text-xs text-[var(--muted)]">{j.school} · {j.area}</p><p className="mt-1 text-xs text-[var(--muted)]">{j.type} · {j.posted}</p></div>
-              </div>
-              <button className="btn-ghost mt-3 !min-h-9 w-full !bg-white text-sm" onClick={() => toast(ar ? "تم حفظ الوظيفة" : "Saved — we'll remind you before it closes")}>{ar ? "احفظ" : "Save"}</button>
-            </li>
-          ))}
+      {tab === "pd" && (
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {WORKSHOPS.map((w) => {
+            const on = joined.includes(`ws:${w.id}`);
+            const when = new Date(Date.now() + w.at * 86_400_000);
+            return (
+              <li key={w.id} className="glass flex flex-col overflow-hidden rounded-[24px]">
+                <img src={w.photo} alt="" className="h-32 w-full object-cover" />
+                <div className="flex flex-1 flex-col p-4">
+                  <p className="font-semibold leading-snug">{ar ? w.titleAr : w.title}</p>
+                  <p className="mt-1 text-xs text-[var(--muted)]">{when.toLocaleDateString(ar ? "ar-AE" : "en-GB", { weekday: "short", day: "numeric", month: "short" })} · {w.hours} {ar ? "ساعات" : "hours"} · {w.place}</p>
+                  <p className="text-xs text-[var(--muted)]"><GraduationCap size={11} className="inline" /> {w.by}</p>
+                  <button className={`mt-auto pt-3`} onClick={() => { toggleEventSignup(`ws:${w.id}`); toast(on ? (ar ? "أُلغي الحجز" : "Place released") : ar ? "تم حجز مقعدك · يُحتسب ضمن ساعات التطوير" : "Seat booked · counts toward your PD hours"); }}>
+                    <span className={`${on ? "btn-ghost !bg-white" : "btn-ink"} !min-h-10 w-full text-sm`}>{on ? (ar ? "محجوز · إلغاء" : "Booked · undo") : ar ? "انضم" : "Join"}</span>
+                  </button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
 
-      {tab === "pd" && (
-        <ul className="grid gap-3 sm:grid-cols-3">
-          {PD.map((d) => (
-            <li key={d.id} className="glass overflow-hidden rounded-[24px]">
-              <img src={d.photo} alt="" className="h-28 w-full object-cover" />
-              <div className="p-3.5"><p className="font-semibold">{d.title}</p><p className="text-xs text-[var(--muted)]"><GraduationCap size={11} className="inline" /> {d.by} · {d.hours} {ar ? "ساعات" : "hours"}</p></div>
-            </li>
-          ))}
+      {tab === "students" && (
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {studentEvents.map((o) => {
+            const on = joined.includes(`bring:${o.id}`);
+            return (
+              <li key={o.id} className="glass flex overflow-hidden rounded-[24px]">
+                {o.photo && <img src={o.photo} alt="" className="w-28 shrink-0 object-cover" />}
+                <div className="flex min-w-0 flex-1 flex-col p-3.5">
+                  <p className="font-semibold leading-snug">{ar ? o.titleAr : o.titleEn}</p>
+                  <p className="mt-1 text-xs text-[var(--muted)]">{new Date(o.startsAt).toLocaleDateString(ar ? "ar-AE" : "en-GB", { weekday: "short", day: "numeric", month: "short" })} · {ar ? "الأعمار" : "Ages"} {o.minAge}–{o.maxAge ?? 18}</p>
+                  {o.source && <p className="text-[11px] text-[var(--muted)]">{ar ? "على غرار" : "Modelled on"} {o.source}</p>}
+                  <button className="mt-auto pt-2.5 text-start" onClick={() => { toggleEventSignup(`bring:${o.id}`); toast(on ? (ar ? "أُلغي" : "Removed") : ar ? "أُرسلت الدعوة لصفوفك وأولياء الأمور" : "Invited your classes — parents get the consent request"); }}>
+                    <span className={`${on ? "btn-ghost !bg-white" : "btn-ink"} !min-h-9 text-xs`}>{on ? (ar ? "صفوفك مدعوّة · إلغاء" : "Classes invited · undo") : ar ? "ادعُ صفوفك" : "Bring your classes"}</span>
+                  </button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
 

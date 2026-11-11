@@ -4,19 +4,20 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform, animate } from "motion/react";
 import { ArrowRight, Check, ChevronRight, KeyRound, Lock, LockOpen, Maximize2, Play, ShieldCheck, Sparkles, ThumbsUp } from "lucide-react";
-import { FlowButton } from "@/components/ui/flow-button";
 import { EASE, SectionHead, useToast } from "./kit";
 import { Mascot } from "@/components/ui";
-import { CommunityBadge, OppCard } from "./cards";
+import { CommunityBadge } from "./cards";
 import { addDays, sameDay, startOfDay, useAgenda, type AgendaItem } from "@/lib/agenda";
 import { COMMUNITIES, OPPORTUNITIES } from "@/lib/seed";
 import { rankOpportunities } from "@/lib/match";
 import { ageOf, useStore } from "@/lib/store";
+import { uiLocale, useTr } from "@/lib/tr";
 
 const greeting = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening"; };
 
 export function StudentHome() {
   const { state, me } = useStore();
+  const tr = useTr();
   const { items, classroomConnected } = useAgenda();
   const [day, setDay] = useState(() => startOfDay(new Date()));
   if (!me) return null;
@@ -29,18 +30,19 @@ export function StudentHome() {
   const joined = COMMUNITIES.filter((c) => (state.joined[me.id] ?? []).includes(c.id));
   const matches = rankOpportunities(me, OPPORTUNITIES).filter((m) => m.score > 20).slice(0, 6);
 
-  const needs = open.slice(0, 6);
+  const needs = open.slice(0, 4);
+  const newPosts = state.posts.filter((p) => joined.some((c) => c.id === p.communityId) && Date.now() - +new Date(p.createdAt) < 2 * 86_400_000).length + state.chat.filter((m) => joined.some((c) => c.id === m.communityId)).length;
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
       <div className="min-w-0 space-y-5">
         {/* greeting */}
         <section className="glass glass-strong relative overflow-hidden rounded-[30px] p-5">
           <div className="pe-28">
-            <p className="text-sm font-medium text-[var(--muted)]">{greeting()}, {me.name}</p>
+            <p className="text-sm font-medium text-[var(--muted)]">{tr(`${greeting()}, ${me.name}`)}</p>
             <h1 className="mt-1 text-[28px] font-bold leading-[1.1] tracking-tight">
-              <motion.span key={open.length} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="inline-block">{open.length}</motion.span> things need you this week
+              <motion.span key={open.length} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="inline-block">{tr(`${open.length} things need you this week`)}</motion.span>
             </h1>
-            <p className="mt-1 text-xs text-[var(--muted)]">From {new Set(open.map((i) => i.source)).size || 1} sources, in one place</p>
+            <p className="mt-1 text-xs text-[var(--muted)]">{tr(`From ${new Set(open.map((i) => i.source)).size || 1} sources, in one place`)}</p>
           </div>
           <div className="pointer-events-none absolute -bottom-2 end-1"><Mascot size={118} /></div>
         </section>
@@ -50,7 +52,7 @@ export function StudentHome() {
           <div className="mb-3 flex items-center justify-between">
             <div>
               <h2 className="section-title">This week</h2>
-              <p className="text-xs text-[var(--muted)]">{today.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</p>
+              <p className="text-xs text-[var(--muted)]">{today.toLocaleDateString(uiLocale(), { month: "long", year: "numeric" })}</p>
             </div>
             <Link href="/app/calendar" className="btn-ghost !min-h-9 !px-3 text-sm" aria-label="Open full calendar"><Maximize2 size={14} /> Calendar</Link>
           </div>
@@ -61,7 +63,7 @@ export function StudentHome() {
               return (
                 <button key={d.toISOString()} role="tab" aria-selected={sel} onClick={() => setDay(d)} className="relative flex h-[68px] flex-col items-center justify-center rounded-2xl">
                   {sel && <motion.span layoutId="day-pill" className="absolute inset-0 rounded-2xl bg-[#121217]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-                  <span className={`relative text-[10px] font-semibold uppercase leading-none ${sel ? "text-white/70" : "text-[var(--muted)]"}`}>{d.toLocaleDateString("en-GB", { weekday: "short" })}</span>
+                  <span className={`relative text-[10px] font-semibold uppercase leading-none ${sel ? "text-white/70" : "text-[var(--muted)]"}`}>{d.toLocaleDateString(uiLocale(), { weekday: "short" })}</span>
                   <span className={`relative mt-1 text-lg font-bold leading-none ${sel ? "text-white" : ""}`}>{d.getDate()}</span>
                   <span className="relative mt-1.5 flex h-1.5 justify-center gap-0.5">{n.slice(0, 3).map((i) => <span key={i.id} className="h-1.5 w-1.5 rounded-full" style={{ background: sel ? "#fff" : i.color }} />)}</span>
                 </button>
@@ -71,7 +73,7 @@ export function StudentHome() {
           <AnimatePresence mode="wait">
             <motion.ul key={day.toISOString()} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.22 }} className="mt-3 space-y-1.5">
               {dayItems.length === 0 ? (
-                <li className="rounded-2xl bg-white/40 px-3 py-3 text-sm text-[var(--muted)]">Nothing on {sameDay(day, today) ? "today" : day.toLocaleDateString("en-GB", { weekday: "long" })}.</li>
+                <li className="rounded-2xl bg-white/40 px-3 py-3 text-sm text-[var(--muted)]">{tr(`Nothing on ${sameDay(day, today) ? "today" : day.toLocaleDateString("en-GB", { weekday: "long" })}.`)}</li>
               ) : dayItems.map((i) => <AgendaRow key={i.id} i={i} />)}
             </motion.ul>
           </AnimatePresence>
@@ -93,40 +95,31 @@ export function StudentHome() {
       <div className="min-w-0 space-y-5">
         <ClassroomCard connected={classroomConnected} items={items} />
 
-        {/* matched opportunities */}
-        <section>
-          <SectionHead title="Matched for you" action={<Link href="/app/explore" className="link-info">See all</Link>} />
-          <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-2 lg:mx-0 lg:px-0" style={{ scrollSnapType: "x mandatory" }}>
-            {matches.map((m, i) => (
-              <motion.div key={m.o.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05, ease: EASE }} style={{ scrollSnapAlign: "start" }}>
-                <OppCard m={m} compact />
-              </motion.div>
-            ))}
-          </div>
-          <div className="mt-3 flex justify-center"><FlowButton text="Explore all opportunities" href="/app/explore" size="sm" /></div>
-        </section>
-
-        {/* your communities: cross-school, as photo cards */}
-        <section>
-          <SectionHead title="Your communities" action={<Link href="/app/communities" className="link-info">Find more</Link>} />
-          {joined.length === 0 ? (
-            <Link href="/app/communities" className="glass flex items-center gap-3 rounded-[22px] p-4 text-sm"><Sparkles size={18} /> Join a community with students from other schools</Link>
-          ) : (
-            <ul className="grid grid-cols-2 gap-2.5">
-              {joined.slice(0, 4).map((c) => (
-                <li key={c.id}>
-                  <Link href={`/app/communities/${c.id}`} className="group relative block h-[120px] overflow-hidden rounded-[22px]">
-                    {c.photo ? <img src={c.photo} alt="" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <span className="absolute inset-0" style={{ background: c.tint }} />}
-                    <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
-                    <span className="absolute inset-x-3 bottom-2.5 text-white"><span className="block text-sm font-bold leading-tight">{c.name}</span><span className="block text-[11px] text-white/80">{c.schools ?? 1} schools · {c.online ?? 0} online</span></span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        {/* Signposts, not copies: Home points to Explore and Communities instead of repeating them */}
+        <section aria-label="More for you" className="space-y-2.5">
+          {matches[0] && (
+            <Link href="/app/explore" className="glass group flex items-center gap-3 overflow-hidden rounded-[24px] p-2.5 pe-4">
+              <span className="relative h-[84px] w-[84px] shrink-0 overflow-hidden rounded-[18px]" style={{ background: matches[0].o.tint }}>
+                {matches[0].o.photo && <img src={matches[0].o.photo} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="label-xs">{tr("Top match")} · {matches[0].score}%</span>
+                <span className="mt-0.5 block truncate font-semibold">{matches[0].o.titleEn}</span>
+                <span className="block text-xs text-[var(--muted)]">{tr(`${Math.max(0, matches.length - 1)} more matched in Explore`)}</span>
+              </span>
+              <ChevronRight size={18} className="shrink-0 opacity-50 rtl:rotate-180" />
+            </Link>
           )}
+          <Link href="/app/communities" className="glass group flex items-center gap-3 rounded-[24px] p-2.5 pe-4">
+            <span className="grid h-[84px] w-[84px] shrink-0 place-items-center rounded-[18px] bg-white/60"><img src="/figma/icons/people.png" alt="" className="obj3d h-14 w-14 object-contain" /></span>
+            <span className="min-w-0 flex-1">
+              <span className="label-xs">{tr("Communities")}</span>
+              <span className="mt-0.5 block font-semibold">{joined.length ? tr(`${newPosts} new in your communities`) : tr("Meet students from other schools")}</span>
+              <span className="block text-xs text-[var(--muted)]">{joined.length ? joined.map((c) => c.name).slice(0, 2).join(" · ") : tr("Moderated, cross-school groups")}</span>
+            </span>
+            <ChevronRight size={18} className="shrink-0 opacity-50 rtl:rotate-180" />
+          </Link>
         </section>
-
-        <FeedGate />
       </div>
     </div>
   );
@@ -140,7 +133,7 @@ function TaskCard({ i }: { i: AgendaItem }) {
     <span className="flex min-w-0 flex-1 flex-col">
       <span className="mb-1 inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white" style={{ background: i.color }}>{i.source}</span>
       <span className={`line-clamp-2 font-semibold leading-snug ${i.done ? "line-through opacity-50" : ""}`}>{i.title}</span>
-      <span className="mt-1 text-xs text-[var(--muted)]">{due.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · {due.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+      <span className="mt-1 text-xs text-[var(--muted)]">{due.toLocaleDateString(uiLocale(), { weekday: "short", day: "numeric", month: "short" })} · {due.toLocaleTimeString(uiLocale(), { hour: "2-digit", minute: "2-digit" })}</span>
     </span>
   );
   return (
@@ -165,7 +158,7 @@ export function AgendaRow({ i, glass = false }: { i: AgendaItem; glass?: boolean
       <span className="h-9 w-1 shrink-0 rounded-full" style={{ background: i.color }} aria-hidden />
       <span className="min-w-0 flex-1">
         <span className={`block truncate text-sm font-semibold ${i.done ? "line-through opacity-50" : ""}`}>{i.title}</span>
-        <span className="block truncate text-xs text-[var(--muted)]">{i.source} · {new Date(i.at).toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit" })}</span>
+        <span className="block truncate text-xs text-[var(--muted)]">{i.source} · {new Date(i.at).toLocaleString(uiLocale(), { weekday: "short", hour: "2-digit", minute: "2-digit" })}</span>
       </span>
     </>
   );
@@ -208,7 +201,7 @@ function ClassroomCard({ connected, items }: { connected: boolean; items: Agenda
 }
 
 /* ── Figma "Feed Gate": one mindful feed session a day, unlocked by swiping ── */
-function FeedGate() {
+export function FeedGate() {
   const { state, me, unlockFeed, toggleHelpful } = useStore();
   const reduce = useReducedMotion();
   const unlocked = me ? state.feedUnlockedOn[me.id] === new Date().toDateString() : false;

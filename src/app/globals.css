@@ -16,7 +16,7 @@
    ───────────────────────────────────────────────────────────── */
 @theme {
   --font-sans: "Inter Variable", "Inter", "Noto Kufi Arabic Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Inter Variable", "Inter", "Noto Kufi Arabic Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", "Noto Kufi Arabic Variable", Georgia, serif;
   --font-serif: "Oranienbaum", Georgia, serif;
   --font-body: "Inter Variable", "Inter", "Noto Kufi Arabic Variable", ui-sans-serif, system-ui, sans-serif;
   /* the design-system plugin replaces Tailwind's palette; restore the neutrals and hues the app uses */
@@ -114,9 +114,9 @@
   --pink: #f280d9;
   --blue: #4073ff;
   --violet: #8c59f2;
-  --grad-verify: linear-gradient(90deg, #f280d9 0%, #734df2 100%);
-  --grad-brand: linear-gradient(100deg, #f280d9 0%, #a57cf6 48%, #4073ff 100%);
-  --grad-brand-soft: linear-gradient(100deg, #fff1fb 0%, #f3eefe 50%, #eef3ff 100%);
+  --grad-verify: #5c29bf; /* solid: verification and AI moments only */
+  --grad-brand: #2c58e6; /* solid accent */
+  --grad-brand-soft: #eef3ff;
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 14px 34px -18px rgba(52, 40, 28, 0.42);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -154,12 +154,6 @@ body {
 }
 
 /* Brand aurora: soft pink and blue light over the silk background (fixed, behind everything) */
-body::before {
-  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(42rem 30rem at -8% -6%, rgba(242, 128, 217, .22), transparent 60%),
-    radial-gradient(46rem 34rem at 108% 104%, rgba(64, 115, 255, .2), transparent 62%);
-}
 
 /* The design-system base layer styles headings and links for content pages;
    inside the app, utilities decide. (html-prefixed for higher specificity than the plugin's base.) */
@@ -221,7 +215,7 @@ body::before {
   .btn-verify {
     display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
     min-height: 56px; padding: 0 1.5rem; border-radius: 28px; color: #fff; font-weight: 600;
-    background: var(--grad-verify); box-shadow: 0 10px 24px rgba(102, 51, 204, .38);
+    background: var(--grad-verify); box-shadow: 0 8px 18px -10px rgba(18, 18, 23, .5);
   }
 
   .jelly {
@@ -294,3 +288,20 @@ body::before {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 .leaflet-container { font: inherit; border-radius: 24px; }
+
+/* ── Type system (v4): Playfair Display for page and section titles, Inter for everything else.
+   Unlayered on purpose so it wins over weight utilities left on older headings. ── */
+main h1, [role="dialog"] h2, .h-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  font-style: normal;
+  text-wrap: balance;
+}
+.section-title, main h2.section-title { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; letter-spacing: -0.005em; }
+html[dir="rtl"] main h1, html[dir="rtl"] .section-title, html[dir="rtl"] .h-display { font-family: "Noto Kufi Arabic Variable", sans-serif; letter-spacing: 0; }
+body { font-size: 16px; }
+::selection { background: #2c58e6; color: #fff; }
+
+/* 3D objects from the Figma file rest on surfaces with the one soft product shadow. */
+.obj3d { filter: drop-shadow(0 10px 14px rgba(40, 30, 20, .22)); }

@@ -36,6 +36,16 @@ Deploy: import the repo on Vercel and add `ANTHROPIC_API_KEY` as an environment 
 
 Tip: open the parent in one window and the teacher in another. Posts and approvals sync live between tabs.
 
+## v4: craft pass
+
+- **Type and colour:** Playfair Display for titles, Inter for UI; decorative gradients, glows and the colour aurora removed. Colour now comes from the Figma 3D objects, photos and the mascot.
+- **Liquid glass:** iOS 26 tab bar from [glisse](https://github.com/0kzh/glisse) with the Figma 3D icons for every role, and Ask Sawa as its own glass button.
+- **Arabic everywhere:** `src/lib/tr.ts` (dictionary + patterns, plus every Arabic name already in the seed data) and `DomTranslator` translate the whole UI when Arabic is on.
+- **Parent:** Figma-style UAE PASS sign-in; onboarding matches Khalid to Sara as her father, a 3D card carousel for priorities, school document upload; working Pay fee (3-instalment plan) and Re-enrol (prerequisite checks then submit); switch-school steps with open-day enquiries; Family tab with approvals, grades, calendar, events sign-up and enquiries.
+- **Teacher:** Events tab with workshops to join and events to bring classes to (jobs removed).
+- **Ask Sawa:** every answer shows what Sawa checked, specific to the role and question.
+- **iOS:** add to the iPhone home screen for a full-screen app (manifest + Apple meta), or open `/device` for an iPhone-sized presenter view.
+
 ## Whole-app pass (v3): one design language for students, parents and teachers
 
 Spec: [`docs/REDESIGN_BRIEF.md`](docs/REDESIGN_BRIEF.md). Highlights:

@@ -1,5 +1,6 @@
 "use client";
 
+import { uiLocale } from "@/lib/tr";
 import { use, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
@@ -26,7 +27,7 @@ export default function OpportunityDetail({ params }: { params: Promise<{ id: st
   const pending = state.approvals.find((a) => a.childId === me.id && a.opportunityId === o.id && a.status === "pending");
   const denied = state.approvals.find((a) => a.childId === me.id && a.opportunityId === o.id && a.status === "denied");
   const needsGuardian = o.needsConsent && ageOf(me) < 15;
-  const fmt = (iso?: string) => (iso ? new Date(iso).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }) : "—");
+  const fmt = (iso?: string) => (iso ? new Date(iso).toLocaleDateString(uiLocale(), { weekday: "short", day: "numeric", month: "short" }) : "—");
 
   const onRegister = () => {
     const r = register(o.id);

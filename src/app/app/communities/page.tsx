@@ -1,5 +1,6 @@
 "use client";
 
+import { uiLocale } from "@/lib/tr";
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -10,6 +11,7 @@ import { COMMUNITIES, COMMUNITY_ACTIVITIES } from "@/lib/seed";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/components/hooks/use-debounce";
 import { ageOf, useStore } from "@/lib/store";
+import { FeedGate } from "@/components/s/StudentHome";
 
 const CATS = [["all", "All"], ["near", "Dubai"], ["stem", "STEM"], ["creative", "Creative"], ["clubs", "Green"], ["sports", "Sports"], ["leadership", "Leadership"]] as const;
 
@@ -54,11 +56,11 @@ export default function Communities() {
             {featured.photo && <img src={featured.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />}
             <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/5" />
             <span className="absolute start-3 top-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-bold">Featured for you</span>
-            {next && <span className="absolute end-3 top-3 inline-flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-1 text-[11px] font-bold text-white"><CalendarDays size={11} /> {new Date(next.startsAt).toLocaleDateString("en-GB", { weekday: "short" })} · {next.titleEn}</span>}
+            {next && <span className="absolute end-3 top-3 inline-flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-1 text-[11px] font-bold text-white"><CalendarDays size={11} /> {new Date(next.startsAt).toLocaleDateString(uiLocale(), { weekday: "short" })} · {next.titleEn}</span>}
             <div className="absolute inset-x-4 bottom-4 flex items-end gap-3">
               <div className="min-w-0 flex-1 text-white">
                 <p className="truncate text-2xl font-bold">{featured.name}</p>
-                <p className="text-xs text-white/85">{featured.schools} schools · {featured.members.toLocaleString()} members · {featured.online} online now</p>
+                <p className="text-xs text-white/85">{`${featured.schools} schools · ${featured.members.toLocaleString()} members · ${featured.online} online now`}</p>
               </div>
               {joined.includes(featured.id) ? <span className="rounded-full bg-white/85 px-4 py-2 text-[13px] font-bold">Joined</span> :
                 <button onClick={(e) => { e.preventDefault(); joinCommunity(featured.id); toast(`Joined ${featured.name}`); }} className="rounded-full bg-white px-4 py-2 text-[13px] font-bold">Join</button>}
@@ -66,6 +68,8 @@ export default function Communities() {
           </motion.section>
         </Link>
       )}
+
+      {!q && cat === "all" && <FeedGate />}
 
       {mine.length > 0 && !q && (
         <section>
@@ -76,9 +80,9 @@ export default function Communities() {
                 <Link href={`/app/communities/${c.id}`} className="glass flex items-center gap-3 rounded-[25px] px-2 py-1.5">
                   <CommunityBadge c={c} size={46} />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[12px] font-semibold text-[var(--muted)]">{c.schools} schools · {c.emirate}</span>
+                    <span className="block text-[12px] font-semibold text-[var(--muted)]">{`${c.schools} schools · ${c.emirate}`}</span>
                     <span className="block truncate font-bold">{c.name}</span>
-                    <span className="block text-xs text-[var(--muted)]">{c.members.toLocaleString()} members</span>
+                    <span className="block text-xs text-[var(--muted)]">{`${c.members.toLocaleString()} members`}</span>
                   </span>
                   {state.posts.some((p) => p.communityId === c.id && Date.now() - +new Date(p.createdAt) < 86_400_000) && <span className="me-3 h-2 w-2 rounded-full bg-blue-500" aria-label="New today" />}
                 </Link>

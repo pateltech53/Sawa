@@ -159,7 +159,7 @@ export function Avatar({ name, size = 44, ring = false, verified = false, src }:
   const initials = name.replace(/\(.*?\)/g, "").trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const hue = [...name].reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
   return (
-    <span className="relative inline-grid shrink-0 place-items-center rounded-full" style={{ width: size, height: size, padding: ring ? 3 : 0, background: ring ? `linear-gradient(90deg,${BRAND.pink},${BRAND.blue})` : undefined }}>
+    <span className="relative inline-grid shrink-0 place-items-center rounded-full" style={{ width: size, height: size, padding: ring ? 3 : 0, background: ring ? "#ffffff" : undefined, boxShadow: ring ? "0 0 0 1px rgba(18,18,23,.12)" : undefined }}>
       <UiAvatar className="h-full w-full border-2 border-white" title={name}>
         {src && <AvatarImage src={src} alt="" className="object-cover" />}
         <AvatarFallback className="font-bold text-[#121217]" style={{ background: `hsl(${hue} 30% 86%)`, fontSize: size * 0.34 }} delayMs={src ? 400 : 0}>{initials}</AvatarFallback>
