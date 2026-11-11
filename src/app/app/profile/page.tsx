@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BarChart3, ChevronRight, Database, FileCheck2, Languages, LogOut, RotateCcw, ShieldCheck, Users } from "lucide-react";
+import { Camera, BarChart3, ChevronRight, Database, FileCheck2, Languages, LogOut, RotateCcw, ShieldCheck, Users } from "lucide-react";
 import { Card, PageTitle, Pill } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { INTERESTS, SCHOOLS } from "@/lib/seed";
@@ -10,6 +11,7 @@ import { ageOf, tierOf, useStore } from "@/lib/store";
 import type { Role } from "@/lib/types";
 import { StudentProfile } from "@/components/s/StudentProfile";
 import { Avatar } from "@/components/s/kit";
+import { CameraCapture } from "@/components/shell/CameraCapture";
 
 export default function Profile() {
   const { me } = useStore();
@@ -19,16 +21,20 @@ export default function Profile() {
 
 function GuardianProfile() {
   const { state, me, myChildren, setLang, signIn, signOut, reset } = useStore();
+  const [camera, setCamera] = useState(false);
   const router = useRouter();
   const L = state.lang;
   const ar = L === "ar";
   if (!me) return null;
   const school = SCHOOLS.find((s) => s.id === me.schoolId);
 
-  const switchTo = (r: Role) => { signIn(r); router.push("/app/today"); };
+  const switchTo = (r: Role) => {
+    const id = signIn(r);
+    router.push(r === "teacher" ? (state.onboarded[id] ? "/onboarding?step=school" : "/onboarding") : "/app/today");
+  };
   const links = [
     { href: "/app/documents", icon: FileCheck2, label: t(L, "tellUsOnce") },
-    ...(me.role === "parent" ? [{ href: "/app/services", icon: Users, label: t(L, "services") }] : [{ href: "/app/classes", icon: Users, label: ar ? "صفوفي" : "My classes" }]),
+    ...(me.role === "parent" ? [{ href: "/app/services", icon: Users, label: t(L, "services") }] : [{ href: "/app/classes", icon: Users, label: ar ? "صفوفي" : "My classes" }, { href: "/onboarding?step=school", icon: Users, label: ar ? "تخصيص المدرسة" : "Customise your school" }]),
   ];
   const about = [
     { href: "/app/impact", icon: BarChart3, label: t(L, "impact") },
@@ -38,8 +44,12 @@ function GuardianProfile() {
   return (
     <div className="space-y-4">
       <PageTitle title={t(L, "profile")} />
+      <CameraCapture open={camera} onClose={() => setCamera(false)} />
       <Card strong className="flex items-center gap-4">
-        <Avatar name={me.name} size={68} ring verified />
+        <button type="button" onClick={() => setCamera(true)} aria-label="Change profile photo" className="relative shrink-0 rounded-full">
+          <Avatar name={me.name} userId={me.id} size={68} ring verified />
+          <span className="absolute -bottom-0.5 -start-0.5 grid h-6 w-6 place-items-center rounded-full border-2 border-white bg-[#121217] text-white"><Camera size={12} /></span>
+        </button>
         <div className="min-w-0">
           <p className="text-xl font-bold">{ar ? me.nameAr : me.name}</p>
           <p className="text-sm text-[var(--muted)]">{ar ? school?.nameAr : school?.name}{me.grade ? ` · ${ar ? "الصف" : "Grade"} ${me.grade}` : ""}</p>

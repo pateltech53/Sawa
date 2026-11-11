@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { Check, X } from "lucide-react";
-import { BRAND } from "@/lib/brand";
+import { useStore } from "@/lib/store";
 import { Avatar as UiAvatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
@@ -155,7 +155,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 export const useToast = () => useContext(ToastCtx);
 
 /* ── Avatar (initials — Sawa never shows real student photos in demo data) ── */
-export function Avatar({ name, size = 44, ring = false, verified = false, src }: { name: string; size?: number; ring?: boolean; verified?: boolean; src?: string }) {
+export function Avatar({ name, size = 44, ring = false, verified = false, src: srcProp, userId }: { name: string; size?: number; ring?: boolean; verified?: boolean; src?: string; userId?: string }) {
+  const { state } = useStore();
+  const src = srcProp ?? (userId ? state.photos?.[userId] : undefined);
   const initials = name.replace(/\(.*?\)/g, "").trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const hue = [...name].reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
   return (
@@ -164,7 +166,7 @@ export function Avatar({ name, size = 44, ring = false, verified = false, src }:
         {src && <AvatarImage src={src} alt="" className="object-cover" />}
         <AvatarFallback className="font-bold text-[#121217]" style={{ background: `hsl(${hue} 30% 86%)`, fontSize: size * 0.34 }} delayMs={src ? 400 : 0}>{initials}</AvatarFallback>
       </UiAvatar>
-      {verified && <span className="absolute -bottom-0.5 -end-0.5 grid place-items-center rounded-full border-[2.5px] border-white bg-blue-500 text-white" style={{ width: size * 0.28, height: size * 0.28 }} aria-label="Verified"><Check size={size * 0.15} strokeWidth={3.5} /></span>}
+      {verified && <span className="absolute -bottom-0.5 -end-0.5 grid place-items-center rounded-full border-[2.5px] border-white bg-blue-500 text-white" style={{ width: size * 0.28, height: size * 0.28 }} role="img" aria-label="Verified"><Check size={size * 0.15} strokeWidth={3.5} /></span>}
     </span>
   );
 }
@@ -224,9 +226,9 @@ export function SectionHead({ title, action }: { title: string; action?: React.R
   );
 }
 
-export function Progress({ value, color = BRAND.blue }: { value: number; color?: string }) {
+export function Progress({ value, color = "var(--accent)", label = "Progress" }: { value: number; color?: string; label?: string }) {
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/70" role="progressbar" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}>
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/70" role="progressbar" aria-label={label} aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}>
       <motion.div className="h-full rounded-full" style={{ background: color }} initial={{ width: 0 }} animate={{ width: `${value}%` }} transition={{ duration: 0.8, ease: EASE }} />
     </div>
   );

@@ -55,7 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const accent = me.role === "teacher" ? state.schoolBrand?.accent : undefined;
 
   return (
-    <div className="min-h-dvh pb-32" style={accent ? ({ ["--school-accent" as string]: accent } as React.CSSProperties) : undefined}>
+    <div className="min-h-dvh pb-32" style={{ ...(accent ? { ["--school-accent" as string]: accent } : {}), ["--accent" as string]: state.prefs?.[me.id]?.accent ?? accent ?? "#2c58e6" } as React.CSSProperties}>
       <header className="sticky top-0 z-30 px-3 pb-2 pt-3 sm:px-6">
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[88px] backdrop-blur-xl [background:linear-gradient(180deg,rgba(214,210,204,.85)_0%,rgba(214,210,204,.6)_70%,rgba(214,210,204,0)_100%)] [mask-image:linear-gradient(180deg,#000_70%,transparent)]" />
         <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-2">
@@ -77,12 +77,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className={cn("mx-auto w-full px-4 pt-4 sm:px-6", wide ? "max-w-[1200px]" : "max-w-[760px]")}>{children}</main>
 
       {/* iOS 26 pattern: a liquid-glass tab bar (glisse) with the Figma 3D icons, and Ask Sawa as its own glass button beside it */}
-      <nav aria-label="Main" className="sawa-tabbar fixed inset-x-0 bottom-3 z-40 mx-auto flex w-[min(100%-16px,480px)] items-center gap-2 pb-[env(safe-area-inset-bottom)]">
+      <nav aria-label="Main" dir="ltr" className="sawa-tabbar fixed inset-x-0 bottom-3 z-40 mx-auto flex w-[min(100%-16px,480px)] items-center justify-center gap-2 pb-[env(safe-area-inset-bottom)]">
         <TabBar
-          className="min-w-0 flex-1"
+          className="shrink-0"
           link={Link}
           value={tabs.find(isOn)?.href ?? null}
-          items={tabs.map((tb) => ({
+          items={(ar ? [...tabs].reverse() : tabs).map((tb) => ({
             value: tb.href,
             href: tb.href,
             label: tb.label,

@@ -93,7 +93,7 @@ function ServiceCarousel({ list, ar, open, setOpen }: { list: typeof SERVICES; a
                 <div className="flex flex-1 flex-col p-4">
                   <h3 className="font-bold leading-snug">{ar ? s.nameAr : s.nameEn}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-[var(--muted)]">{ar ? s.descAr : s.descEn}</p>
-                  <p className="mt-auto flex items-center gap-2 pt-2 text-xs font-semibold text-[var(--ink-2)]"><span className="rounded-full bg-[#2E9E6B]/15 px-2 py-0.5 text-[#1F7A50]">{s.fields.length}/{s.fields.length} {ar ? "معبّأ" : "pre-filled"}</span> ~{look.minutes} {ar ? "دقيقة" : "min"}</p>
+                  <p className="mt-auto flex items-center gap-2 pt-2 text-xs font-semibold text-[var(--ink-2)]"><span className="rounded-full bg-[#1F7A50]/15 px-2 py-0.5 text-[#1F7A50]">{s.fields.length}/{s.fields.length} {ar ? "معبّأ" : "pre-filled"}</span> ~{look.minutes} {ar ? "دقيقة" : "min"}</p>
                   {s.href ? (
                     <Link href={s.href} className="btn-ink mt-3 !min-h-10 w-full text-sm">{ar ? "ابدأ" : "Start"} <ArrowRight size={15} className="rtl:rotate-180" /></Link>
                   ) : open === s.id ? (

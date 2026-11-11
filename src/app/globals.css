@@ -301,7 +301,12 @@ main h1, [role="dialog"] h2, .h-display {
 .section-title, main h2.section-title { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; letter-spacing: -0.005em; }
 html[dir="rtl"] main h1, html[dir="rtl"] .section-title, html[dir="rtl"] .h-display { font-family: "Noto Kufi Arabic Variable", sans-serif; letter-spacing: 0; }
 body { font-size: 16px; }
-::selection { background: #2c58e6; color: #fff; }
+::selection { background: var(--accent); color: #fff; }
 
 /* 3D objects from the Figma file rest on surfaces with the one soft product shadow. */
 .obj3d { filter: drop-shadow(0 10px 14px rgba(40, 30, 20, .22)); }
+
+/* glisse tab bar: one fixed tab width that fits 4 tabs + the Ask button on a phone,
+   so the liquid-glass selection lands exactly on each icon. */
+.sawa-tabbar .lg-tab-bar[data-icons] { --lg-tab-width: min(92px, calc((100vw - 112px) / 4)); --lg-tab-height: 58px; }
+.sawa-tabbar .lg-tab-bar[data-icons] :is(.lg-tab, .lg-tab-copy) { font-size: 11px; font-weight: 600; white-space: nowrap; }

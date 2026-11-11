@@ -10,7 +10,7 @@ import { CommunityBadge } from "./cards";
 import { addDays, sameDay, startOfDay, useAgenda, type AgendaItem } from "@/lib/agenda";
 import { COMMUNITIES, OPPORTUNITIES } from "@/lib/seed";
 import { rankOpportunities } from "@/lib/match";
-import { ageOf, useStore } from "@/lib/store";
+import { ageOf, DEFAULT_PREFS, useStore } from "@/lib/store";
 import { uiLocale, useTr } from "@/lib/tr";
 
 const greeting = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening"; };
@@ -31,6 +31,7 @@ export function StudentHome() {
   const matches = rankOpportunities(me, OPPORTUNITIES).filter((m) => m.score > 20).slice(0, 6);
 
   const needs = open.slice(0, 4);
+  const prefs = { ...DEFAULT_PREFS, ...state.prefs?.[me.id] };
   const newPosts = state.posts.filter((p) => joined.some((c) => c.id === p.communityId) && Date.now() - +new Date(p.createdAt) < 2 * 86_400_000).length + state.chat.filter((m) => joined.some((c) => c.id === m.communityId)).length;
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
@@ -48,7 +49,7 @@ export function StudentHome() {
         </section>
 
         {/* weekly overview */}
-        <section className="glass rounded-[28px] p-4">
+        {prefs.showWeek && <section className="glass rounded-[28px] p-4">
           <div className="mb-3 flex items-center justify-between">
             <div>
               <h2 className="section-title">This week</h2>
@@ -77,7 +78,7 @@ export function StudentHome() {
               ) : dayItems.map((i) => <AgendaRow key={i.id} i={i} />)}
             </motion.ul>
           </AnimatePresence>
-        </section>
+        </section>}
 
         {/* what needs you: clickable task cards */}
         <section>
@@ -93,10 +94,10 @@ export function StudentHome() {
       </div>
 
       <div className="min-w-0 space-y-5">
-        <ClassroomCard connected={classroomConnected} items={items} />
+        {prefs.showClassroom && <ClassroomCard connected={classroomConnected} items={items} />}
 
         {/* Signposts, not copies: Home points to Explore and Communities instead of repeating them */}
-        <section aria-label="More for you" className="space-y-2.5">
+        {prefs.showSignposts && <section aria-label="More for you" className="space-y-2.5">
           {matches[0] && (
             <Link href="/app/explore" className="glass group flex items-center gap-3 overflow-hidden rounded-[24px] p-2.5 pe-4">
               <span className="relative h-[84px] w-[84px] shrink-0 overflow-hidden rounded-[18px]" style={{ background: matches[0].o.tint }}>
@@ -119,7 +120,7 @@ export function StudentHome() {
             </span>
             <ChevronRight size={18} className="shrink-0 opacity-50 rtl:rotate-180" />
           </Link>
-        </section>
+        </section>}
       </div>
     </div>
   );
@@ -180,7 +181,7 @@ function ClassroomCard({ connected, items }: { connected: boolean; items: Agenda
   return (
     <Link href="/app/connections" className="block">
       <motion.section whileTap={{ scale: 0.99 }} className="glass flex items-center gap-3 rounded-[24px] p-4">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#2E9E6B] text-lg font-bold text-white">GC</span>
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#1F7A50] text-lg font-bold text-white">GC</span>
         <div className="min-w-0 flex-1">
           {connected ? (
             <>
@@ -194,7 +195,7 @@ function ClassroomCard({ connected, items }: { connected: boolean; items: Agenda
             </>
           )}
         </div>
-        <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${connected ? "bg-[#2E9E6B]/15 text-[#1F7A50]" : "bg-[#121217] text-white"}`}>{connected ? "Connected" : "Connect"}</span>
+        <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${connected ? "bg-[#1F7A50]/15 text-[#1F7A50]" : "bg-[#121217] text-white"}`}>{connected ? "Connected" : "Connect"}</span>
       </motion.section>
     </Link>
   );

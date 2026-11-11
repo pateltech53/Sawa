@@ -5,7 +5,8 @@
 // Parent:  family match (you are Sara's father) → what Sawa should handle → controls → school documents → tools → done
 // Teacher: verified → school (name, logo, colour) → what you'll use Sawa for → invite → tools → done
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Copy, FileText, ImagePlus, Lock, ScanLine, ShieldCheck, Upload } from "lucide-react";
 import { LangToggle } from "@/components/ui";
@@ -43,13 +44,15 @@ const DOCS = [
 ] as const;
 
 const page = {
-  initial: { opacity: 0, y: 16, filter: "blur(6px)" },
-  animate: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: EASE } },
-  exit: { opacity: 0, y: -10, filter: "blur(6px)", transition: { duration: 0.25, ease: EASE } },
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+  exit: { opacity: 0, y: -10, transition: { duration: 0.25, ease: EASE } },
 };
 
 function Inner() {
   const router = useRouter();
+  const params = useSearchParams();
+  const quickSchool = params.get("step") === "school";
   const toast = useToast();
   const reduce = useReducedMotion();
   const { state, ready, me, myChildren, finishOnboarding, setParentControls, setSchoolBrand, addDocument, setPriorities } = useStore();
@@ -59,7 +62,7 @@ function Inner() {
   const [prio, setPrio] = useState<string[]>([]);
   const [controls, setControls] = useState<ParentControls>({ outsideSchool: true, autoApproveSchoolClubs: true, messages: "school_only", feedWindow: "after_school" });
   const school = SCHOOLS.find((s) => s.id === me?.schoolId);
-  const [brand, setBrand] = useState({ name: "", logo: "", accent: PALETTES[1].accent, image: "" });
+  const [brand, setBrand] = useState({ name: state.schoolBrand?.name ?? "", logo: state.schoolBrand?.logo ?? "", accent: state.schoolBrand?.accent ?? PALETTES[1].accent, image: "" });
   const [toolsDone, setToolsDone] = useState(false);
   const [reading, setReading] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -71,9 +74,11 @@ function Inner() {
     if (!me) router.replace("/");
     else if (me.role === "student") router.replace("/welcome");
   }, [ready, me, router]);
+  useEffect(() => { router.prefetch("/app/today"); }, [router]);
   useEffect(() => { if (school && !brand.name) setBrand((b) => ({ ...b, name: school.name.replace(" (sample)", ""), logo: initials(school.name) })); }, [school, brand.name]);
 
-  const steps = me?.role === "parent" ? ["match", "priorities", "controls", "documents", "tools", "done"] : ["verified", "school", "priorities", "invite", "tools", "done"];
+  // Teachers always confirm their school's look: the full set-up the first time, the school step on every later sign-in.
+  const steps = me?.role === "parent" ? ["match", "priorities", "controls", "documents", "tools", "done"] : quickSchool ? ["school"] : ["verified", "school", "priorities", "invite", "tools", "done"];
   const cur = steps[step];
 
   useEffect(() => {
@@ -91,6 +96,7 @@ function Inner() {
     if (cur === "priorities") setPriorities(prio);
     if (cur === "controls") setParentControls(controls);
     if (cur === "school") setSchoolBrand({ name: brand.name, logo: brand.logo || initials(brand.name), accent: brand.accent, inviteCode: "ALN-8-" + brand.name.length.toString().padStart(2, "0") + "K" });
+    if (cur === "school" && quickSchool) { router.push("/app/today"); return; }
     if (step < steps.length - 1) setStep(step + 1);
     else { finishOnboarding(); router.push("/app/today"); }
   };
@@ -157,7 +163,7 @@ function Inner() {
                 <AnimatePresence>
                   {matched && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass mt-6 flex w-full items-center gap-3 rounded-[22px] p-3.5">
-                      <Avatar name={child.name} size={48} verified />
+                      <Avatar name={child.name} userId={child.id} size={48} verified />
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold">{ar ? `أنت مسجّل والداً لـ${child.nameAr}` : `You're registered as ${child.name}'s father`}</p>
                         <p className="text-xs text-[var(--muted)]">{ar ? `الصف ${child.grade} · ${ageOf(child)} سنة · ${school?.nameAr}` : `Grade ${child.grade} · age ${ageOf(child)} · ${school?.name.replace(" (sample)", "")}`}</p>
@@ -215,7 +221,7 @@ function Inner() {
 
             {cur === "verified" && (
               <div className="glass flex flex-col items-center rounded-[28px] p-6 text-center">
-                <Avatar name={me.name} size={96} ring verified />
+                <Avatar name={me.name} userId={me.id} size={96} ring verified />
                 <p className="h-display mt-3 text-[22px]">{ar ? me.nameAr : me.name}</p>
                 <p className="text-sm text-[var(--muted)]">{ar ? school?.nameAr : school?.name}</p>
                 <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#121217] px-3 py-1.5 text-sm font-semibold text-white"><ShieldCheck size={15} /> {ar ? "معلم موثّق · محاكاة" : "Verified educator · simulated"}</span>
@@ -280,7 +286,7 @@ function Inner() {
           </div>
 
           <button className="btn-glass mt-6 w-full" onClick={next} disabled={!canNext}>
-            {cur === "done" ? (ar ? "ادخل سوا" : "Enter Sawa") : ar ? "متابعة" : "Continue"} <ArrowRight size={20} className="rtl:rotate-180" />
+            {cur === "done" || quickSchool ? (ar ? "ادخل سوا" : "Enter Sawa") : ar ? "متابعة" : "Continue"} <ArrowRight size={20} className="rtl:rotate-180" />
           </button>
         </motion.section>
       </AnimatePresence>
@@ -313,5 +319,5 @@ function Choice({ label, value, options, onChange }: { label: string; value: str
 }
 
 export default function Onboarding() {
-  return <ToastProvider><Inner /></ToastProvider>;
+  return <ToastProvider><Suspense><Inner /></Suspense></ToastProvider>;
 }

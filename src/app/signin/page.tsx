@@ -29,7 +29,7 @@ function SignInInner() {
     setTimeout(() => setStep("ok"), 1600);
     setTimeout(() => {
       const id = signIn(role);
-      router.push(state.onboarded[id] ? "/app/today" : "/onboarding");
+      router.push(role === "teacher" ? (state.onboarded[id] ? "/onboarding?step=school" : "/onboarding") : state.onboarded[id] ? "/app/today" : "/onboarding");
     }, 2700);
   };
 

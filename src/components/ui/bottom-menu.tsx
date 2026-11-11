@@ -83,9 +83,9 @@ export function BottomMenu({ items, placement = "top", align = "center", classNa
               <AnimatePresence initial={false} mode="popLayout">
                 <motion.div
                   key={active.key}
-                  initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                  exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.95, filter: "blur(12px)" }}
+                  initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.25, ease: [0.42, 0, 0.58, 1] }}
                   className="p-1.5"
                 >

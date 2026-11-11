@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as seed from "./seed";
 import type {
-  AgeTier, Announcement, Approval, ChatMsg, CommunityPost, ParentControls, SchoolBrand, TeacherEvent, Lang, Notice, Profile, ProfileFact, Project, Reminder, RequestStatus, Role, ServiceRequest,
+  AgeTier, Announcement, Approval, ChatMsg, CommunityPost, ParentControls, SchoolBrand, TeacherEvent, UserPrefs, Lang, Notice, Profile, ProfileFact, Project, Reminder, RequestStatus, Role, ServiceRequest,
 } from "./types";
 
 const KEY = "sawa-demo-v2"; // bumped with each redesign so an old saved demo cannot hide the new screens
@@ -42,6 +42,8 @@ export interface State {
   payments: { id: string; approvalId?: string; amountAed: number; at: string; label: string }[];
   documents: { id: string; ownerId: string; childId?: string; kind: string; file: string; at: string; fields: number }[];
   priorities: Record<string, string[]>;
+  photos: Record<string, string>;
+  prefs: Record<string, UserPrefs>;
   enquiries: { id: string; ownerId: string; childId?: string; schoolId: string; topic: "open_day" | "transfer"; at: string; status: "sent" | "replied"; reply?: string }[];
   eventSignups: Record<string, string[]>;
 }
@@ -68,7 +70,8 @@ export const initialState = (): State => ({
   helpfulBy: {},
   activitiesJoined: {},
   projects: [
-    { id: "pr-1", userId: "stu-sara", title: "Line-follower robot", role: "Robotics Club · Builder", progress: 45, due: seed.at(20), image: "/figma/interests/coding.png" },
+    { id: "pr-1", userId: "stu-sara", title: "Line-follower robot", role: "Robotics Club · Builder", progress: 45, due: seed.at(20), image: "/figma/interests/coding.png",
+      milestones: [{ id: "m1", label: "Chassis built", done: true }, { id: "m2", label: "Sensors calibrated", done: true }, { id: "m3", label: "Track test under 30 s", done: false }, { id: "m4", label: "Design notebook for judges", done: false }] },
     { id: "pr-2", userId: "stu-sara", title: "Reflections photo series", role: "Photography Club", progress: 30, due: seed.at(28), image: "/figma/interests/photography.png" },
   ],
   verification: {},
@@ -80,9 +83,13 @@ export const initialState = (): State => ({
   payments: [],
   documents: [],
   priorities: {},
+  photos: {},
+  prefs: {},
   enquiries: [],
   eventSignups: {},
 });
+
+export const DEFAULT_PREFS: UserPrefs = { accent: "#2c58e6", showClassroom: true, showSignposts: true, showWeek: true };
 
 export const ageOf = (p?: Profile) => (p?.birthYear ? new Date().getFullYear() - p.birthYear : 30);
 export const tierOf = (p?: Profile): AgeTier => (ageOf(p) < 15 ? "u15" : "15plus");
@@ -167,9 +174,11 @@ function useBuildStore() {
   useEffect(() => {
     if (!ready) return;
     if (skipSave.current) { skipSave.current = false; return; }
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {}
     document.documentElement.lang = state.lang;
     document.documentElement.dir = state.lang === "ar" ? "rtl" : "ltr";
+    // Save off the interaction path: serialising the whole demo on every tap made buttons feel slow.
+    const t = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }, 220);
+    return () => clearTimeout(t);
   }, [state, ready]);
 
   const update = useCallback((fn: (s: State) => State) => setState((s) => evaluateNudges(fn(s))), []);
@@ -388,8 +397,15 @@ function useBuildStore() {
         const id = s.sessionUserId!; const cur = s.activitiesJoined[id] ?? [];
         return { ...s, activitiesJoined: { ...s.activitiesJoined, [id]: cur.includes(activityId) ? cur.filter((x) => x !== activityId) : [...cur, activityId] } };
       }),
-    addProject: (title: string, role: string) =>
-      update((s) => ({ ...s, projects: [...s.projects, { id: `pr-${uid()}`, userId: s.sessionUserId!, title, role, progress: 0 }] })),
+    addProject: (title: string, role: string, extra?: { image?: string; due?: string }) =>
+      update((s) => ({ ...s, projects: [...s.projects, { id: `pr-${uid()}`, userId: s.sessionUserId!, title, role, progress: 0, milestones: [], ...extra }] })),
+    updateProject: (id: string, patch: Partial<import("./types").Project>) =>
+      update((s) => ({ ...s, projects: s.projects.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
+    removeProject: (id: string) => update((s) => ({ ...s, projects: s.projects.filter((p) => p.id !== id) })),
+    setPhoto: (dataUrl: string | null) =>
+      update((s) => { const photos = { ...s.photos }; if (dataUrl) photos[s.sessionUserId!] = dataUrl; else delete photos[s.sessionUserId!]; return { ...s, photos }; }),
+    setPrefs: (patch: Partial<UserPrefs>) =>
+      update((s) => ({ ...s, prefs: { ...s.prefs, [s.sessionUserId!]: { ...DEFAULT_PREFS, ...s.prefs[s.sessionUserId!], ...patch } } })),
     setProjectProgress: (id: string, progress: number) =>
       update((s) => ({ ...s, projects: s.projects.map((p) => (p.id === id ? { ...p, progress: Math.max(0, Math.min(100, progress)) } : p)) })),
     unlockFeed: () => update((s) => ({ ...s, feedUnlockedOn: { ...s.feedUnlockedOn, [s.sessionUserId!]: new Date().toDateString() } })),

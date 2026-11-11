@@ -26,7 +26,9 @@ const OUT = require('path').join(__dirname, '..', 'e2e-screens'); require('fs').
   await p.click('button:has-text("These are correct")'); await p.waitForTimeout(300); await shot('06-confirm');
   await p.click('button:has-text("Confirm & submit")'); await p.waitForTimeout(600); await shot('07-done');
   // teacher posts + office
-  await p.goto(B + '/app/profile'); await p.click('button:has-text("Teacher")'); await p.waitForURL('**/app/today');
+  await p.evaluate(() => { const k = 'sawa-demo-v2'; const s = JSON.parse(localStorage.getItem(k)); s.onboarded['tch-aisha'] = true; localStorage.setItem(k, JSON.stringify(s)); });
+  await p.goto(B + '/app/profile'); await p.click('button:has-text("Teacher")'); await p.waitForURL('**/onboarding?step=school'); await p.waitForTimeout(700); await shot('08a-teacher-school');
+  await p.click('main button.btn-glass'); await p.waitForURL('**/app/today');
   await p.goto(B + '/app/post'); await p.click('button:has-text("Post")>>nth=-1'); await p.waitForTimeout(400); await shot('08-teacher-post');
   await p.goto(B + '/app/office'); await p.click('button:has-text("Approve & complete")'); await p.waitForTimeout(300); await shot('09-office');
   await p.goto(B + '/app/today'); await p.waitForTimeout(1000); await shot('09b-teacher-today');

@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { CLASSROOM_COURSES, CLASSROOM_WORK, COMMUNITY_ACTIVITIES, COMMUNITIES, OPPORTUNITIES } from "./seed";
 import { useStore } from "./store";
-import { BRAND } from "@/lib/brand";
 
 export type AgendaKind = "assignment" | "exam" | "event" | "notice" | "opportunity" | "saved" | "reminder" | "community" | "proactive";
 
@@ -21,8 +20,9 @@ export interface AgendaItem {
 }
 
 export const KIND_COLOR: Record<AgendaKind, string> = {
-  assignment: BRAND.blue, exam: "#D0453B", event: "#2E9E6B", notice: "#7B6A59", opportunity: BRAND.pinkDeep,
-  saved: "#B68A35", reminder: "#121217", community: "#D9822B", proactive: "#B68A35",
+  // AA (4.5:1) with white text, since these colours also fill the small source tags
+  assignment: "#2c58e6", exam: "#b3261e", event: "#1f7a50", notice: "#6b5b4b", opportunity: "#9c2e85",
+  saved: "#85621f", reminder: "#121217", community: "#a14c0f", proactive: "#85621f",
 };
 
 /** Everything that belongs on a student's week, merged from every connected system. */

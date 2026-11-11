@@ -95,7 +95,7 @@ export default function OpportunityDetail({ params }: { params: Promise<{ id: st
           <ul className="mt-2 space-y-2">
             {el.checks.map((c, i) => (
               <motion.li key={c.label} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.25 }} className="flex items-start gap-3 rounded-2xl bg-white/45 px-3 py-2.5">
-                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: i * 0.25 + 0.15, ...spring }} className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-white ${c.ok ? "bg-[#2E9E6B]" : "bg-[#D0453B]"}`}>{c.ok ? <Check size={13} strokeWidth={3} /> : <X size={13} strokeWidth={3} />}</motion.span>
+                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: i * 0.25 + 0.15, ...spring }} className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-white ${c.ok ? "bg-[#1F7A50]" : "bg-[#D0453B]"}`}>{c.ok ? <Check size={13} strokeWidth={3} /> : <X size={13} strokeWidth={3} />}</motion.span>
                 <span><span className="block text-sm font-semibold">{c.label}</span><span className="block text-xs text-[var(--muted)]">{c.detail}</span></span>
               </motion.li>
             ))}
@@ -106,7 +106,7 @@ export default function OpportunityDetail({ params }: { params: Promise<{ id: st
       <div className="sticky bottom-28 z-10 space-y-2">
         <div className="glass flex gap-2 rounded-[28px] p-2">
           {registered ? (
-            <span className="btn-ghost flex-1 !bg-[#2E9E6B]/15 !text-[#1F7A50]"><Check size={17} /> Registered</span>
+            <span className="btn-ghost flex-1 !bg-[#1F7A50]/15 !text-[#1F7A50]"><Check size={17} /> Registered</span>
           ) : pending ? (
             <span className="btn-ghost flex-1"><Send size={16} /> Waiting for guardian</span>
           ) : !el.ok ? (

@@ -59,9 +59,9 @@ function StudentsInner() {
                       const reached = STEPS.indexOf(e.sponsorship!.status) >= i;
                       return (
                         <li key={s} className="flex flex-1 items-center gap-1">
-                          <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[10px] font-bold ${reached ? "bg-[#2E9E6B] text-white" : "bg-black/10"}`}>{reached ? <Check size={12} strokeWidth={3} /> : i + 1}</span>
+                          <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[10px] font-bold ${reached ? "bg-[#1F7A50] text-white" : "bg-black/10"}`}>{reached ? <Check size={12} strokeWidth={3} /> : i + 1}</span>
                           <span className={`text-[11px] font-semibold capitalize ${reached ? "" : "text-[var(--muted)]"}`}>{s}</span>
-                          {i < 2 && <span className={`h-0.5 flex-1 rounded ${STEPS.indexOf(e.sponsorship!.status) > i ? "bg-[#2E9E6B]" : "bg-black/10"}`} />}
+                          {i < 2 && <span className={`h-0.5 flex-1 rounded ${STEPS.indexOf(e.sponsorship!.status) > i ? "bg-[#1F7A50]" : "bg-black/10"}`} />}
                         </li>
                       );
                     })}
@@ -85,7 +85,7 @@ function StudentsInner() {
           <ul className="divide-y divide-black/5">
             {roster.map((s, i) => (
               <li key={s.id} className="flex items-center gap-3 py-2.5">
-                <Avatar name={s.name} size={38} />
+                <Avatar name={s.name} userId={s.id} size={38} />
                 <span className="min-w-0 flex-1"><span className="block font-semibold">{ar ? s.nameAr : s.name}</span><span className="block text-xs text-[var(--muted)]">{ar ? "الصف" : "Grade"} {s.grade} · {ageOf(s)} {ar ? "سنة" : "yrs"}</span></span>
                 <span className="text-xs font-semibold text-[var(--muted)]">{["8A", "8A", "8B"][i % 3]}</span>
               </li>

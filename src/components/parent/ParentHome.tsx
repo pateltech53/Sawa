@@ -88,7 +88,7 @@ export function ParentHome() {
             </div>
           )}
 
-          <div className="relative mx-auto mt-4 w-fit"><Avatar name={child.name} size={116} ring verified /></div>
+          <div className="relative mx-auto mt-4 w-fit"><Avatar name={child.name} userId={child.id} size={116} ring verified /></div>
           <p className="relative mt-2 text-lg font-bold">{firstName}</p>
           <p className="relative text-sm text-[var(--muted)]">{ar ? school?.nameAr : school?.name?.replace(" (sample)", "")}</p>
 
@@ -152,7 +152,7 @@ export function ParentHome() {
             <ul className="divide-y divide-black/5">
               {done.map((d) => (
                 <li key={d.id} className="flex items-center gap-3 py-2.5">
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#2E9E6B] text-white"><Check size={14} strokeWidth={3} /></span>
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#1F7A50] text-white"><Check size={14} strokeWidth={3} /></span>
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">{d.title}</span>
                   <span className="shrink-0 text-xs text-[var(--muted)]">{d.note}</span>
                 </li>
@@ -187,7 +187,7 @@ export function ParentHome() {
                 const paid = i < paidFees, isNext = i === paidFees;
                 return (
                   <li key={f.n} className="flex items-center gap-3 py-2.5">
-                    <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${paid ? "bg-[#2E9E6B] text-white" : isNext ? "bg-[#121217] text-white" : "bg-black/8"}`}>{paid ? <Check size={14} strokeWidth={3} /> : f.n}</span>
+                    <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${paid ? "bg-[#1F7A50] text-white" : isNext ? "bg-[#121217] text-white" : "bg-black/8"}`}>{paid ? <Check size={14} strokeWidth={3} /> : f.n}</span>
                     <span className="flex-1 text-sm">{ar ? `القسط ${f.n}` : `Instalment ${f.n}`} · {fmtDate(f.dueAt, L)}</span>
                     <span className="text-sm font-semibold tabular-nums">AED {f.amountAed}</span>
                   </li>
@@ -203,7 +203,7 @@ export function ParentHome() {
             }}>
               <CreditCard size={17} /> {ar ? `ادفع ${nextFee.amountAed} درهم` : `Pay AED ${nextFee.amountAed}`}
             </button>
-          ) : <p className="rounded-2xl bg-[#2E9E6B]/12 p-3 text-sm font-semibold text-[#1F7A50]">{ar ? "تم دفع كل الأقساط" : "All instalments paid"}</p>}
+          ) : <p className="rounded-2xl bg-[#1F7A50]/12 p-3 text-sm font-semibold text-[#1F7A50]">{ar ? "تم دفع كل الأقساط" : "All instalments paid"}</p>}
         </div>
       </Sheet>
 
@@ -226,7 +226,7 @@ export function ParentHome() {
                   <li key={x.id} className="flex items-center gap-3 rounded-[18px] bg-white p-3">
                     <span className="min-w-0 flex-1"><span className="block truncate font-semibold">{ar ? x.nameAr : x.name.replace(" (sample)", "")}</span><span className="block text-xs text-[var(--muted)]">{x.area} · {x.curriculum}</span></span>
                     {sent ? (
-                      <span className="shrink-0 rounded-full bg-[#2E9E6B]/12 px-2.5 py-1 text-xs font-semibold text-[#1F7A50]">{sent.status === "replied" ? (ar ? "ردّت المدرسة" : "Replied") : ar ? "أُرسل" : "Sent"}</span>
+                      <span className="shrink-0 rounded-full bg-[#1F7A50]/12 px-2.5 py-1 text-xs font-semibold text-[#1F7A50]">{sent.status === "replied" ? (ar ? "ردّت المدرسة" : "Replied") : ar ? "أُرسل" : "Sent"}</span>
                     ) : (
                       <button className="btn-ink !min-h-9 shrink-0 !px-3 text-xs" disabled={enqSchool === x.id} onClick={() => {
                         setEnqSchool(x.id);

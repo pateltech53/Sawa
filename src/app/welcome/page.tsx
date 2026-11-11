@@ -22,9 +22,9 @@ const SAMPLE_IDS = [
 ] as const;
 
 const page = {
-  initial: { opacity: 0, y: 18, filter: "blur(6px)" },
-  animate: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: EASE } },
-  exit: { opacity: 0, y: -12, filter: "blur(6px)", transition: { duration: 0.3, ease: EASE } },
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+  exit: { opacity: 0, y: -12, transition: { duration: 0.3, ease: EASE } },
 };
 
 export default function Welcome() {
@@ -543,6 +543,9 @@ function MatchingStep({ profile, onDone }: { profile: Profile; onDone: () => voi
 }
 
 function DoneStep({ profile, onEnter }: { profile: Profile; onEnter: () => void }) {
+  const router = useRouter();
+  const [going, setGoing] = useState(false);
+  useEffect(() => { router.prefetch("/app/today"); }, [router]);
   const ranked = useMemo(() => rankOpportunities(profile, OPPORTUNITIES).slice(0, 3), [profile]);
   const comms = COMMUNITIES.filter((c) => c.interests.some((i) => profile.interests.includes(i)));
   const age = new Date().getFullYear() - (profile.birthYear ?? 2012);
@@ -565,7 +568,7 @@ function DoneStep({ profile, onEnter }: { profile: Profile; onEnter: () => void 
         ))}
       </ul>
       {age < 15 && <p className="mt-4 rounded-2xl bg-white/40 p-3 text-xs text-[var(--muted)]">Under-15 tier: your school&apos;s clubs are open to you; activities outside school go to your guardian first. No public posts or direct messages.</p>}
-      <button className="btn-ink mt-auto w-full !min-h-14 text-[17px]" onClick={onEnter}>Enter Sawa</button>
+      <button className="btn-ink mt-auto w-full !min-h-14 text-[17px]" disabled={going} aria-busy={going} onClick={() => { setGoing(true); onEnter(); }}>{going ? "Opening your Sawa…" : "Enter Sawa"}</button>
     </motion.section>
   );
 }

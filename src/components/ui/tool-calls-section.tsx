@@ -49,7 +49,7 @@ function StatusBadge({ s }: { s: ToolStatus }) {
   const map = {
     pending: ["bg-black/5 text-[var(--muted)]", <Clock key="i" size={11} />],
     connecting: ["bg-blue-50 text-blue-700", <Loader2 key="i" size={11} className="animate-spin" />],
-    connected: ["bg-[#2E9E6B]/15 text-[#1F7A50]", <Check key="i" size={11} strokeWidth={3} />],
+    connected: ["bg-[#1F7A50]/15 text-[#1F7A50]", <Check key="i" size={11} strokeWidth={3} />],
     needs_approval: ["bg-aegold-100 text-aegold-800", <Clock key="i" size={11} />],
   } as const;
   const [cls, icon] = map[s];

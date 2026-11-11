@@ -9,11 +9,14 @@ import { DotPattern } from "@/components/ui/dot-pattern";
 import { ShiningText } from "@/components/ui/shining-text";
 import { ToolCallsSection } from "@/components/ui/tool-calls-section";
 import { agentSteps } from "@/lib/agent-steps";
+import { planTask, TASK_EXAMPLES, type AgentTask } from "@/lib/agent-tasks";
+import { TaskCard } from "@/components/shell/TaskCard";
 import { useStore } from "@/lib/store";
 import { MessageLoading } from "@/components/ui/message-loading";
 
 interface Msg {
   role: "user" | "sawa";
+  task?: AgentTask;
   q?: string;
   text: string;
   sources?: { n: number; title: string; url: string; name: string }[];
@@ -41,7 +44,8 @@ const SUGGEST: Record<string, { topicEn: string; topicAr: string; icon: typeof C
 };
 
 function AskInner() {
-  const { state, me, visibleNotices, logAi } = useStore();
+  const store = useStore();
+  const { state, me, visibleNotices, logAi, myChildren } = store;
   const ar = state.lang === "ar";
   const params = useSearchParams();
   const [msgs, setMsgs] = useState<Msg[]>([]);
@@ -54,6 +58,13 @@ function AskInner() {
     if (!question.trim() || busy) return;
     setMsgs((m) => [...m, { role: "user", text: question }]);
     setQ("");
+    // Agentic path: if this is something Sawa can do, show the plan and do it here in the chat.
+    const task = planTask(question, me, state, myChildren, store, ar);
+    if (task) {
+      setMsgs((m) => [...m, { role: "sawa", text: "", task }]);
+      logAi(question, "task:" + task.id);
+      return;
+    }
     setBusy(true);
     try {
       const today = visibleNotices.filter((n) => n.status === "open").map((n) => ({ title: ar ? n.titleAr : n.titleEn, source: n.sourceSystem, due: n.dueAt, kind: n.kind }));
@@ -98,7 +109,13 @@ function AskInner() {
               <span className="inline-flex items-center gap-1 rounded-full bg-white/12 px-2.5 py-1 ring-1 ring-white/15"><ShieldCheck size={12} /> {ar ? "تُحذف الأسماء والأرقام قبل الإرسال" : "Names & IDs stripped before sending"}</span>
               <span className="rounded-full bg-white/12 px-2.5 py-1 ring-1 ring-white/15">{ar ? "يرفض المواضيع غير الآمنة" : "Refuses unsafe topics"}</span>
             </div>
-            <div className="mt-6 grid w-full gap-2.5 text-start sm:grid-cols-3">
+            <section className="mt-6 w-full rounded-[24px] bg-white p-3 text-start text-[#121217]">
+              <p className="mb-2 flex items-center gap-1.5 px-1 text-xs font-semibold text-[#5c29bf]"><Sparkles size={13} /> {ar ? "اطلب من سوا أن ينجزها" : "Ask Sawa to do it"}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {(TASK_EXAMPLES[me?.role ?? "parent"] ?? []).map((x) => <button key={x.en} dir="auto" className="chip !bg-[#f1ecfb] !border-transparent" onClick={() => ask(ar ? x.ar : x.en)}>{ar ? x.ar : x.en}</button>)}
+              </div>
+            </section>
+            <div className="mt-2.5 grid w-full gap-2.5 text-start sm:grid-cols-3">
               {groups.map((g) => (
                 <section key={g.topicEn} className="rounded-[24px] bg-white/[.08] p-3 ring-1 ring-white/15 backdrop-blur-md">
                   <p className="mb-2 flex items-center gap-1.5 px-1 text-[11px] font-bold uppercase tracking-wide text-white/60"><g.icon size={13} /> {ar ? g.topicAr : g.topicEn}</p>
@@ -124,6 +141,8 @@ function AskInner() {
             <li key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} pop`}>
               {m.role === "user" ? (
                 <p className="max-w-[85%] rounded-[24px] rounded-ee-md bg-[#5c29bf] px-4 py-3 text-white" dir="auto">{m.text}</p>
+              ) : m.task ? (
+                <TaskCard task={m.task} ar={ar} />
               ) : (
                 <div className="max-w-[92%] rounded-[24px] rounded-es-md bg-white/95 px-4 py-3 text-[#121217] shadow-[0_16px_34px_-18px_rgba(0,0,0,.6)]">
                   <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-[#5C29BF]"><Sparkles size={12} /> Sawa</p>

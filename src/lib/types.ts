@@ -201,7 +201,10 @@ export interface Project {
   progress: number;
   due?: string;
   image?: string;
+  milestones?: { id: string; label: string; done: boolean }[];
+  notes?: string;
 }
+export interface UserPrefs { accent: string; showClassroom: boolean; showSignposts: boolean; showWeek: boolean }
 
 export interface Approval {
   id: string;

@@ -160,7 +160,7 @@ export default function CommunityDetail({ params }: { params: Promise<{ id: stri
                       <span className="flex items-center gap-2 text-xs text-[var(--muted)]"><Clock size={11} /> {new Date(a.startsAt).toLocaleTimeString(uiLocale(), { hour: "2-digit", minute: "2-digit" })} <MapPin size={11} /> {a.place}</span>
                     </span>
                     <motion.button whileTap={{ scale: 0.92 }} disabled={!joined} onClick={() => { toggleActivity(a.id); toast(on ? "Removed from your calendar" : "Added to your calendar"); }} aria-pressed={on}
-                      className={`rounded-full px-3 py-2 text-xs font-bold transition disabled:opacity-40 ${on ? "bg-[#2E9E6B]/15 text-[#1F7A50]" : "bg-[#121217] text-white"}`}>
+                      className={`rounded-full px-3 py-2 text-xs font-bold transition disabled:opacity-40 ${on ? "bg-[#1F7A50]/15 text-[#1F7A50]" : "bg-[#121217] text-white"}`}>
                       {on ? <span className="inline-flex items-center gap-1"><CalendarCheck size={13} /> Going</span> : "I'm going"}
                     </motion.button>
                   </li>

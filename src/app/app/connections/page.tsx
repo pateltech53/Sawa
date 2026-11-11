@@ -20,7 +20,7 @@ const APPS = [
 ] as const;
 
 const STATUS: Record<string, [string, string]> = {
-  assigned: ["Assigned", "bg-blue-500/12 text-blue-700"], submitted: ["Turned in", "bg-[#2E9E6B]/15 text-[#1F7A50]"],
+  assigned: ["Assigned", "bg-blue-500/12 text-blue-700"], submitted: ["Turned in", "bg-[#1F7A50]/15 text-[#1F7A50]"],
   returned: ["Returned", "bg-black/8 text-[var(--ink-2)]"], missing: ["Missing", "bg-[#D0453B]/12 text-[#a3271f]"],
 };
 
@@ -58,7 +58,7 @@ export default function Connections() {
                 <span className="block text-xs text-[var(--muted)]">{"viaSchool" in a ? a.desc : on ? `Connected (demo) · ${new Date(connected[a.key].connectedAt).toLocaleDateString(uiLocale(), { day: "numeric", month: "short" })}` : a.desc}</span>
               </span>
               {"viaSchool" in a ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#2E9E6B]/15 px-3 py-1.5 text-xs font-bold text-[#1F7A50]"><Check size={12} /> On</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#1F7A50]/15 px-3 py-1.5 text-xs font-bold text-[#1F7A50]"><Check size={12} /> On</span>
               ) : "unavailable" in a ? (
                 <span className="rounded-full bg-white/50 px-3 py-1.5 text-xs font-semibold text-[var(--muted)]">Not available</span>
               ) : on ? (
@@ -165,7 +165,7 @@ function ConnectFlow({ appKey, onClose, onConnected }: { appKey: string | null; 
         )}
         {stage === "done" && (
           <motion.div key="d" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="space-y-3 text-center">
-            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={spring} className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#2E9E6B] text-white"><Check size={30} strokeWidth={3} /></motion.span>
+            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={spring} className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#1F7A50] text-white"><Check size={30} strokeWidth={3} /></motion.span>
             <p className="text-[15px]">{CLASSROOM_COURSES.length} classes and {CLASSROOM_WORK.length} assignments are now on your Home and Calendar.</p>
             <button className="btn-ink w-full" onClick={onClose}>View my classes</button>
           </motion.div>

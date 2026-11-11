@@ -56,9 +56,9 @@ const LogoColumn: React.FC<LogoColumnProps> = React.memo(function LogoColumn({ l
         <motion.div
           key={`${logos[currentIndex].id}-${currentIndex}`}
           className="absolute inset-0 flex items-center justify-center"
-          initial={{ y: "10%", opacity: 0, filter: "blur(8px)" }}
-          animate={{ y: "0%", opacity: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 300, damping: 20, mass: 1, bounce: 0.2, duration: 0.5 } }}
-          exit={{ y: "-20%", opacity: 0, filter: "blur(6px)", transition: { type: "tween", ease: "easeIn", duration: 0.3 } }}
+          initial={{ y: "10%", opacity: 0 }}
+          animate={{ y: "0%", opacity: 1, transition: { type: "spring", stiffness: 300, damping: 20, mass: 1, bounce: 0.2, duration: 0.5 } }}
+          exit={{ y: "-20%", opacity: 0, transition: { type: "tween", ease: "easeIn", duration: 0.3 } }}
         >
           <CurrentLogo className="max-h-[80%] max-w-[90%]" />
         </motion.div>

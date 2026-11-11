@@ -36,6 +36,16 @@ Deploy: import the repo on Vercel and add `ANTHROPIC_API_KEY` as an environment 
 
 Tip: open the parent in one window and the teacher in another. Posts and approvals sync live between tabs.
 
+## v5: agentic Sawa, photos, customisation
+
+- **Ask Sawa does the task in the chat** (`src/lib/agent-tasks.ts`, `TaskCard`): pay a fee instalment, re-enrol (it stops and explains if the ID must be updated first), sign a child up for an event, approve a permission, ask a school about open days, add reminders, connect Google Classroom, join a community, register for an opportunity, post to a class, host an event. Each shows its steps and runs only after one tap.
+- **Profile photos from the live camera** (`CameraCapture`), or upload; shown everywhere that person appears (a student's photo also appears on their parent's home).
+- **Students make Sawa theirs:** accent colour, which home sections show, and projects with covers, due dates, milestones, notes, rename and delete.
+- **Teachers always confirm their school's look** on sign-in (name, logo, colour).
+- Glisse tab bar fixed so the glass selection lands on the icons (also in Arabic). Mascot loops play forward then back. Saving is debounced and blur transitions removed, so taps respond faster.
+- **TDRA UAE Design System check** (github.com/TDRA-ae/aegov-dls 3.x): built on `@aegov/design-system`; UI and Arabic type from its token set (Inter, Noto Kufi Arabic), Playfair only for English display titles; aegold reserved for official/UAE PASS marks; RTL, visible focus, reduced motion. `npm run a11y` runs axe WCAG 2.1 AA on 22 screens in both languages: **0 violations**.
+- Tests: `npm run e2e`, `npm run e2e:student`, `npm run e2e:agent`, `npm run a11y` (app running).
+
 ## v4: craft pass
 
 - **Type and colour:** Playfair Display for titles, Inter for UI; decorative gradients, glows and the colour aurora removed. Colour now comes from the Figma 3D objects, photos and the mascot.

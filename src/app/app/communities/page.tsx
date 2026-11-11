@@ -56,7 +56,7 @@ export default function Communities() {
             {featured.photo && <img src={featured.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />}
             <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/5" />
             <span className="absolute start-3 top-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-bold">Featured for you</span>
-            {next && <span className="absolute end-3 top-3 inline-flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-1 text-[11px] font-bold text-white"><CalendarDays size={11} /> {new Date(next.startsAt).toLocaleDateString(uiLocale(), { weekday: "short" })} · {next.titleEn}</span>}
+            {next && <span className="absolute end-3 top-3 inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white"><CalendarDays size={11} /> {new Date(next.startsAt).toLocaleDateString(uiLocale(), { weekday: "short" })} · {next.titleEn}</span>}
             <div className="absolute inset-x-4 bottom-4 flex items-end gap-3">
               <div className="min-w-0 flex-1 text-white">
                 <p className="truncate text-2xl font-bold">{featured.name}</p>

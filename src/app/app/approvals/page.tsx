@@ -63,7 +63,7 @@ function FamilyInner() {
     <div className="space-y-4">
       {child && (
         <header className="flex items-center gap-3">
-          <Avatar name={child.name} size={52} verified />
+          <Avatar name={child.name} userId={child.id} size={52} verified />
           <div className="min-w-0 flex-1">
             <h1 className="text-[28px] leading-tight">{ar ? `عائلة ${child.nameAr}` : `${child.name.split(" ")[0]}'s family hub`}</h1>
             <p className="text-sm text-[var(--muted)]">{ar ? `الصف ${child.grade} · ${pending.length} بانتظار قرارك` : `Grade ${child.grade} · ${pending.length} waiting for your decision`}</p>
@@ -215,7 +215,7 @@ function FamilyInner() {
                   <li key={e.id} className="rounded-[18px] bg-white/70 p-3">
                     <p className="font-semibold">{ar ? s?.nameAr : s?.name.replace(" (sample)", "")}</p>
                     <p className="text-xs text-[var(--muted)]">{ar ? "استفسار عن الأيام المفتوحة" : "Open day enquiry"} · {fmtDate(e.at, L, true)}</p>
-                    {e.reply ? <p className="mt-2 flex gap-2 rounded-xl bg-[#2E9E6B]/10 p-2.5 text-sm"><MessageSquareReply size={15} className="mt-0.5 shrink-0 text-[#1F7A50]" />{e.reply}</p> : <p className="mt-2 text-xs text-[var(--muted)]">{ar ? "بانتظار رد المدرسة" : "Waiting for the school's reply"}</p>}
+                    {e.reply ? <p className="mt-2 flex gap-2 rounded-xl bg-[#1F7A50]/10 p-2.5 text-sm"><MessageSquareReply size={15} className="mt-0.5 shrink-0 text-[#1F7A50]" />{e.reply}</p> : <p className="mt-2 text-xs text-[var(--muted)]">{ar ? "بانتظار رد المدرسة" : "Waiting for the school's reply"}</p>}
                   </li>
                 );
               })}

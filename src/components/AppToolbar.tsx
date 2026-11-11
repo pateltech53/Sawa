@@ -15,6 +15,7 @@ import { t } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import type { Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { Avatar } from "@/components/s/kit";
 
 type Hit = { id: string; title: string; sub: string; href: string };
 
@@ -125,7 +126,7 @@ export function AppToolbar() {
       render: (close) => (
         <div className="min-w-[240px]">
           <div className="flex items-center gap-3 px-3 pb-2 pt-2">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-[image:var(--grad-brand)] text-sm font-bold text-white">{me.avatar}</span>
+            <Avatar name={me.name} userId={me.id} size={40} />
             <span className="min-w-0">
               <span className="block truncate font-semibold">{ar ? me.nameAr : me.name}</span>
               <span className="block text-xs text-muted-foreground">{t(L, me.role)}</span>

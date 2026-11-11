@@ -91,7 +91,7 @@ export function TeacherToday() {
                     <span className="block truncate font-semibold">{p.cls}</span>
                     <span className="block text-xs text-[var(--muted)]">{p.room}{p.students ? ` · ${p.students} ${ar ? "طلاب" : "students"}` : ""}</span>
                   </span>
-                  {now && <span className="rounded-full bg-blue-500 px-2.5 py-1 text-[11px] font-bold text-white">{ar ? "الآن" : "Now"}</span>}
+                  {now && <span className="rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white">{ar ? "الآن" : "Now"}</span>}
                 </li>
               );
             })}
